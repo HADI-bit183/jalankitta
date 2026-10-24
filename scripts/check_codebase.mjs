@@ -5,6 +5,7 @@ const EXPECTED_SRI = {
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js': 'sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js': 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=',
   'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js': 'sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr',
+  'https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js': 'sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu',
 };
 
 const HTML_FILES = ['index.html', 'app.html', 'admin.html', 'login.html'];

@@ -207,6 +207,9 @@ language plpgsql
 security definer
 as $$
 begin
+  -- Kunci transaksi baris spesifik (Advisory Xact Lock) untuk mencegah race condition update paralel
+  perform pg_advisory_xact_lock(hashtext('laporan_update_' || old.id::text));
+
   if (new.id <> old.id)
      or (new.nama           is distinct from old.nama)
      or (new.kategori_rusak is distinct from old.kategori_rusak)
@@ -901,8 +904,12 @@ as $$
   select *
   from public.laporan_publik
   where (
-    koordinat_lng between min_lng and max_lng
-    and koordinat_lat between min_lat and max_lat
+    -- Operator spasial && dengan ST_MakeEnvelope untuk pemanfaatan indeks GIST instan
+    (exists (select 1 from pg_proc where proname = 'st_makeenvelope') and
+     st_setsrid(st_makepoint(koordinat_lng, koordinat_lat), 4326) && st_makeenvelope(min_lng, min_lat, max_lng, max_lat, 4326))
+    or
+    (not exists (select 1 from pg_proc where proname = 'st_makeenvelope') and
+     koordinat_lng between min_lng and max_lng and koordinat_lat between min_lat and max_lat)
   )
   and (p_kategori is null or p_kategori = 'all' or kategori_rusak = p_kategori)
   order by created_at desc

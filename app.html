@@ -2,7 +2,7 @@
 <html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://server.arcgisonline.com https://unpkg.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://router.project-osrm.org; object-src 'none'; base-uri 'self'; form-action 'self'" />
   <title>JalanKitta — Peta &amp; Laporan Infrastruktur Jalan Provinsi Lampung</title>
   <meta name="description"
@@ -42,7 +42,7 @@
   <link rel="stylesheet" href="assets/css/style.css" />
   <link rel="stylesheet" href="assets/css/tailwind.css" />
 </head>
-<body class="font-sans selection:bg-amber-500/30 selection:text-amber-500">
+<body class="font-sans selection:bg-amber-500/30 selection:text-amber-500 overflow-x-hidden min-h-screen">
   <a href="#main-content" class="skip-link">Lewati ke konten utama</a>
 
   <!-- Ambient Radiant Mesh Background -->
@@ -445,6 +445,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js" integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu" crossorigin="anonymous"></script>
   <script src="assets/js/auth.js"></script>
 
   <script>
@@ -889,6 +890,13 @@
         map.flyTo([-5.25, 105.15], 11, { duration: 1.5 });
       });
 
+      const sanitizeHtml = (str) => {
+        const raw = String(str ?? '');
+        if (typeof window.DOMPurify !== 'undefined' && typeof window.DOMPurify.sanitize === 'function') {
+          return window.DOMPurify.sanitize(raw, { ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'span'], ALLOWED_ATTR: ['class', 'style'] });
+        }
+        return raw.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      };
       const escapeHtml = (str) => String(str ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
       const makePulseIcon = (color) => L.divIcon({ className: 'custom-div-icon', html: `<div class="pulse-marker" style="--c:${color}"><span></span></div>`, iconSize: [18, 18], iconAnchor: [9, 9] });
       const safeImageUrl = (url) => { try { const u = new URL(url); return ['https:', 'http:'].includes(u.protocol) ? u.href : null; } catch { return null; } };
@@ -1009,12 +1017,15 @@
         const fotoSrc = foto_url ? safeImageUrl(foto_url) : null;
         const fotoHtml = fotoSrc ? `<a href="${escapeHtml(fotoSrc)}" target="_blank" rel="noopener" class="mb-2 mt-1.5 block overflow-hidden rounded-xl border border-slate-100"><img src="${escapeHtml(fotoSrc)}" alt="Foto dokumentasi kerusakan jalan" loading="lazy" class="h-28 w-full object-cover transition hover:scale-105" /></a>` : '';
 
+        const cleanDeskripsi = sanitizeHtml(deskripsi);
+        const cleanNama = escapeHtml(formatNamaPublik(nama));
+
         const marker = L.marker([koordinat_lat, koordinat_lng], { icon: makePulseIcon(color) }).bindPopup(`
             <div class="min-w-[180px] max-w-[220px]">
               <p class="text-[11px] font-bold uppercase tracking-wider text-ink">Laporan Warga</p>${fotoHtml}
-              <p class="mt-0.5 font-display text-base font-bold text-navy">${escapeHtml(formatNamaPublik(nama))}</p>
+              <p class="mt-0.5 font-display text-base font-bold text-navy">${cleanNama}</p>
               <span class="mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:${color}25;color:${color}">${label}</span>
-              <p class="mt-2 text-sm text-navy">${escapeHtml(deskripsi)}</p>
+              <p class="mt-2 text-sm text-navy break-words">${cleanDeskripsi}</p>
               <p class="mt-2 text-[10px] font-medium text-ink">Dilaporkan pada ${date}</p>
             </div>
           `);

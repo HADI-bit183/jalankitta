@@ -41,7 +41,7 @@
     html.dark main code { color: #fcd34d; background: rgba(255,255,255,.1) !important; }
   </style>
 </head>
-<body class="font-sans text-navy antialiased min-h-screen flex flex-col selection:bg-amber-500/30">
+<body class="font-sans text-navy antialiased min-h-screen flex flex-col selection:bg-amber-500/30 overflow-x-hidden">
   <a href="#main-content" class="skip-link">Lewati ke konten utama</a>
 
   <!-- Ambient Radiant Mesh Background -->
@@ -236,8 +236,9 @@
     <span id="toast-message">Status berhasil diperbarui!</span>
   </div>
 
-  <!-- Script Supabase & Auth -->
+  <!-- Script Supabase, Auth & Sanitizer -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js" integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu" crossorigin="anonymous"></script>
   <script src="assets/js/auth.js"></script>
   <script>
     (() => {
@@ -386,7 +387,13 @@
       }
 
       // Sanitasi XSS & URL Aman
-      const esc = (s = '') => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const esc = (s = '') => {
+        const raw = String(s);
+        if (typeof window.DOMPurify !== 'undefined' && typeof window.DOMPurify.sanitize === 'function') {
+          return window.DOMPurify.sanitize(raw, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+        }
+        return raw.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      };
       const safeUrl = (u) => {
         try {
           const x = new URL(u);
