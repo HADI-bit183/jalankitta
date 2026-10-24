@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://server.arcgisonline.com https://unpkg.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://router.project-osrm.org; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <title>JalanKitta — Platform Pemantauan & Pelaporan Jalan Cerdas Lampung</title>
+  <meta name="description"
+    content="JalanKitta: platform pemantauan kondisi jalan Provinsi Lampung berbasis peta interaktif modern dan pelaporan warga terverifikasi. Mendukung SDG 9." />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="JalanKitta — Platform Pemantauan Jalan Cerdas Provinsi Lampung" />
+  <meta property="og:description" content="Pantau jalan, laporkan cepat, dan wujudkan Lampung yang tangguh dengan peta interaktif. Prototipe SDG 9." />
+  <meta name="theme-color" content="#0F172A" />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg" />
+
+  <!-- Preload theme to avoid flickering -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+
+  <noscript>
+    <style>
+      .reveal { opacity: 1 !important; transform: none !important; }
+    </style>
+  </noscript>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
+    rel="stylesheet" />
+
+
+  <script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js" integrity="sha384-0v3Wh0ZtiQBYCYywQoeMDA5mAw5Z01p0lhorqy0BlwFrcN6u3lmN7K0U/e1uezmr" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+</head>
+<body class="selection:bg-amber-500/30 selection:text-amber-500">
+  <a href="#main-content" class="skip-link">Lewati ke konten utama</a>
+
+  <!-- Ambient Radiant Mesh Background -->
+  <div class="aurora-mesh">
+    <div class="aurora-orb-1"></div>
+    <div class="aurora-orb-2"></div>
+  </div>
+
+  <!-- ===== Header & Island Navbar ===== -->
+  <header id="navbar" class="fixed inset-x-0 top-0 z-[1000] px-4 py-4 transition-all duration-300">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between rounded-2xl px-5 py-3.5 glass transition-all" aria-label="Navigasi utama">
+      <!-- Logo -->
+      <a href="#home" class="flex items-center gap-3 group" id="nav-logo">
+        <div class="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/30 transition-transform group-hover:scale-105">
+          <i data-lucide="map-pin" class="h-5 w-5"></i>
+          <span class="absolute -top-1 -right-1 flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+          </span>
+        </div>
+        <div>
+          <span class="font-logo text-xl font-bold tracking-tight text-slate-900 dark:text-white">Jalan<span class="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Kitta</span></span>
+          <span class="hidden sm:block text-[10px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase">Lampung Smart Road</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <ul class="hidden items-center gap-1 lg:flex text-sm font-semibold text-slate-700 dark:text-slate-300">
+        <li><a href="#home" class="nav-link relative px-4 py-2 rounded-xl transition hover:text-amber-500 dark:hover:text-amber-400">Home</a></li>
+        <li><a href="#layanan" class="nav-link relative px-4 py-2 rounded-xl transition hover:text-amber-500 dark:hover:text-amber-400">Layanan</a></li>
+        <li><a href="#kondisi" class="nav-link relative px-4 py-2 rounded-xl transition hover:text-amber-500 dark:hover:text-amber-400">Kondisi Jalan</a></li>
+        <li><a href="#langkah" class="nav-link relative px-4 py-2 rounded-xl transition hover:text-amber-500 dark:hover:text-amber-400">Alur Lapor</a></li>
+        <li><a href="#sdg" class="nav-link relative px-4 py-2 rounded-xl transition hover:text-amber-500 dark:hover:text-amber-400">SDG 9</a></li>
+        <li>
+          <a href="app.html#peta" class="flex items-center gap-1.5 px-4 py-2 rounded-xl text-amber-600 dark:text-amber-400 font-bold hover:bg-amber-500/10 transition">
+            <i data-lucide="map" class="h-4 w-4"></i> Peta Interaktif
+          </a>
+        </li>
+      </ul>
+
+      <!-- Right Actions: Theme Toggle + Login + CTA -->
+      <div class="flex items-center gap-3">
+        <!-- Theme Toggle Button -->
+        <button id="dark-toggle" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/80 dark:border-white/10 bg-white/60 dark:bg-slate-800/80 text-slate-700 dark:text-amber-400 shadow-sm transition hover:scale-105 active:scale-95" title="Ganti Tema (Gelap / Terang)" aria-label="Toggle Dark Mode">
+          <i data-lucide="sun" id="theme-sun-icon" class="h-5 w-5 hidden dark:block transition-transform duration-300"></i>
+          <i data-lucide="moon" id="theme-moon-icon" class="h-5 w-5 block dark:hidden transition-transform duration-300"></i>
+        </button>
+
+        <div id="auth-container" class="hidden sm:flex items-center gap-3">
+          <a href="login.html" id="btn-login-nav" class="rounded-xl border border-slate-200 dark:border-white/15 px-4 py-2 text-sm font-semibold text-slate-800 dark:text-slate-200 transition hover:bg-slate-100 dark:hover:bg-slate-800">
+            Masuk
+          </a>
+          <div id="user-menu" class="hidden items-center gap-3">
+            <div class="grid h-8 w-8 place-items-center rounded-full bg-slate-900 dark:bg-amber-500 text-sm font-bold text-white dark:text-slate-900 shadow-sm" id="user-initial" title="User">U</div>
+            <button id="btn-logout" class="text-sm font-medium text-coral hover:underline">Logout</button>
+          </div>
+          <a href="app.html#lapor" id="nav-cta" class="glow-btn-primary flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold shadow-md">
+            <i data-lucide="camera" class="h-4 w-4"></i>
+            <span>Lapor Cepat</span>
+          </a>
+        </div>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button id="menu-toggle" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-800/80 text-slate-800 dark:text-white lg:hidden" aria-label="Buka menu navigasi">
+          <i data-lucide="menu" class="h-5 w-5"></i>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobile-menu" class="mx-auto mt-2 max-w-7xl hidden overflow-hidden rounded-2xl glass p-4 shadow-2xl lg:hidden">
+      <ul class="flex flex-col gap-1 text-sm font-semibold text-slate-800 dark:text-slate-200">
+        <li><a href="#home" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="home" class="h-4 w-4 text-amber-500"></i>Home</a></li>
+        <li><a href="#layanan" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="layers" class="h-4 w-4 text-amber-500"></i>Layanan Unggulan</a></li>
+        <li><a href="#kondisi" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="activity" class="h-4 w-4 text-amber-500"></i>Kondisi Jalan Lampung</a></li>
+        <li><a href="#langkah" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="check-circle" class="h-4 w-4 text-amber-500"></i>3 Langkah Lapor</a></li>
+        <li><a href="#sdg" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="target" class="h-4 w-4 text-amber-500"></i>Komitmen SDG 9</a></li>
+        <li><a href="app.html#peta" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 bg-amber-500/10 text-amber-500"><i data-lucide="map" class="h-4 w-4"></i>Buka Peta Interaktif</a></li>
+        <li class="pt-2 border-t border-slate-200/50 dark:border-white/10 flex gap-2">
+          <a href="login.html" class="flex-1 text-center py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-sm font-bold text-slate-700 dark:text-slate-200">Masuk Akun</a>
+          <a href="app.html#lapor" class="flex-1 text-center py-2.5 rounded-xl glow-btn-primary text-sm font-bold text-white">Lapor Cepat</a>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1" class="relative z-10 pt-28 sm:pt-32">
+    <!-- ===== HERO SECTION ===== -->
+    <section id="home" class="relative overflow-hidden py-12 lg:py-20">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="grid items-center gap-12 lg:grid-cols-12 lg:gap-8">
+          
+          <!-- Left Column: Copy & High-impact Headlines -->
+          <div class="reveal lg:col-span-7">
+            <!-- Pill Status Badge -->
+            <div class="inline-flex items-center gap-2.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 backdrop-blur-md mb-6">
+              <span class="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Empowering Global Innovators for an Intelligent Future</span>
+            </div>
+
+            <!-- Main Heading with High Contrast in Both Modes -->
+            <h1 class="font-display text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-[56px] lg:leading-[1.15]">
+              Pantau Jalan, <br class="hidden sm:inline" />
+              <span class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 bg-clip-text text-transparent">
+                Laporkan Cepat
+              </span>, <br class="hidden sm:inline" />
+              Wujudkan Lampung Tangguh.
+            </h1>
+
+            <p class="mt-6 max-w-xl text-base sm:text-lg leading-relaxed text-slate-600 dark:text-slate-300">
+              JalanKitta menyatukan partisipasi warga dan visualisasi spasial real-time dalam satu platform peta cerdas. Bersama mempercepat penanganan jalan rusak demi infrastruktur yang berdaya tahan tinggi.
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="mt-8 flex flex-wrap items-center gap-4">
+              <a href="app.html#lapor"
+                class="glow-btn-primary flex items-center gap-3 rounded-2xl px-8 py-4 text-base font-bold shadow-xl transition-all">
+                <i data-lucide="megaphone" class="h-5 w-5"></i>
+                <span>Lapor Kerusakan Sekarang</span>
+              </a>
+              <a href="app.html#peta"
+                class="flex items-center gap-3 rounded-2xl border border-slate-300 dark:border-white/20 bg-white/80 dark:bg-slate-800/80 px-7 py-4 text-base font-bold text-slate-800 dark:text-white shadow-sm backdrop-blur-md transition hover:bg-slate-100 dark:hover:bg-slate-700/80 hover:border-amber-500/50">
+                <i data-lucide="map" class="h-5 w-5 text-amber-500"></i>
+                <span>Buka Peta Jalan</span>
+              </a>
+            </div>
+
+            <!-- Real-time Stats Ribbon -->
+            <!-- Angka diambil dari database (lihat skrip hero-stats di bawah) -->
+            <div class="mt-12 grid grid-cols-3 gap-4 border-t border-slate-200/80 dark:border-white/10 pt-8">
+              <div>
+                <p id="stat-roads" class="font-logo text-2xl font-extrabold text-slate-900 dark:text-white">–</p>
+                <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Ruas dalam Database</p>
+              </div>
+              <div>
+                <p id="stat-km" class="font-logo text-2xl font-extrabold text-amber-500">–</p>
+                <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Total Panjang (km)</p>
+              </div>
+              <div>
+                <p id="stat-reports" class="font-logo text-2xl font-extrabold text-emerald-500">–</p>
+                <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Laporan Terverifikasi</p>
+              </div>
+            </div>
+            <p class="mt-3 text-[11px] text-slate-500 dark:text-slate-400">Prototipe kompetisi — data ruas bersifat contoh/seed, bukan data resmi pemerintah.</p>
+          </div>
+
+          <!-- Right Column: Futuristic Interactive Glass Dashboard Mockup -->
+          <div class="reveal relative lg:col-span-5">
+            <!-- Glow backdrop behind card -->
+            <div class="absolute -inset-4 rounded-3xl bg-gradient-to-tr from-amber-500/20 to-cyan-500/20 blur-2xl -z-10"></div>
+
+            <!-- Central Glass Card Preview -->
+            <div class="glass-card relative overflow-hidden rounded-3xl p-5 sm:p-6">
+              
+              <!-- Card Header -->
+              <div class="flex items-center justify-between border-b border-slate-200/60 dark:border-white/10 pb-4">
+                <div class="flex items-center gap-2">
+                  <span class="h-3 w-3 rounded-full bg-rose-500"></span>
+                  <span class="h-3 w-3 rounded-full bg-amber-500"></span>
+                  <span class="h-3 w-3 rounded-full bg-emerald-500"></span>
+                  <span class="ml-2 text-xs font-bold text-slate-600 dark:text-slate-300">Pusat Kendali JalanKitta</span>
+                </div>
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-bold text-emerald-500">
+                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live
+                </span>
+              </div>
+
+              <!-- Worker Illustration + Dashboard Blend -->
+              <div class="relative mt-4 flex items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-slate-100 to-amber-500/10 dark:from-slate-900 dark:to-slate-950 p-4 min-h-[340px]" title="Ilustrasi (dibuat dengan AI)">
+                <!-- Cahaya krem di belakang petugas (membuat latar putih gambar menyatu) -->
+                <div class="absolute left-1/2 top-1/2 h-[19rem] w-[19rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-b from-amber-50 via-orange-50 to-amber-100 blur-xl dark:from-amber-100 dark:via-orange-100 dark:to-amber-200 opacity-95"></div>
+                <img src="assets/img/hero-worker.webp" alt="Petugas infrastruktur jalan memantau peta"
+                  class="relative h-72 w-auto object-contain mix-blend-multiply transition-transform hover:scale-105" />
+
+                <!-- Floating Live Alert Card 1 -->
+                <div class="absolute top-4 left-3 right-3 sm:left-4 sm:right-auto max-w-xs rounded-2xl glass p-3.5 shadow-xl border border-white/40 dark:border-white/10 animate-soft-float">
+                  <div class="flex items-center gap-3">
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-rose-500/15 text-rose-500">
+                      <i data-lucide="alert-triangle" class="h-5 w-5"></i>
+                    </span>
+                    <div class="min-w-0">
+                      <p class="truncate text-xs font-bold text-slate-900 dark:text-white">Contoh: Jl. Ryacudu KM 4</p>
+                      <p class="text-[11px] font-semibold text-rose-500">Rusak Berat • Data contoh</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Floating Live Alert Card 2 -->
+                <div class="absolute bottom-4 right-3 left-3 sm:right-4 sm:left-auto max-w-xs rounded-2xl glass p-3.5 shadow-xl border border-white/40 dark:border-white/10">
+                  <div class="flex items-center gap-3">
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-500">
+                      <i data-lucide="check-circle" class="h-5 w-5"></i>
+                    </span>
+                    <div>
+                      <p class="text-xs font-bold text-slate-900 dark:text-white">Contoh: Jalur Lintas Barat</p>
+                      <p class="text-[11px] font-semibold text-emerald-500">Kondisi Baik • Data contoh</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Interactive Card Bottom Quick Action -->
+              <div class="mt-4 flex items-center justify-between text-xs">
+                <span class="text-slate-500 dark:text-slate-400">Tampilan ilustrasi antarmuka</span>
+                <a href="app.html#peta" class="font-bold text-amber-500 hover:underline flex items-center gap-1">
+                  Buka Radar <i data-lucide="arrow-right" class="h-3 w-3"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TICKER TEMA & SDG ===== -->
+    <section class="border-y border-slate-200/80 dark:border-white/10 bg-slate-100/50 dark:bg-slate-900/50 py-3 overflow-hidden backdrop-blur-md">
+      <div class="flex items-center gap-4 text-xs font-semibold">
+        <span class="shrink-0 ml-4 flex items-center gap-2 rounded-full bg-amber-500 px-3 py-1 text-white font-bold">
+          <i data-lucide="radio" class="h-3.5 w-3.5 animate-pulse"></i> TENTANG
+        </span>
+        <div class="overflow-hidden flex-1">
+          <div class="marquee-track flex w-max gap-8 whitespace-nowrap text-slate-600 dark:text-slate-300">
+            <span>🌐 <strong>Tema:</strong> Empowering Global Innovators for an Intelligent Future</span>
+            <span>•</span>
+            <span>🎯 <strong>SDG 9:</strong> Industri, Inovasi &amp; Infrastruktur</span>
+            <span>•</span>
+            <span>🗺️ <strong>Peta:</strong> Kondisi jalan berkode warna dari database</span>
+            <span>•</span>
+            <span>📸 <strong>Lapor:</strong> Foto + lokasi, diverifikasi admin</span>
+            <span>•</span>
+            <span>🌐 <strong>Tema:</strong> Empowering Global Innovators for an Intelligent Future</span>
+            <span>•</span>
+            <span>🎯 <strong>SDG 9:</strong> Industri, Inovasi &amp; Infrastruktur</span>
+            <span>•</span>
+            <span>🗺️ <strong>Peta:</strong> Kondisi jalan berkode warna dari database</span>
+            <span>•</span>
+            <span>📸 <strong>Lapor:</strong> Foto + lokasi, diverifikasi admin</span>
+            <span>•</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FITUR & LAYANAN UNGGULAN ===== -->
+    <section id="layanan" class="py-24">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="reveal text-center max-w-2xl mx-auto">
+          <span class="rounded-full bg-amber-500/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Layanan Unggulan</span>
+          <h2 class="mt-3 font-display text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl">Teknologi Modern untuk Jalan Lampung</h2>
+          <p class="mt-3 text-slate-600 dark:text-slate-400 text-sm sm:text-base">Dilengkapi algoritma visual spasial cerdas untuk menyederhanakan pelaporan dan memastikan respon lebih cepat.</p>
+        </div>
+
+        <div class="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <!-- Feature 1 -->
+          <article class="glass-card hover-lift reveal rounded-3xl p-7 flex flex-col justify-between">
+            <div>
+              <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-500/15 text-cyan-500">
+                <i data-lucide="map" class="h-7 w-7"></i>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white">Peta Interaktif GIS</h3>
+              <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Pantau kondisi ruas jalan yang tersimpan di database secara visual dengan kode warna kondisi.</p>
+            </div>
+            <a href="app.html#peta" class="mt-6 flex items-center gap-2 text-sm font-bold text-cyan-500 hover:gap-3 transition-all">
+              Jelajahi Peta <i data-lucide="arrow-right" class="h-4 w-4"></i>
+            </a>
+          </article>
+
+          <!-- Feature 2 -->
+          <article class="glass-card hover-lift reveal rounded-3xl p-7 flex flex-col justify-between">
+            <div>
+              <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-500">
+                <i data-lucide="camera" class="h-7 w-7"></i>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white">Lapor 60 Detik</h3>
+              <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Unggah foto, tentukan lokasi dengan tombol “Lokasi Saya” atau klik peta, lalu kirim laporan untuk diverifikasi admin.</p>
+            </div>
+            <a href="app.html#lapor" class="mt-6 flex items-center gap-2 text-sm font-bold text-amber-500 hover:gap-3 transition-all">
+              Kirim Laporan <i data-lucide="arrow-right" class="h-4 w-4"></i>
+            </a>
+          </article>
+
+          <!-- Feature 3 -->
+          <article class="glass-card hover-lift reveal rounded-3xl p-7 flex flex-col justify-between">
+            <div>
+              <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/15 text-rose-500">
+                <i data-lucide="route" class="h-7 w-7"></i>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white">Garis Ruas Akurat</h3>
+              <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Garis ruas pada peta digambar mengikuti jalan sebenarnya menggunakan layanan routing OSRM, lengkap dengan filter kondisi.</p>
+            </div>
+            <a href="app.html#peta" class="mt-6 flex items-center gap-2 text-sm font-bold text-rose-500 hover:gap-3 transition-all">
+              Lihat Peta <i data-lucide="arrow-right" class="h-4 w-4"></i>
+            </a>
+          </article>
+
+          <!-- Feature 4 -->
+          <article class="glass-card hover-lift reveal rounded-3xl p-7 flex flex-col justify-between">
+            <div>
+              <div class="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-500">
+                <i data-lucide="bar-chart-3" class="h-7 w-7"></i>
+              </div>
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white">Statistik Transparan</h3>
+              <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Ringkasan jumlah ruas, panjang, dan laporan yang dapat diakses publik kapan saja.</p>
+            </div>
+            <a href="app.html#statistik" class="mt-6 flex items-center gap-2 text-sm font-bold text-emerald-500 hover:gap-3 transition-all">
+              Lihat Statistik <i data-lucide="arrow-right" class="h-4 w-4"></i>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== KONDISI JALAN LAMPUNG SHOWCASE ===== -->
+    <section id="kondisi" class="py-20 relative">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="reveal text-center max-w-2xl mx-auto">
+          <span class="rounded-full bg-amber-500/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Klasifikasi Standar</span>
+          <h2 class="mt-3 font-display text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl">Kategori Kondisi Jalan</h2>
+          <p class="mt-3 text-slate-600 dark:text-slate-400 text-sm sm:text-base">Setiap laporan dikelompokkan secara visual untuk menentukan prioritas aksi pemeliharaan. <em>Gambar adalah ilustrasi buatan AI.</em></p>
+        </div>
+
+        <div class="mt-14 grid gap-8 md:grid-cols-3">
+          <!-- Card Kondisi Baik -->
+          <div class="glass-card hover-lift reveal group overflow-hidden rounded-3xl transition-all">
+            <div class="relative h-56 overflow-hidden">
+              <img src="assets/img/road-good.webp" alt="Ilustrasi jalan kondisi baik (dibuat dengan AI)" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+              <span class="absolute top-4 right-4 rounded-full bg-emerald-500/90 backdrop-blur-md px-3 py-1 text-xs font-bold text-white shadow-lg">
+                ● Kondisi Baik
+              </span>
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white">Mulus &amp; Laik Lintasi</h3>
+              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Permukaan aspal rata tanpa deformasi berarti, marka jalan jelas, dan aman dilewati kecepatan normal.</p>
+              <div class="mt-5 border-t border-slate-200/60 dark:border-white/10 pt-4 flex items-center justify-between text-xs font-bold text-emerald-500">
+                <span>Aman dilintasi kecepatan normal</span>
+                <a href="app.html#peta" class="hover:underline flex items-center gap-1">Lihat di Peta <i data-lucide="chevron-right" class="h-3.5 w-3.5"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Rusak Ringan -->
+          <div class="glass-card hover-lift reveal group overflow-hidden rounded-3xl transition-all">
+            <div class="relative h-56 overflow-hidden">
+              <img src="assets/img/road-minor.webp" alt="Ilustrasi jalan rusak ringan (dibuat dengan AI)" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+              <span class="absolute top-4 right-4 rounded-full bg-amber-500/90 backdrop-blur-md px-3 py-1 text-xs font-bold text-white shadow-lg">
+                ● Rusak Ringan
+              </span>
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white">Retak &amp; Bergelombang</h3>
+              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Terdapat retak rambut, lubang dangkal diameter &lt;30 cm, atau gelombang permukaan yang memerlukan pelapisan ulang.</p>
+              <div class="mt-5 border-t border-slate-200/60 dark:border-white/10 pt-4 flex items-center justify-between text-xs font-bold text-amber-500">
+                <span>Perlu Pemeliharaan Rutin</span>
+                <a href="app.html#peta" class="hover:underline flex items-center gap-1">Lihat di Peta <i data-lucide="chevron-right" class="h-3.5 w-3.5"></i></a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Rusak Berat -->
+          <div class="glass-card hover-lift reveal group overflow-hidden rounded-3xl transition-all">
+            <div class="relative h-56 overflow-hidden">
+              <img src="assets/img/road-major.webp" alt="Ilustrasi jalan rusak berat (dibuat dengan AI)" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+              <span class="absolute top-4 right-4 rounded-full bg-rose-500/90 backdrop-blur-md px-3 py-1 text-xs font-bold text-white shadow-lg">
+                ● Rusak Berat
+              </span>
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white">Lubang Dalam &amp; Amblas</h3>
+              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Kerusakan struktural parah, kubangan dalam, atau bahu jalan longsor yang membahayakan keselamatan pengendara.</p>
+              <div class="mt-5 border-t border-slate-200/60 dark:border-white/10 pt-4 flex items-center justify-between text-xs font-bold text-rose-500">
+                <span>Prioritas Penanganan</span>
+                <a href="app.html#peta" class="hover:underline flex items-center gap-1">Lihat di Peta <i data-lucide="chevron-right" class="h-3.5 w-3.5"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 3 LANGKAH PELAPORAN ===== -->
+    <section id="langkah" class="py-24">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="grid items-center gap-14 lg:grid-cols-2">
+          
+          <div class="reveal">
+            <span class="rounded-full bg-amber-500/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Alur Sangat Simpel</span>
+            <h2 class="mt-3 font-display text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl">Lapor Jalan Rusak dalam 3 Langkah Mudah</h2>
+            <p class="mt-4 text-slate-600 dark:text-slate-400 leading-relaxed">Siapa pun bisa menjadi pengawas infrastruktur jalan. Tidak perlu birokrasi berbelit, laporan langsung masuk ke radar pantau.</p>
+
+            <div class="mt-10 space-y-6">
+              <!-- Step 1 -->
+              <div class="flex gap-5 glass-card p-5 rounded-2xl">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white font-black text-lg shadow-md shadow-amber-500/30">
+                  01
+                </div>
+                <div>
+                  <h3 class="font-bold text-base text-slate-900 dark:text-white">Tandai Lokasi Presisi</h3>
+                  <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Gunakan GPS ponsel Anda secara otomatis atau geser pin lokasi langsung di peta interaktif.</p>
+                </div>
+              </div>
+
+              <!-- Step 2 -->
+              <div class="flex gap-5 glass-card p-5 rounded-2xl">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white font-black text-lg shadow-md shadow-orange-500/30">
+                  02
+                </div>
+                <div>
+                  <h3 class="font-bold text-base text-slate-900 dark:text-white">Foto Bukti &amp; Pilih Kategori</h3>
+                  <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Lampirkan foto kondisi aktual dan tandai tingkat kerusakan (Baik / Rusak Ringan / Rusak Berat).</p>
+                </div>
+              </div>
+
+              <!-- Step 3 -->
+              <div class="flex gap-5 glass-card p-5 rounded-2xl">
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white font-black text-lg shadow-md shadow-emerald-500/30">
+                  03
+                </div>
+                <div>
+                  <h3 class="font-bold text-base text-slate-900 dark:text-white">Kirim &amp; Pantau Tindak Lanjut</h3>
+                  <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Laporan masuk antrean verifikasi admin; status dapat dilihat di akun Anda setelah masuk.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8">
+              <a href="app.html#lapor" class="glow-btn-primary inline-flex items-center gap-2 rounded-2xl px-7 py-3.5 font-bold shadow-lg">
+                <i data-lucide="send" class="h-4 w-4"></i> Coba Buat Laporan Sekarang
+              </a>
+            </div>
+          </div>
+
+          <!-- Right Showcase Card -->
+          <div class="reveal relative mx-auto w-full max-w-md">
+            <div class="glass-card overflow-hidden rounded-3xl p-5 shadow-2xl">
+              <div class="relative overflow-hidden rounded-2xl">
+                <img src="assets/img/hero-lampung.webp" alt="Ilustrasi simulasi pelaporan (dibuat dengan AI)" class="h-64 w-full object-cover" />
+                <div class="absolute top-3 left-3 rounded-full bg-slate-950/80 backdrop-blur-md px-3 py-1 text-[11px] font-bold text-amber-400">
+                  ⚡ Contoh Ilustrasi (bukan data nyata)
+                </div>
+              </div>
+              <div class="mt-5">
+                <div class="flex items-center justify-between">
+                  <h4 class="font-bold text-base text-slate-900 dark:text-white">Ruas Jl. Ryacudu, Bandar Lampung</h4>
+                  <span class="rounded-full bg-rose-500/15 px-2.5 py-0.5 text-xs font-bold text-rose-500">Rusak Berat</span>
+                </div>
+                <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Koordinat: -5.3782, 105.2910 • Data contoh</p>
+                
+                <div class="mt-4 flex items-center justify-between rounded-xl bg-slate-100 dark:bg-slate-800/80 p-3 text-xs">
+                  <div class="flex items-center gap-2">
+                    <span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span>
+                    <span class="font-semibold text-slate-700 dark:text-slate-200">Status: Menunggu Verifikasi</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SDG 9 BENTO SECTION ===== -->
+    <section id="sdg" class="py-20">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-amber-600 via-orange-600 to-rose-700 p-8 sm:p-14 text-white shadow-2xl">
+          <div class="absolute -right-20 -top-20 h-96 w-96 rounded-full bg-white/10 blur-3xl"></div>
+          
+          <div class="relative grid items-center gap-10 lg:grid-cols-12">
+            <div class="reveal lg:col-span-8">
+              <span class="inline-block rounded-full bg-white/20 backdrop-blur-md px-4 py-1 text-xs font-extrabold uppercase tracking-widest text-white mb-4">
+                Sustainable Development Goals (SDG 9)
+              </span>
+              <h2 class="font-display text-3xl font-extrabold sm:text-4xl lg:text-5xl leading-tight">
+                Infrastruktur Tangguh Dimulai dari Data yang Jujur &amp; Cepat
+              </h2>
+              <p class="mt-4 text-white font-bold text-lg">Tema: “Empowering Global Innovators for an Intelligent Future”</p>
+              <p class="mt-4 text-white/90 text-base sm:text-lg leading-relaxed max-w-2xl">
+                JalanKitta mengadopsi pilar <strong>SDG 9: Industri, Inovasi, dan Infrastruktur</strong>. Setiap partisipasi warga menjadi sensor hidup bagi percepatan konektivitas logistik dan keselamatan perjalanan masyarakat Lampung.
+              </p>
+              <div class="mt-8 flex flex-wrap gap-4">
+                <div class="rounded-2xl bg-white/15 backdrop-blur-md px-5 py-3 border border-white/20">
+                  <p class="text-xs uppercase text-white/80 font-bold">Indikator 9.1</p>
+                  <p class="text-sm font-extrabold">Aksesibilitas Jalan Merata</p>
+                </div>
+                <div class="rounded-2xl bg-white/15 backdrop-blur-md px-5 py-3 border border-white/20">
+                  <p class="text-xs uppercase text-white/80 font-bold">Indikator 9.c</p>
+                  <p class="text-sm font-extrabold">Inovasi Digital Partisipatif</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="reveal lg:col-span-4 flex justify-center">
+              <div class="flex flex-col items-center justify-center rounded-3xl bg-white/10 backdrop-blur-xl p-8 border border-white/20 text-center shadow-xl w-full max-w-xs">
+                <span class="font-display text-8xl font-black leading-none drop-shadow-md">9</span>
+                <span class="font-logo mt-2 text-xl font-extrabold uppercase tracking-wide">Industri, Inovasi &amp; Infrastruktur</span>
+                <i data-lucide="boxes" class="mt-4 h-12 w-12 text-white/80"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== MITRA & KOORDINASI LINTAS SEKTOR ===== -->
+    <section class="py-14 border-y border-slate-200/60 dark:border-white/10 bg-slate-50/50 dark:bg-slate-900/30">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8 text-center">
+        <p class="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2">
+          Rencana Kolaborasi Pemangku Kepentingan
+        </p>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">Belum ada kemitraan resmi; daftar berikut hanya rencana pengembangan.</p>
+        <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 font-logo text-base sm:text-lg font-bold text-slate-500 dark:text-slate-400">
+          <span class="hover:text-amber-500 transition">Pemprov Lampung</span>
+          <span class="text-slate-300 dark:text-slate-700">•</span>
+          <span class="hover:text-amber-500 transition">Dinas PUPR &amp; Bina Marga</span>
+          <span class="text-slate-300 dark:text-slate-700">•</span>
+          <span class="hover:text-amber-500 transition">Dinas Perhubungan</span>
+          <span class="text-slate-300 dark:text-slate-700">•</span>
+          <span class="hover:text-amber-500 transition">BPBD Provinsi Lampung</span>
+          <span class="text-slate-300 dark:text-slate-700">•</span>
+          <span class="hover:text-amber-500 transition">Polda Lampung</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== NEWSLETTER SUBSCRIBE ===== -->
+    <section class="py-24">
+      <div class="mx-auto max-w-4xl px-5 lg:px-8">
+        <div class="reveal relative overflow-hidden rounded-[2.5rem] glass-card p-8 sm:p-14 text-center">
+          <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-500 mb-5">
+            <i data-lucide="bell" class="h-7 w-7"></i>
+          </div>
+          <h2 class="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
+            Dapatkan Warta Pembaruan &amp; Perbaikan Jalan
+          </h2>
+          <p class="mt-3 text-slate-600 dark:text-slate-400 text-sm sm:text-base max-w-md mx-auto">
+            Berlangganan info mingguan mengenai ruas jalan yang telah selesai diperbaiki di kabupaten/kota Anda.
+          </p>
+
+          <form id="form-subscribe" class="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
+            <label for="sub-email" class="sr-only">Alamat Email</label>
+            <input id="sub-email" type="email" required placeholder="Masukkan alamat email Anda"
+              class="flex-1 rounded-2xl border border-slate-300 dark:border-white/10 bg-white dark:bg-slate-800/80 px-5 py-3.5 text-sm shadow-sm outline-none ring-amber-500 focus:ring-2 dark:text-white" />
+            <button type="submit" id="sub-btn" class="glow-btn-primary rounded-2xl px-7 py-3.5 text-sm font-bold shadow-md">
+              Berlangganan
+            </button>
+          </form>
+          <p id="sub-feedback" class="mt-4 hidden text-sm font-bold text-emerald-500"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="border-t border-slate-200/80 dark:border-white/10 bg-white/50 dark:bg-slate-950/70 pb-12 pt-16 backdrop-blur-lg">
+    <div class="mx-auto grid max-w-7xl gap-10 px-5 sm:grid-cols-2 lg:grid-cols-4 lg:px-8">
+      <div>
+        <div class="flex items-center gap-2">
+          <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500 text-white font-bold">
+            <i data-lucide="map-pin" class="h-4 w-4"></i>
+          </div>
+          <span class="font-logo text-2xl font-bold text-slate-900 dark:text-white">Jalan<span class="text-amber-500">Kitta</span></span>
+        </div>
+        <p class="mt-4 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+          Inisiatif pemantauan kondisi jalan partisipatif untuk mewujudkan konektivitas jalan Lampung yang aman, tangguh, dan transparan.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-slate-900 dark:text-white">Layanan &amp; Fitur</h4>
+        <ul class="mt-4 space-y-2.5 text-sm text-slate-600 dark:text-slate-400">
+          <li><a href="app.html#peta" class="hover:text-amber-500 transition">Peta Interaktif Lampung</a></li>
+          <li><a href="app.html#lapor" class="hover:text-amber-500 transition">Form Pelaporan Cepat</a></li>
+          <li><a href="app.html#statistik" class="hover:text-amber-500 transition">Dashboard Statistik</a></li>
+          <li><a href="admin.html" class="hover:text-amber-500 transition">Portal Verifikator</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-slate-900 dark:text-white">Tentang &amp; Regulasi</h4>
+        <ul class="mt-4 space-y-2.5 text-sm text-slate-600 dark:text-slate-400">
+          <li><a href="#sdg" class="hover:text-amber-500 transition">Komitmen SDG 9</a></li>
+          <li><a href="#langkah" class="hover:text-amber-500 transition">Standar Pelaporan</a></li>
+          <li><a href="#layanan" class="hover:text-amber-500 transition">Garis Ruas Akurat</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="font-bold text-slate-900 dark:text-white">Hubungi Kami</h4>
+        <ul class="mt-4 space-y-2.5 text-sm text-slate-600 dark:text-slate-400">
+          <li class="flex items-center gap-2"><i data-lucide="map-pin" class="h-4 w-4 text-amber-500"></i> Bandar Lampung, Lampung</li>
+          <li class="flex items-center gap-2"><i data-lucide="mail" class="h-4 w-4 text-amber-500"></i> Kontak: lihat README / proposal</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="mt-12 border-t border-slate-200/60 dark:border-white/10 pt-8 text-center text-xs text-slate-500 dark:text-slate-400">
+      &copy; 2026 JalanKitta — Prototipe kompetisi. Ilustrasi dibuat dengan AI. Peta © Esri &amp; kontributor, Leaflet, ikon Lucide.
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    (() => {
+      'use strict';
+      const $ = (s, el = document) => el.querySelector(s);
+      const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+
+      // Initialize Lucide Icons
+      lucide.createIcons();
+
+      // Navbar scroll effect
+      const navbar = $('#navbar');
+      const onScroll = () => {
+        if (navbar) {
+          navbar.classList.toggle('scrolled', window.scrollY > 20);
+        }
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      // Mobile Menu Toggle
+      const toggle = $('#menu-toggle');
+      const menu = $('#mobile-menu');
+      if (toggle && menu) {
+        toggle.addEventListener('click', () => {
+          menu.classList.toggle('hidden');
+        });
+        $$('.mobile-link').forEach((link) => {
+          link.addEventListener('click', () => menu.classList.add('hidden'));
+        });
+      }
+
+      // Smooth Dark Mode Toggle
+      const darkToggle = $('#dark-toggle');
+      const htmlEl = document.documentElement;
+
+      const updateThemeIcons = (isDark) => {
+        const sun = $('#theme-sun-icon');
+        const moon = $('#theme-moon-icon');
+        if (sun && moon) {
+          if (isDark) {
+            sun.classList.remove('hidden');
+            moon.classList.add('hidden');
+          } else {
+            sun.classList.add('hidden');
+            moon.classList.remove('hidden');
+          }
+        }
+      };
+
+      // Set initial icon state
+      updateThemeIcons(htmlEl.classList.contains('dark'));
+
+      if (darkToggle) {
+        darkToggle.addEventListener('click', () => {
+          const isDark = htmlEl.classList.toggle('dark');
+          localStorage.setItem('theme', isDark ? 'dark' : 'light');
+          updateThemeIcons(isDark);
+          lucide.createIcons();
+        });
+      }
+
+      // Scrollspy
+      const sections = ['home', 'layanan', 'kondisi', 'langkah', 'sdg']
+        .map(id => document.getElementById(id))
+        .filter(Boolean);
+      const inPageNavLinks = $$('.nav-link').filter(l => l.getAttribute('href')?.startsWith('#'));
+
+      const updateScrollspy = () => {
+        let current = 'home';
+        const scrollPos = window.scrollY + 140;
+        sections.forEach(sec => {
+          if (sec && scrollPos >= sec.offsetTop) {
+            current = sec.id;
+          }
+        });
+        inPageNavLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+        });
+      };
+      window.addEventListener('scroll', updateScrollspy, { passive: true });
+      updateScrollspy();
+
+      // Reveal Animations on scroll
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) {
+            en.target.classList.add('is-visible');
+            io.unobserve(en.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      $$('.reveal').forEach((el) => io.observe(el));
+
+      // Statistik hero: diambil dari database (tanpa angka karangan)
+      (async () => {
+        const db = window.supabaseDb;
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        if (!db) return;
+        try {
+          const { data: roads, error } = await db.from('ruas_jalan').select('panjang_km');
+          if (error) throw error;
+          const km = (roads || []).reduce((a, r) => a + (Number(r.panjang_km) || 0), 0);
+          set('stat-roads', (roads || []).length.toLocaleString('id-ID'));
+          set('stat-km', km.toLocaleString('id-ID', { maximumFractionDigits: 1 }));
+        } catch (e) { console.warn('Gagal memuat statistik ruas:', e); }
+        try {
+          const { data, error } = await db.from('statistik_publik').select('total_publik').maybeSingle();
+          if (error) throw error;
+          set('stat-reports', Number(data?.total_publik ?? 0).toLocaleString('id-ID'));
+        } catch (e) { console.warn('Gagal memuat statistik laporan:', e); }
+      })();
+
+      // Newsletter Form with Supabase
+      const formSub = $('#form-subscribe');
+      if (formSub) {
+        formSub.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const emailInput = $('#sub-email');
+          const email = emailInput.value.trim();
+          const fb = $('#sub-feedback');
+          const btn = $('#sub-btn');
+
+          btn.disabled = true;
+          btn.textContent = 'Menyimpan...';
+
+          try {
+            if (!window.supabaseDb) throw new Error('Supabase client tidak tersedia');
+            const { error } = await window.supabaseDb.from('subscribers').insert([{ email }]);
+            if (error && error.code !== '23505') throw error;
+            btn.textContent = 'Berlangganan';
+            btn.disabled = false;
+            emailInput.value = '';
+            fb.textContent = `Terima kasih! Email ${email} berhasil didaftarkan.`;
+            fb.className = 'mt-4 text-sm font-bold text-emerald-500';
+            fb.classList.remove('hidden');
+          } catch (err) {
+            console.warn('Gagal menyimpan subscriber:', err);
+            btn.textContent = 'Berlangganan';
+            btn.disabled = false;
+            fb.textContent = 'Gagal menyimpan email. Silakan coba lagi.';
+            fb.className = 'mt-4 text-sm font-bold text-rose-500';
+            fb.classList.remove('hidden');
+          }
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

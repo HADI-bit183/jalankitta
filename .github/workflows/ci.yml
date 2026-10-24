@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Verify Tailwind CSS compilation
+      run: npm run build:css
+
+    - name: Run codebase integrity & security test
+      run: npm test
+
+    - name: Verify submission packaging
+      run: npm run package

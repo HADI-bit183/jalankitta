@@ -1,0 +1,439 @@
+/* ==========================================================================
+   JalanKitta — Master Modern Design System (Glassmorphic & Dynamic Theme)
+   ========================================================================== */
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-logo: 'Poppins', sans-serif;
+
+  /* Light Theme Palette */
+  --bg-main: #f8fafc;
+  --bg-surface: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-subtle: rgba(148, 163, 184, 0.2);
+
+  --accent-primary: #f59e0b;
+  --accent-coral: #f97316;
+  --accent-cyan: #06b6d4;
+  --accent-emerald: #10b981;
+}
+
+html.dark {
+  --bg-main: #07090e;
+  --bg-surface: #0f172a;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  transition: background-color 0.4s ease, color 0.4s ease;
+  overflow-x: hidden;
+}
+
+section[id] {
+  scroll-margin-top: 130px;
+}
+
+/* Accessible Skip Link */
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: 3000;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-decoration: none;
+  box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4);
+  transform: translateY(-200%);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 3px solid #fef3c7;
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Interactive & Animation Utilities
+   ========================================================================== */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Glassmorphism tokens */
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+html.dark .glass {
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html.dark .glass-card {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+}
+
+.glass-card:hover {
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 25px 50px -12px rgba(245, 158, 11, 0.15);
+}
+
+html.dark .glass-card:hover {
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 25px 50px -12px rgba(245, 158, 11, 0.2);
+}
+
+/* Efek naik saat hover hanya untuk kartu dekoratif (bukan peta/form/panel) */
+.glass-card.hover-lift:hover {
+  transform: translateY(-6px);
+}
+
+/* Ticker berjalan */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 40s linear infinite;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
+
+/* Aurora / Radiant Mesh Backgrounds */
+.aurora-mesh {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.aurora-orb-1 {
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 580px;
+  height: 580px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(249, 115, 22, 0.12) 50%, transparent 70%);
+  filter: blur(60px);
+  animation: orbFloat1 18s ease-in-out infinite alternate;
+}
+
+.aurora-orb-2 {
+  position: absolute;
+  top: 15%;
+  left: -8%;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, rgba(59, 130, 246, 0.1) 50%, transparent 70%);
+  filter: blur(70px);
+  animation: orbFloat2 22s ease-in-out infinite alternate;
+}
+
+html.dark .aurora-orb-1 {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, rgba(249, 115, 22, 0.1) 50%, transparent 70%);
+}
+
+html.dark .aurora-orb-2 {
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.18) 0%, rgba(99, 102, 241, 0.12) 50%, transparent 70%);
+}
+
+@keyframes orbFloat1 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-40px, 60px) scale(1.08); }
+  100% { transform: translate(30px, 30px) scale(0.95); }
+}
+
+@keyframes orbFloat2 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(50px, -40px) scale(1.1); }
+  100% { transform: translate(-20px, 50px) scale(0.92); }
+}
+
+/* Subtle Grid Texture for Modern Tech Vibe */
+.tech-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+}
+
+html.dark .tech-grid {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+/* Floating animation */
+@keyframes softFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+.animate-soft-float {
+  animation: softFloat 5s ease-in-out infinite;
+}
+
+/* Glowing Button Styles */
+.glow-btn-primary {
+  position: relative;
+  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  color: #ffffff;
+  box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4), 0 0 15px 0 rgba(234, 88, 12, 0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glow-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px -5px rgba(245, 158, 11, 0.55), 0 0 25px 0 rgba(234, 88, 12, 0.35);
+  filter: brightness(1.05);
+}
+
+.glow-btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Navbar Scrolled State */
+#navbar {
+  transition: all 0.35s ease;
+}
+
+#navbar.scrolled {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+#navbar.scrolled nav {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+  border-radius: 1.25rem;
+}
+
+html.dark #navbar.scrolled nav {
+  background: rgba(11, 15, 25, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+}
+
+/* Active Nav Links */
+.nav-link.active {
+  color: #f59e0b !important;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: #f59e0b;
+  border-radius: 9999px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 158, 11, 0.6);
+}
+
+/* Leaflet Container Tweaks for Dark Theme */
+.leaflet-container {
+  font-family: var(--font-sans);
+}
+
+/* Tile peta HD: tajam di layar retina */
+.leaflet-tile {
+  image-rendering: -webkit-optimize-contrast;
+}
+
+html.dark .leaflet-popup-content-wrapper,
+html.dark .leaflet-popup-tip {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8);
+}
+
+/* ==========================================================================
+   Komponen halaman Peta & Lapor (app.html)
+   ========================================================================== */
+
+/* Marker laporan warga (Leaflet divIcon) */
+.custom-div-icon { background: transparent; border: 0; }
+.pulse-marker {
+  --c: #f59e0b;
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--c);
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.45);
+}
+.pulse-marker span {
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  background: var(--c);
+  opacity: 0.55;
+  animation: markerPulse 1.8s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes markerPulse {
+  0% { transform: scale(1); opacity: 0.55; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+/* Kartu kategori kerusakan (radio disembunyikan, status ditandai di label) */
+.kategori-card { border-width: 2px; }
+.kategori-card:has(input:checked) {
+  border-color: #f59e0b !important;
+  background: rgba(245, 158, 11, 0.1) !important;
+  box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.18);
+}
+.kategori-card:has(input:focus-visible) { outline: 2px solid #f59e0b; outline-offset: 2px; }
+html.dark .kategori-card {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Dropzone unggah foto */
+.dropzone.dragover {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+  transform: scale(1.01);
+}
+.dropzone:has(input:focus-visible) { outline: 2px solid #f59e0b; outline-offset: 2px; }
+
+/* Tombol gaya peta */
+.map-style-btn { color: inherit; }
+.map-style-btn:hover { background: rgba(245, 158, 11, 0.15); }
+.map-style-btn[aria-pressed="true"] { background: #f59e0b; color: #ffffff; }
+
+/* Tombol filter kondisi */
+.filter-btn.is-active {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border-color: #f59e0b !important;
+  color: #b45309 !important;
+}
+html.dark .filter-btn.is-active { color: #fbbf24 !important; }
+.filter-btn[data-filter="all"].is-active {
+  background: #f59e0b !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 16px -4px rgba(245, 158, 11, 0.4);
+}
+
+/* Scrollbar tipis untuk daftar */
+.thin-scroll { scrollbar-width: thin; scrollbar-color: rgba(148, 163, 184, 0.5) transparent; }
+.thin-scroll::-webkit-scrollbar { width: 5px; }
+
+/* Bayangan tombol utama */
+.shadow-btn { box-shadow: 0 10px 25px -8px rgba(245, 158, 11, 0.55); }
+
+/* Animasi masuk modal */
+@keyframes jkFadeIn { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: none; } }
+.animate-in { animation: jkFadeIn 0.2s ease-out both; }
+
+/* ==========================================================================
+   Dark mode: override warna kustom (navy/ink) & elemen putih di app.html
+   ========================================================================== */
+html.dark .text-navy { color: #f8fafc; }
+html.dark .text-ink { color: #94a3b8; }
+html.dark #report-form input:not([type="radio"]):not([type="file"]),
+html.dark #report-form textarea {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f8fafc;
+}
+html.dark #report-form input:focus,
+html.dark #report-form textarea:focus { background: #1e293b; }
+html.dark #dropzone,
+html.dark #foto-preview { background: rgba(30, 41, 59, 0.6); border-color: rgba(255, 255, 255, 0.15); }
+html.dark #dropzone > span:first-child { background: #1e293b; }
+html.dark #picker-hint { background: rgba(15, 23, 42, 0.92); }
+html.dark #picker-map { background: #0f172a; }
+html.dark #modal-my-reports > div,
+html.dark #modal-my-reports-photo > div,
+html.dark #modal-ai-report-result > div { background: #0f172a; color: #f8fafc; }
+html.dark #modal-my-reports .bg-white,
+html.dark #modal-my-reports .bg-slate-50,
+html.dark #modal-my-reports .bg-slate-50\/60 { background: rgba(30, 41, 59, 0.7); }
+html.dark #modal-my-reports .border-slate-100,
+html.dark #modal-my-reports .border-slate-200,
+html.dark #modal-my-reports-photo .border-slate-100 { border-color: rgba(255, 255, 255, 0.1); }
+html.dark #modal-my-reports-photo .hover\:bg-slate-100:hover { background: rgba(255, 255, 255, 0.08); }

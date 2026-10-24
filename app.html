@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://server.arcgisonline.com https://unpkg.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://router.project-osrm.org; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <title>JalanKitta — Peta &amp; Laporan Infrastruktur Jalan Provinsi Lampung</title>
+  <meta name="description"
+    content="JalanKitta: platform pemantauan kondisi jalan Provinsi Lampung berbasis peta interaktif dan laporan warga. Mendukung SDG 9 — Industri, Inovasi, dan Infrastruktur." />
+  <meta name="theme-color" content="#0F172A" />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg" />
+
+  <!-- Preload theme to avoid flickering -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+
+  <noscript>
+    <style>
+      .reveal { opacity: 1 !important; transform: none !important; }
+    </style>
+  </noscript>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js" integrity="sha384-0v3Wh0ZtiQBYCYywQoeMDA5mAw5Z01p0lhorqy0BlwFrcN6u3lmN7K0U/e1uezmr" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/tailwind.css" />
+</head>
+<body class="font-sans selection:bg-amber-500/30 selection:text-amber-500">
+  <a href="#main-content" class="skip-link">Lewati ke konten utama</a>
+
+  <!-- Ambient Radiant Mesh Background -->
+  <div class="aurora-mesh">
+    <div class="aurora-orb-1"></div>
+    <div class="aurora-orb-2"></div>
+  </div>
+
+  <!-- ===== Header & Island Navbar ===== -->
+  <header id="navbar" class="fixed inset-x-0 top-0 z-[1000] px-4 py-4 transition-all duration-300">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between rounded-2xl px-5 py-3.5 glass transition-all" aria-label="Navigasi utama">
+      <!-- Logo -->
+      <a href="index.html#home" class="flex items-center gap-3 group" id="nav-logo">
+        <div class="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/30 transition-transform group-hover:scale-105">
+          <i data-lucide="map-pin" class="h-5 w-5"></i>
+          <span class="absolute -top-1 -right-1 flex h-3 w-3">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+          </span>
+        </div>
+        <div>
+          <span class="font-logo text-xl font-bold tracking-tight text-slate-900 dark:text-white">Jalan<span class="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Kitta</span></span>
+          <span class="hidden sm:block text-[10px] font-semibold tracking-wider text-slate-500 dark:text-slate-400 uppercase">Lampung Smart Road</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <ul class="hidden items-center gap-1 lg:flex text-sm font-semibold text-slate-700 dark:text-slate-300">
+        <li><a href="index.html#home" class="nav-link relative px-4 py-2 rounded-xl transition hover:text-amber-500 dark:hover:text-amber-400">Home</a></li>
+        <li><a href="index.html#layanan" class="nav-link relative px-4 py-2 rounded-xl transition hover:text-amber-500 dark:hover:text-amber-400">Layanan</a></li>
+        <li><a href="index.html#sdg" class="nav-link relative px-4 py-2 rounded-xl transition hover:text-amber-500 dark:hover:text-amber-400">SDG 9</a></li>
+        <li><a href="#peta" class="nav-link active relative px-4 py-2 rounded-xl text-amber-500 font-bold transition">Peta Jalan</a></li>
+        <li><a href="#statistik" class="nav-link relative px-4 py-2 rounded-xl transition hover:text-amber-500 dark:hover:text-amber-400">Statistik</a></li>
+      </ul>
+
+      <!-- Right Actions: Theme Toggle + Login + CTA -->
+      <div class="flex items-center gap-3">
+        <!-- Theme Toggle Button -->
+        <button id="dark-toggle" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/80 dark:border-white/10 bg-white/60 dark:bg-slate-800/80 text-slate-700 dark:text-amber-400 shadow-sm transition hover:scale-105 active:scale-95" title="Ganti Tema (Gelap / Terang)" aria-label="Toggle Dark Mode">
+          <i data-lucide="sun" id="theme-sun-icon" class="h-5 w-5 hidden dark:block transition-transform duration-300"></i>
+          <i data-lucide="moon" id="theme-moon-icon" class="h-5 w-5 block dark:hidden transition-transform duration-300"></i>
+        </button>
+
+        <div id="auth-container" class="hidden sm:flex items-center gap-3">
+          <button id="btn-login-nav" class="rounded-xl border border-slate-200 dark:border-white/15 px-4 py-2 text-sm font-semibold text-slate-800 dark:text-slate-200 transition hover:bg-slate-100 dark:hover:bg-slate-800">Login</button>
+          <div id="user-menu" class="hidden items-center gap-3">
+            <div class="grid h-8 w-8 place-items-center rounded-full bg-slate-900 dark:bg-amber-500 text-sm font-bold text-white dark:text-slate-900 shadow-sm" id="user-initial" title="User">U</div>
+            <button id="btn-logout" class="text-sm font-medium text-coral hover:underline">Logout</button>
+          </div>
+          <a href="#lapor" id="nav-cta" class="glow-btn-primary flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold shadow-md">
+            <i data-lucide="camera" class="h-4 w-4"></i>
+            <span>Lapor</span>
+          </a>
+        </div>
+
+        <button id="menu-toggle" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-slate-800/80 text-slate-800 dark:text-white lg:hidden" aria-label="Buka menu">
+          <i data-lucide="menu" class="h-5 w-5"></i>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobile-menu" class="mx-auto mt-2 max-w-7xl hidden overflow-hidden rounded-2xl glass p-4 shadow-2xl lg:hidden">
+      <ul class="flex flex-col gap-1 text-sm font-semibold text-slate-800 dark:text-slate-200">
+        <li><a href="index.html#home" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="home" class="h-4 w-4 text-amber-500"></i>Home</a></li>
+        <li><a href="index.html#layanan" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="layers" class="h-4 w-4 text-amber-500"></i>Layanan</a></li>
+        <li><a href="index.html#sdg" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="target" class="h-4 w-4 text-amber-500"></i>SDG 9</a></li>
+        <li><a href="#peta" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 bg-amber-500/10 text-amber-500"><i data-lucide="map" class="h-4 w-4"></i>Peta Jalan</a></li>
+        <li><a href="#statistik" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="bar-chart-3" class="h-4 w-4 text-amber-500"></i>Statistik</a></li>
+        <li><a href="#lapor" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="megaphone" class="h-4 w-4 text-amber-500"></i>Lapor Kerusakan</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="main-content" tabindex="-1" class="relative z-10 pt-36 sm:pt-44">
+    <section id="peta" class="relative pb-24 scroll-mt-36">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="mx-auto mb-12 max-w-2xl text-center">
+          <span class="rounded-full bg-amber-500/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Peta Interaktif Spasial</span>
+          <h1 class="mt-3 font-display text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl lg:text-[44px]">Kondisi Jalan Provinsi Lampung</h1>
+          <p class="mt-3 text-slate-600 dark:text-slate-400 text-sm sm:text-base">Garis ruas digambar mengikuti jalan sebenarnya menggunakan layanan routing OSRM. <strong>Prototipe:</strong> data ruas dan kondisinya adalah data contoh untuk demonstrasi, bukan data resmi pemerintah.</p>
+        </div>
+
+        <div class="grid gap-8 lg:grid-cols-3">
+          <!-- Filter Panel -->
+          <aside class="glass-card flex flex-col rounded-3xl p-6 lg:max-h-[640px]">
+            <div class="mb-4 flex items-center justify-between">
+              <h3 class="font-bold text-slate-900 dark:text-white">Filter Kondisi</h3>
+              <span id="road-count" class="text-xs font-bold text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded-full"></span>
+            </div>
+            <div class="mb-6 grid grid-cols-2 gap-2.5 text-xs font-semibold">
+              <button data-filter="all" class="filter-btn is-active rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-800/60 px-3 py-2.5 transition hover:bg-slate-100 dark:hover:bg-slate-700">Semua</button>
+              <button data-filter="baik" class="filter-btn flex items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-800/60 px-3 py-2.5 transition hover:bg-slate-100 dark:hover:bg-slate-700"><span class="h-2.5 w-2.5 rounded-full bg-good"></span>Mantap</button>
+              <button data-filter="ringan" class="filter-btn flex items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-800/60 px-3 py-2.5 transition hover:bg-slate-100 dark:hover:bg-slate-700"><span class="h-2.5 w-2.5 rounded-full bg-minor"></span>Rusak Ringan</button>
+              <button data-filter="berat" class="filter-btn flex items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-800/60 px-3 py-2.5 transition hover:bg-slate-100 dark:hover:bg-slate-700"><span class="h-2.5 w-2.5 rounded-full bg-major"></span>Rusak Berat</button>
+            </div>
+            <h3 class="mb-3 text-sm font-bold text-slate-900 dark:text-white">Daftar Ruas Jalan</h3>
+            <ul id="road-list" class="thin-scroll -mr-2 flex-1 space-y-2 overflow-y-auto pr-2"></ul>
+          </aside>
+
+          <!-- Map Container -->
+          <div class="glass-card relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/10 shadow-2xl lg:col-span-2">
+            <div id="map" class="h-[460px] w-full sm:h-[640px] bg-slate-100 dark:bg-slate-900 z-0"></div>
+
+            <div class="pointer-events-none absolute bottom-4 left-4 z-[500] rounded-2xl glass px-4 py-3 text-xs shadow-lg border border-slate-200/80 dark:border-white/10 text-slate-800 dark:text-slate-200">
+              <p class="mb-2 font-bold">Legenda Jalan</p>
+              <ul class="space-y-1.5 font-medium">
+                <li class="flex items-center gap-2"><span class="h-1.5 w-6 rounded bg-good"></span>Mantap</li>
+                <li class="flex items-center gap-2"><span class="h-1.5 w-6 rounded bg-minor"></span>Rusak Ringan</li>
+                <li class="flex items-center gap-2"><span class="h-1.5 w-6 rounded bg-major"></span>Rusak Berat</li>
+              </ul>
+            </div>
+
+            <div class="absolute right-4 top-4 z-[500] flex flex-col items-end gap-2">
+              <div class="glass inline-flex rounded-xl p-1 text-xs font-bold text-slate-800 dark:text-white shadow" role="group" aria-label="Gaya peta">
+                <button type="button" data-style="jalan" class="map-style-btn inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition" aria-pressed="true">
+                  <i data-lucide="map" class="h-3.5 w-3.5"></i> Jalan
+                </button>
+                <button type="button" data-style="satelit" class="map-style-btn inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition" aria-pressed="false">
+                  <i data-lucide="satellite" class="h-3.5 w-3.5"></i> Satelit HD
+                </button>
+              </div>
+              <button id="btn-reset-view" class="inline-flex items-center gap-2 rounded-xl glass px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-white shadow hover:scale-105 transition">
+                <i data-lucide="locate-fixed" class="h-4 w-4 text-amber-500"></i> Reset Peta
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <section id="statistik" class="relative py-24 border-t border-slate-200/80 dark:border-white/10">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="reveal mb-12 text-center">
+          <span class="rounded-full bg-amber-500/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Transparansi Publik</span>
+          <h2 class="mt-3 font-display text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl">Data Berbicara, Perbaikan Bergerak</h2>
+        </div>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <article class="reveal glass-card rounded-3xl p-6 text-center hover:-translate-y-2 transition">
+            <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">Total Ruas Dipantau</p>
+            <p class="mt-2 font-display text-4xl font-extrabold text-slate-900 dark:text-white"><span class="counter" id="counter-total-km" data-target="0">0</span>
+              <span class="text-lg text-slate-500">km</span>
+            </p>
+          </article>
+          <article class="reveal glass-card rounded-3xl p-6 text-center hover:-translate-y-2 transition">
+            <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">Persentase Rusak</p>
+            <p class="mt-2 font-display text-4xl font-extrabold text-amber-500"><span class="counter" id="counter-persen-rusak" data-target="0"
+                data-decimals="1">0</span><span class="text-lg text-slate-500">%</span></p>
+          </article>
+          <article class="reveal glass-card rounded-3xl p-6 text-center hover:-translate-y-2 transition">
+            <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">Total Laporan Warga</p>
+            <p class="mt-2 font-display text-4xl font-extrabold text-slate-900 dark:text-white"><span id="counter-laporan" class="counter"
+                data-target="0">0</span>
+            </p>
+            <p id="counter-selesai-text" class="mt-1 text-xs font-bold text-emerald-500">0 selesai diperbaiki</p>
+          </article>
+          <article class="reveal glass-card rounded-3xl p-6 text-center hover:-translate-y-2 transition">
+            <p class="text-sm font-semibold text-slate-500 dark:text-slate-400">Rata-rata Penyelesaian</p>
+            <p class="mt-2 font-display text-4xl font-extrabold text-cyan-500"><span class="counter" id="counter-waktu-selesai"
+                data-decimals="1">—</span><span id="unit-waktu-selesai" class="text-lg text-slate-500 hidden"> hari</span></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="lapor" class="relative py-24 border-t border-slate-200/80 dark:border-white/10">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="grid gap-12 lg:grid-cols-5">
+          <!-- Kolom kiri: judul + panduan 3 langkah -->
+          <div class="reveal lg:col-span-2">
+            <span class="rounded-full bg-amber-500/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Formulir Laporan</span>
+            <h2 class="mt-3 font-display text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl">Lihat jalan rusak? <br />Laporkan dalam 1 menit.</h2>
+            <p class="mt-4 leading-relaxed text-slate-600 dark:text-slate-400">Tidak perlu tahu koordinat. Cukup tandai lokasi di peta atau gunakan GPS ponsel Anda — laporan akan tampil di peta publik JalanKitta setelah diverifikasi tim.</p>
+
+            <ol class="mt-8 space-y-4">
+              <li class="flex gap-4 glass-card p-4 rounded-2xl">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500 text-white font-extrabold text-sm shadow-md shadow-amber-500/30">1</span>
+                <div>
+                  <p class="font-bold text-sm text-slate-900 dark:text-white">Tandai lokasi</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Klik titik kerusakan di peta mini, atau tekan <span class="font-bold text-amber-500">Lokasi Saya</span>.</p>
+                </div>
+              </li>
+              <li class="flex gap-4 glass-card p-4 rounded-2xl">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white font-extrabold text-sm shadow-md shadow-orange-500/30">2</span>
+                <div>
+                  <p class="font-bold text-sm text-slate-900 dark:text-white">Pilih tingkat kerusakan &amp; foto</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Pilih kategori dan lampirkan foto bukti aktual.</p>
+                </div>
+              </li>
+              <li class="flex gap-4 glass-card p-4 rounded-2xl">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white font-extrabold text-sm shadow-md shadow-emerald-500/30">3</span>
+                <div>
+                  <p class="font-bold text-sm text-slate-900 dark:text-white">Kirim &amp; pantau</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Laporan tersimpan dan muncul sebagai titik di Peta Jalan setelah diverifikasi admin.</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <!-- Kolom kanan: form -->
+          <div class="reveal lg:col-span-3">
+            <form id="report-form" class="glass-card space-y-6 rounded-[2.5rem] p-6 sm:p-10 border border-slate-200/80 dark:border-white/10 shadow-2xl" novalidate>
+              
+              <!-- Nama -->
+              <div>
+                <label for="input-nama" class="mb-2 block text-sm font-bold text-slate-900 dark:text-white">Nama Lengkap</label>
+                <div class="relative">
+                  <i data-lucide="user" class="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+                  <input type="text" id="input-nama" required maxlength="100" placeholder="cth. Siti Rahmawati" autocomplete="name"
+                    class="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/80 py-3 pl-11 pr-4 text-sm text-slate-900 dark:text-white outline-none focus:border-amber-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-amber-500/20 transition" />
+                </div>
+              </div>
+
+              <!-- Lokasi: peta mini + GPS -->
+              <div>
+                <div class="mb-2 flex items-center justify-between gap-3">
+                  <label for="input-lokasi" class="block text-sm font-bold text-navy">Lokasi Kerusakan</label>
+                  <button type="button" id="btn-geolocate"
+                    class="inline-flex items-center gap-2 rounded-full bg-accent/10 px-3.5 py-1.5 text-xs font-bold text-accent transition hover:bg-accent/20 disabled:cursor-wait disabled:opacity-60">
+                    <i data-lucide="crosshair" class="h-3.5 w-3.5"></i><span>Lokasi Saya</span>
+                  </button>
+                </div>
+                <div class="relative overflow-hidden rounded-2xl border border-slate-200 z-0">
+                  <div id="picker-map" class="h-64 w-full sm:h-72 bg-slate-100"></div>
+                  <p id="picker-hint"
+                    class="pointer-events-none absolute left-1/2 top-3 z-[500] -translate-x-1/2 whitespace-nowrap rounded-full bg-white/95 px-3 py-1.5 text-[11px] font-bold text-navy shadow-sm transition-opacity">
+                    <i data-lucide="mouse-pointer-click" class="mr-1 inline h-3.5 w-3.5 text-accent"></i>Klik peta untuk menandai lokasi
+                  </p>
+                </div>
+                <div class="relative mt-3">
+                  <i data-lucide="map-pin" class="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+                  <input type="text" id="input-lokasi" readonly required
+                    placeholder="Belum ada lokasi — klik peta atau gunakan GPS"
+                    class="w-full cursor-default rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 font-mono text-sm text-navy outline-none placeholder:font-sans placeholder:text-slate-400" />
+                </div>
+                <div id="detected-road-box" class="hidden mt-2 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-3.5 py-2 text-xs flex items-center justify-between">
+                  <span class="flex items-center gap-1.5 font-semibold text-amber-800 dark:text-amber-300">
+                    <i data-lucide="git-branch" class="h-3.5 w-3.5"></i> Ruas Terdeteksi: <strong id="detected-road-name" class="font-bold"></strong>
+                  </span>
+                  <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-amber-200/60 dark:bg-amber-400/20 text-amber-900 dark:text-amber-200" id="detected-road-dist"></span>
+                </div>
+                <div id="duplicate-warning-box" class="hidden mt-2 rounded-xl bg-orange-50 dark:bg-orange-500/10 border border-orange-200 dark:border-orange-500/20 px-3.5 py-2 text-xs flex items-center justify-between text-orange-800 dark:text-orange-300">
+                  <span class="flex items-center gap-1.5 font-semibold">
+                    <i data-lucide="alert-triangle" class="h-3.5 w-3.5 text-orange-600 dark:text-orange-400"></i>
+                    <span id="duplicate-warning-text"></span>
+                  </span>
+                  <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-orange-200/60 dark:bg-orange-400/20 text-orange-950 dark:text-orange-200">Duplikat?</span>
+                </div>
+                <input type="hidden" id="input-lat" />
+                <input type="hidden" id="input-lng" />
+              </div>
+
+              <!-- Kategori -->
+              <fieldset>
+                <legend class="mb-2 block text-sm font-bold text-navy">Tingkat Kerusakan</legend>
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <label class="kategori-card flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-accent">
+                    <input type="radio" name="kategori" value="baik" class="sr-only" />
+                    <span class="h-3 w-3 shrink-0 rounded-full bg-good shadow-[0_0_12px_#22c55e]"></span>
+                    <span class="text-sm font-bold text-navy">Kondisi Baik</span>
+                  </label>
+                  <label class="kategori-card flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-accent">
+                    <input type="radio" name="kategori" value="ringan" class="sr-only" checked />
+                    <span class="h-3 w-3 shrink-0 rounded-full bg-minor shadow-[0_0_12px_#F59E0B]"></span>
+                    <span class="text-sm font-bold text-navy">Rusak Ringan</span>
+                  </label>
+                  <label class="kategori-card flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-accent">
+                    <input type="radio" name="kategori" value="berat" class="sr-only" />
+                    <span class="h-3 w-3 shrink-0 rounded-full bg-major shadow-[0_0_12px_#ef4444]"></span>
+                    <span class="text-sm font-bold text-navy">Rusak Berat</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <!-- Upload Foto (Dropzone) -->
+              <div>
+                <span class="mb-2 block text-sm font-bold text-navy">Foto Kerusakan <span class="text-ink font-normal">(opsional, maks. 5 MB)</span></span>
+                <label id="dropzone" for="input-foto"
+                  class="dropzone flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 px-6 py-8 text-center transition hover:border-accent hover:bg-accent/5">
+                  <span class="grid h-12 w-12 place-items-center rounded-2xl bg-white text-ink shadow-sm">
+                    <i data-lucide="image-plus" class="h-6 w-6"></i>
+                  </span>
+                  <span class="text-sm font-bold text-navy">Seret foto ke sini atau <span class="text-accent underline underline-offset-4">pilih file</span></span>
+                  <span class="text-xs text-ink">JPG, PNG, atau WEBP</span>
+                  <input type="file" id="input-foto" accept="image/jpeg,image/png,image/webp" class="sr-only" />
+                </label>
+                <div id="foto-preview" class="mt-3 hidden items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+                  <img id="foto-preview-img" alt="Pratinjau foto kerusakan" class="h-16 w-16 rounded-xl object-cover" />
+                  <div class="min-w-0 flex-1">
+                    <p id="foto-preview-name" class="truncate text-sm font-bold text-navy"></p>
+                    <p id="foto-preview-size" class="text-xs text-ink"></p>
+                  </div>
+                  <button type="button" id="btn-foto-remove" aria-label="Hapus foto" class="grid h-9 w-9 place-items-center rounded-xl text-slate-400 transition hover:bg-slate-200 hover:text-major">
+                    <i data-lucide="x" class="h-4 w-4"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Deskripsi -->
+              <div>
+                <label for="input-deskripsi" class="mb-2 block text-sm font-bold text-navy">Deskripsi</label>
+                <textarea id="input-deskripsi" rows="3" required maxlength="1000"
+                  placeholder="cth. Lubang ±1 m di lajur kiri, tergenang saat hujan..."
+                  class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-navy outline-none focus:border-accent focus:bg-white focus:ring-4 focus:ring-accent/20 transition"></textarea>
+              </div>
+
+              <p id="form-status" class="hidden rounded-xl px-4 py-3 text-sm" role="status" aria-live="polite"></p>
+
+              <button type="submit" id="btn-submit-report"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent px-6 py-4 font-bold text-white shadow-btn transition hover:-translate-y-1 disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0">
+                <i data-lucide="send" class="h-4 w-4"></i><span>Kirim Laporan</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal Laporan Saya -->
+  <div id="modal-my-reports" role="dialog" aria-modal="true" aria-labelledby="modal-my-reports-title" class="fixed inset-0 z-[2000] hidden bg-black/60 backdrop-blur-sm p-4 flex items-center justify-center">
+    <div class="relative max-w-2xl w-full bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] animate-in fade-in duration-200">
+      <div class="p-5 sm:p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+        <div class="flex items-center gap-3">
+          <div class="h-10 w-10 rounded-2xl bg-accent/15 grid place-items-center text-accent">
+            <i data-lucide="clipboard-list" class="h-5 w-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="modal-my-reports-title" class="font-display text-lg font-bold text-navy">Laporan Saya</h3>
+              <span id="my-reports-badge" class="rounded-full bg-navy/10 px-2.5 py-0.5 text-xs font-bold text-navy">0</span>
+            </div>
+            <p class="text-xs text-ink">Pantau status laporan kerusakan jalan yang pernah Anda kirimkan</p>
+          </div>
+        </div>
+        <button id="modal-my-reports-close" aria-label="Tutup jendela laporan saya" class="rounded-xl p-2 text-ink hover:bg-slate-200/60 transition"><i data-lucide="x" class="h-5 w-5"></i></button>
+      </div>
+
+      <div class="p-5 sm:p-6 overflow-y-auto flex-1 space-y-4 thin-scroll" id="my-reports-list-container">
+        <!-- Konten Laporan Saya di-render dinamis -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Lightbox Foto Laporan Saya -->
+  <div id="modal-my-reports-photo" role="dialog" aria-modal="true" aria-labelledby="modal-my-photo-title" class="fixed inset-0 z-[2050] hidden bg-black/85 backdrop-blur-sm p-4 flex items-center justify-center">
+    <div class="relative max-w-3xl w-full bg-white rounded-2xl overflow-hidden shadow-2xl">
+      <div class="p-4 flex items-center justify-between border-b border-slate-100">
+        <h3 id="modal-my-photo-title" class="text-sm font-bold text-navy truncate">Dokumentasi Kerusakan</h3>
+        <button id="modal-my-photo-close" aria-label="Tutup foto" class="rounded-lg p-1 text-ink hover:bg-slate-100 transition"><i data-lucide="x" class="h-5 w-5"></i></button>
+      </div>
+      <div class="p-4 bg-slate-900 flex items-center justify-center min-h-[260px] max-h-[75vh]">
+        <img id="modal-my-photo-img" src="" alt="Foto Bukti" class="max-h-[70vh] w-auto max-w-full object-contain rounded-lg" />
+      </div>
+    </div>
+  </div>
+
+    <!-- Modal Laporan Terkirim -->
+    <div id="modal-success-result" role="dialog" aria-modal="true" aria-labelledby="modal-success-title" class="fixed inset-0 z-[2100] hidden bg-black/60 backdrop-blur-sm p-4 flex items-center justify-center">
+      <div class="relative max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-6">
+        <button id="modal-success-close" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" aria-label="Tutup"><i data-lucide="x" class="h-5 w-5"></i></button>
+        <div class="flex flex-col items-center space-y-4">
+          <div class="flex items-center justify-center bg-green-100 rounded-full p-2">
+            <i data-lucide="check-circle" class="h-8 w-8 text-green-600"></i>
+          </div>
+          <h3 id="modal-success-title" class="text-2xl font-bold text-navy">Laporan terkirim!</h3>
+          <p id="modal-success-code" class="text-sm text-ink">Kode laporan <span class="font-mono text-navy"></span></p>
+          <!-- Photo preview -->
+          <img id="modal-success-photo" src="" alt="Foto laporan" class="hidden rounded-xl max-h-80 object-cover" />
+          <p class="text-center text-sm text-ink">Laporan Anda sedang menunggu verifikasi tim. Simpan kode di atas untuk merujuk laporan ini.</p>
+          <div class="mt-4 text-center">
+            <button id="modal-success-share" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-navy transition hover:bg-slate-100"><i data-lucide="share-2" class="h-4 w-4"></i>Bagikan</button>
+            <button id="modal-success-track" class="ml-2 inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-bold text-white shadow-md transition hover:brightness-110"><i data-lucide="clipboard-list" class="h-4 w-4"></i>Lacak status</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
+  <script src="assets/js/auth.js"></script>
+
+  <script>
+    (() => {
+      'use strict';
+
+      // =====================================================================
+      // INISIALISASI SUPABASE (Diambil dari window.supabaseDb buatan auth.js)
+      // =====================================================================
+      const db = window.supabaseDb;
+      let loadedRoadsData = [];
+      
+      if (!db) {
+        console.warn('Supabase SDK tidak termuat.');
+      }
+
+      function haversineDistKm(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      }
+
+      function findNearestRoad(lat, lng) {
+        if (!loadedRoadsData || loadedRoadsData.length === 0) return null;
+        let nearest = null;
+        let minDist = Infinity;
+        for (const road of loadedRoadsData) {
+          const coords = road.geometry?.coordinates;
+          if (!Array.isArray(coords)) continue;
+          for (const pt of coords) {
+            const d = haversineDistKm(lat, lng, pt[1], pt[0]);
+            if (d < minDist) {
+              minDist = d;
+              nearest = road;
+            }
+          }
+        }
+        return minDist <= 10 ? { road: nearest, distKm: minDist } : null;
+      }
+
+      function findNearbyDuplicateReport(lat, lng, radiusMeters = 30) {
+        if (!reportMarkers || reportMarkers.length === 0) return null;
+        const radiusKm = radiusMeters / 1000;
+        for (const item of reportMarkers) {
+          if (item.lat == null || item.lng == null) continue;
+          const dKm = haversineDistKm(lat, lng, item.lat, item.lng);
+          if (dKm <= radiusKm) {
+            return { report: item, distMeters: Math.round(dKm * 1000) };
+          }
+        }
+        return null;
+      }
+
+      const $ = (s, el = document) => el.querySelector(s);
+      const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+
+      lucide.createIcons();
+
+      // UI INTERACTIVITY
+      const navbar = $('#navbar');
+      const onScroll = () => navbar.classList.toggle('scrolled', window.scrollY > 20);
+      window.addEventListener('scroll', onScroll); onScroll();
+
+      const toggle = $('#menu-toggle'), menu = $('#mobile-menu');
+      toggle.addEventListener('click', () => {
+        const open = menu.classList.toggle('hidden') === false;
+        toggle.setAttribute('aria-expanded', open);
+      });
+      $$('.mobile-link').forEach((a) => a.addEventListener('click', () => menu.classList.add('hidden')));
+
+      // Scrollspy & Nav Link Active State untuk halaman aplikasi
+      const inPageNavLinks = $$('.nav-link').filter((l) => l.getAttribute('href')?.startsWith('#'));
+      const inPageMobileLinks = $$('.mobile-link').filter((l) => l.getAttribute('href')?.startsWith('#'));
+      const navSections = ['peta', 'statistik'].map((id) => document.getElementById(id)).filter(Boolean);
+
+      const updateScrollspy = () => {
+        let current = '';
+        const scrollPos = window.scrollY + 200;
+        navSections.forEach((sec) => {
+          if (sec) {
+            const top = sec.offsetTop;
+            const bottom = top + sec.offsetHeight;
+            if (scrollPos >= top && scrollPos < bottom) {
+              current = sec.id;
+            }
+          }
+        });
+
+        // Jika berada di dekat bagian atas, default ke peta
+        if (!current && window.scrollY < 300) {
+          current = 'peta';
+        }
+
+        inPageNavLinks.forEach((link) => {
+          const isActive = Boolean(current && link.getAttribute('href') === `#${current}`);
+          link.classList.toggle('active', isActive);
+        });
+        inPageMobileLinks.forEach((link) => {
+          const isActive = Boolean(current && link.getAttribute('href') === `#${current}`);
+          link.classList.toggle('active', isActive);
+        });
+      };
+
+      window.addEventListener('scroll', updateScrollspy, { passive: true });
+      window.addEventListener('hashchange', () => {
+        if (window.location.hash) {
+          const hashId = window.location.hash.substring(1);
+          if (['peta', 'statistik'].includes(hashId)) {
+            inPageNavLinks.forEach((l) => l.classList.toggle('active', l.getAttribute('href') === `#${hashId}`));
+            inPageMobileLinks.forEach((l) => l.classList.toggle('active', l.getAttribute('href') === `#${hashId}`));
+          }
+        }
+        setTimeout(updateScrollspy, 100);
+      });
+
+      // Respon seketika saat menu navbar diklik
+      [...inPageNavLinks, ...inPageMobileLinks].forEach((link) => {
+        link.addEventListener('click', () => {
+          const href = link.getAttribute('href');
+          if (href && href.startsWith('#')) {
+            const targetId = href.substring(1);
+            inPageNavLinks.forEach((l) => l.classList.toggle('active', l.getAttribute('href') === `#${targetId}`));
+            inPageMobileLinks.forEach((l) => l.classList.toggle('active', l.getAttribute('href') === `#${targetId}`));
+          }
+        });
+      });
+
+      // Jalankan saat load awal
+      if (window.location.hash && ['peta', 'statistik'].includes(window.location.hash.substring(1))) {
+        const hashId = window.location.hash.substring(1);
+        inPageNavLinks.forEach((l) => l.classList.toggle('active', l.getAttribute('href') === `#${hashId}`));
+        inPageMobileLinks.forEach((l) => l.classList.toggle('active', l.getAttribute('href') === `#${hashId}`));
+      } else {
+        updateScrollspy();
+      }
+      setTimeout(updateScrollspy, 300);
+      setTimeout(updateScrollspy, 1000);
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (en.isIntersecting) {
+            en.target.classList.add('is-visible');
+            $$('.counter', en.target).forEach(animateCounter);
+            io.unobserve(en.target);
+          }
+        });
+      }, { threshold: 0.05, rootMargin: '50px' });
+      $$('.reveal').forEach((el) => io.observe(el));
+
+      // Fallback agar elemen di viewport langsung muncul tanpa harus scroll
+      const forceRevealInView = () => {
+        $$('.reveal:not(.is-visible)').forEach((el) => {
+          const rect = el.getBoundingClientRect();
+          if (rect.top < window.innerHeight + 100 && rect.bottom > -50) {
+            el.classList.add('is-visible');
+            $$('.counter', el).forEach(animateCounter);
+          }
+        });
+      };
+      forceRevealInView();
+      setTimeout(forceRevealInView, 100);
+      setTimeout(forceRevealInView, 400);
+
+      function animateCounter(el) {
+        const raw = el.textContent.trim().replace(',', '.');
+        if (raw === '—' || isNaN(parseFloat(raw))) return;
+        if (el.dataset.done) return;
+        el.dataset.done = '1';
+        const dec = parseInt(el.dataset.decimals || '0', 10);
+        const duration = 1600, start = performance.now();
+        const step = (now) => {
+          const target = parseFloat(el.dataset.target);
+          if (isNaN(target)) return;
+          const p = Math.min((now - start) / duration, 1);
+          el.textContent = (target * (1 - Math.pow(1 - p, 3))).toLocaleString('id-ID', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+
+      // LEAFLET MAP & OSRM SMART ROUTING
+      const CONDITION = {
+        baik: { label: 'Kondisi Baik', color: '#22c55e' },
+        ringan: { label: 'Rusak Ringan', color: '#F59E0B' },
+        berat: { label: 'Rusak Berat', color: '#ef4444' },
+      };
+
+      const map = L.map('map', {
+        center: [-5.25, 105.15],
+        zoom: 11,
+        scrollWheelZoom: false,
+      });
+
+      // Tile HD dari Esri (gratis, tanpa API key) — gaya Jalan (ikut tema) atau Satelit
+      const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services';
+      const TILE_ATTR = 'Tiles &copy; Esri &mdash; Esri, Maxar, Earthstar Geographics, HERE, Garmin, OpenStreetMap contributors';
+      const makeBaseTiles = (isDark, style) => {
+        const opts = { attribution: TILE_ATTR, detectRetina: true, maxZoom: 20 };
+        if (style === 'satelit') {
+          return L.layerGroup([
+            L.tileLayer(`${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 19, zIndex: 1 }),
+            L.tileLayer(`${ESRI}/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 19, zIndex: 2 }),
+            L.tileLayer(`${ESRI}/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 19, zIndex: 3 }),
+          ]);
+        }
+        if (!isDark) {
+          return L.tileLayer(`${ESRI}/World_Street_Map/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 19 });
+        }
+        return L.layerGroup([
+          L.tileLayer(`${ESRI}/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 16, zIndex: 1 }),
+          L.tileLayer(`${ESRI}/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 16, zIndex: 2 }),
+        ]);
+      };
+
+      let mapStyle = localStorage.getItem('jk-map-style') === 'satelit' ? 'satelit' : 'jalan';
+      let baseTiles = null;
+      const applyBaseTiles = () => {
+        if (baseTiles) map.removeLayer(baseTiles);
+        baseTiles = makeBaseTiles(document.documentElement.classList.contains('dark'), mapStyle).addTo(map);
+        $$('.map-style-btn').forEach((b) => {
+          const active = b.dataset.style === mapStyle;
+          b.classList.toggle('bg-amber-500', active);
+          b.classList.toggle('text-white', active);
+          b.setAttribute('aria-pressed', active);
+        });
+      };
+      applyBaseTiles();
+      window.addEventListener('jk-theme-change', applyBaseTiles);
+      $$('.map-style-btn').forEach((btn) => btn.addEventListener('click', () => {
+        mapStyle = btn.dataset.style;
+        localStorage.setItem('jk-map-style', mapStyle);
+        applyBaseTiles();
+      }));
+
+      // Invalidate size immediately and after load so tiles render fully
+      map.whenReady(() => {
+        setTimeout(() => map.invalidateSize(), 50);
+        setTimeout(() => map.invalidateSize(), 300);
+      });
+      window.addEventListener('resize', () => map.invalidateSize());
+
+      const roadLayers = {};
+      let activeFilter = 'all';
+
+      async function drawSmartRoad(id, startLng, startLat, endLng, endLat, conditionKey, roadName, kab) {
+        try {
+          const url = `https://router.project-osrm.org/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?geometries=geojson&overview=full`;
+          const res = await fetch(url);
+          const data = await res.json();
+
+          if (data.code === 'Ok' && data.routes.length > 0) {
+            const color = CONDITION[conditionKey].color;
+            const geojson = data.routes[0].geometry;
+            const lengthKm = (data.routes[0].distance / 1000).toFixed(1);
+
+            const layer = L.geoJSON(geojson, {
+              style: { color: color, weight: 6, opacity: 0.9, lineCap: 'round' }
+            }).bindPopup(`
+              <div class="min-w-[180px]">
+                <p class="text-[11px] font-bold uppercase tracking-wider text-ink">${escapeHtml(kab)}</p>
+                <p class="mt-0.5 font-display text-base font-bold text-navy">${escapeHtml(roadName)}</p>
+                <span class="mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:${color}25;color:${color}">${CONDITION[conditionKey].label}</span>
+                <p class="mt-2 text-xs font-semibold text-ink">Estimasi Panjang: ${lengthKm} km</p>
+              </div>
+            `);
+
+            layer.on('mouseover', () => layer.setStyle({ weight: 9, opacity: 1 }));
+            layer.on('mouseout', () => layer.setStyle({ weight: 6, opacity: 0.9 }));
+
+            roadLayers[id] = { layer: layer, props: { id, name: roadName, condition: conditionKey, kab, lengthKm, color } };
+            layer.addTo(map);
+            updateUIList();
+            updateRoadStats(Object.values(roadLayers).map(r => ({ kondisi: r.props.condition, panjang_km: parseFloat(r.props.lengthKm) })));
+            return;
+          }
+          throw new Error('OSRM route unavailable');
+        } catch (err) {
+          console.warn(`OSRM routing fallback ke garis lurus untuk ruas ${id}:`, err.message || err);
+          // Visual Fallback: Jika OSRM offline/rate-limited, gambar polyline garis lurus agar peta tidak kosong
+          try {
+            const color = CONDITION[conditionKey]?.color || CONDITION.ringan.color;
+            const distEstKm = (map.distance([startLat, startLng], [endLat, endLng]) / 1000 * 1.25).toFixed(1);
+            const fallbackLayer = L.polyline([[startLat, startLng], [endLat, endLng]], {
+              color: color, weight: 6, opacity: 0.85, lineCap: 'round', dashArray: '6, 8'
+            }).bindPopup(`
+              <div class="min-w-[180px]">
+                <p class="text-[11px] font-bold uppercase tracking-wider text-ink">${escapeHtml(kab)}</p>
+                <p class="mt-0.5 font-display text-base font-bold text-navy">${escapeHtml(roadName)}</p>
+                <span class="mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:${color}25;color:${color}">${CONDITION[conditionKey]?.label || conditionKey} (Estimasi)</span>
+                <p class="mt-2 text-xs font-semibold text-ink">Estimasi Panjang: ~${distEstKm} km</p>
+              </div>
+            `);
+
+            fallbackLayer.on('mouseover', () => fallbackLayer.setStyle({ weight: 9, opacity: 1 }));
+            fallbackLayer.on('mouseout', () => fallbackLayer.setStyle({ weight: 6, opacity: 0.85 }));
+
+            roadLayers[id] = { layer: fallbackLayer, props: { id, name: roadName, condition: conditionKey, kab, lengthKm: distEstKm, color } };
+            fallbackLayer.addTo(map);
+            updateUIList();
+            updateRoadStats(Object.values(roadLayers).map(r => ({ kondisi: r.props.condition, panjang_km: parseFloat(r.props.lengthKm) })));
+          } catch (renderFallbackErr) {
+            console.error('Gagal me-render fallback ruas:', renderFallbackErr);
+          }
+        }
+      }
+
+      function updateUIList() {
+        const list = $('#road-list');
+        const visibleRoads = Object.values(roadLayers)
+          .filter(r => activeFilter === 'all' || r.props.condition === activeFilter)
+          .sort((a, b) => a.props.id.localeCompare(b.props.id));
+
+        $('#road-count').textContent = `${visibleRoads.length} ruas`;
+        list.innerHTML = visibleRoads.map(r => `
+          <li>
+            <button data-road-id="${escapeHtml(r.props.id)}" class="btn-focus-road group flex w-full items-center gap-3 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white/60 dark:bg-slate-800/60 p-3 text-left hover:border-amber-500 hover:bg-amber-500/5 dark:hover:bg-slate-800 transition">
+              <span class="h-10 w-1.5 shrink-0 rounded-full" style="background:${r.props.color}"></span>
+              <span class="min-w-0 flex-1">
+                <span class="block truncate text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(r.props.name)}</span>
+                <span class="block text-xs font-medium text-slate-500 dark:text-slate-400">${escapeHtml(r.props.kab)} · ${r.props.lengthKm} km</span>
+              </span>
+            </button>
+          </li>
+        `).join('');
+      }
+
+      $('#road-list').addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-focus-road');
+        if (btn && btn.dataset.roadId) {
+          window.focusRoad(btn.dataset.roadId);
+        }
+      });
+
+      const POPUP_NAVBAR_GAP = 16;
+      function offsetPopupFromNavbar(popup) {
+        const popupEl = popup?.getElement();
+        if (!popupEl) return;
+        const navbarBottom = $('#navbar').getBoundingClientRect().bottom;
+        const mapTop = map.getContainer().getBoundingClientRect().top;
+        const safeTop = Math.max(navbarBottom, mapTop) + POPUP_NAVBAR_GAP;
+        const overlap = safeTop - popupEl.getBoundingClientRect().top;
+        if (overlap > 0) map.panBy([0, -Math.ceil(overlap)], { animate: true, duration: 0.4 });
+      }
+
+      window.focusRoad = (id) => {
+        const target = roadLayers[id];
+        if (!target) return;
+        const bounds = target.layer.getBounds();
+        map.closePopup();
+        let opened = false;
+        const openPopupOnce = () => {
+          if (opened) return;
+          opened = true;
+          map.off('moveend', openPopupOnce);
+          clearTimeout(fallbackTimer);
+          const popup = target.layer.getPopup();
+          const prevAutoPan = popup.options.autoPan;
+          popup.options.autoPan = false;
+          target.layer.openPopup(bounds.getCenter());
+          popup.options.autoPan = prevAutoPan;
+          requestAnimationFrame(() => offsetPopupFromNavbar(popup));
+        };
+        // moveend tidak terpicu jika peta sudah berada di posisi tujuan; timer sebagai cadangan
+        map.on('moveend', openPopupOnce);
+        const fallbackTimer = setTimeout(openPopupOnce, 1800);
+        map.flyToBounds(bounds, { padding: [50, 50], duration: 1.5 });
+      };
+
+      // Fokus ke satu laporan (dipakai tautan admin: app.html?laporan=ID#peta)
+      window.focusReport = (id) => {
+        const entry = reportMarkers.find((m) => String(m.id) === String(id));
+        if (!entry) return false;
+        if (!map.hasLayer(entry.marker)) entry.marker.addTo(map);
+        map.flyTo(entry.marker.getLatLng(), 16, { duration: 1.2 });
+        setTimeout(() => entry.marker.openPopup(), 1300);
+        return true;
+      };
+
+      const reportMarkers = [];
+
+      function filterReportMarkers() {
+        reportMarkers.forEach(({ marker, kategori, status }) => {
+          const isSelesai = status === 'selesai';
+          const match = activeFilter === 'all'
+            || (activeFilter === 'baik' && (kategori === 'baik' || isSelesai))
+            || (kategori === activeFilter && !isSelesai);
+          if (match) {
+            if (!map.hasLayer(marker)) marker.addTo(map);
+          } else {
+            if (map.hasLayer(marker)) map.removeLayer(marker);
+          }
+        });
+      }
+
+      $$('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          activeFilter = e.currentTarget.dataset.filter;
+          $$('.filter-btn').forEach(b => {
+            b.classList.toggle('is-active', b.dataset.filter === activeFilter);
+          });
+          Object.values(roadLayers).forEach(r => {
+            if (activeFilter === 'all' || r.props.condition === activeFilter) r.layer.addTo(map);
+            else map.removeLayer(r.layer);
+          });
+          filterReportMarkers();
+          updateUIList();
+        });
+      });
+
+      $('#btn-reset-view').addEventListener('click', () => {
+        map.closePopup();
+        map.flyTo([-5.25, 105.15], 11, { duration: 1.5 });
+      });
+
+      const escapeHtml = (str) => String(str ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const makePulseIcon = (color) => L.divIcon({ className: 'custom-div-icon', html: `<div class="pulse-marker" style="--c:${color}"><span></span></div>`, iconSize: [18, 18], iconAnchor: [9, 9] });
+      const safeImageUrl = (url) => { try { const u = new URL(url); return ['https:', 'http:'].includes(u.protocol) ? u.href : null; } catch { return null; } };
+
+      function formatNamaPublik(str = '') {
+        if (!str) return 'Warga';
+        if (str.includes('@')) {
+          const userPart = str.split('@')[0];
+          return userPart.length > 3 ? `${userPart.slice(0, 3)}***` : userPart;
+        }
+        const parts = str.trim().split(/\s+/);
+        if (parts.length === 1) return parts[0];
+        return `${parts[0]} ${parts.slice(1).map(p => p[0].toUpperCase() + '.').join(' ')}`;
+      }
+
+      function updateRoadStats(roads) {
+        if (!roads || roads.length === 0) {
+          const elTotal = $('#counter-total-km');
+          if (elTotal) { elTotal.dataset.target = '0'; elTotal.textContent = '0'; }
+          const elPersen = $('#counter-persen-rusak');
+          if (elPersen) { elPersen.dataset.target = '0'; elPersen.textContent = '0'; }
+          return;
+        }
+        const totalKm = roads.reduce((acc, r) => acc + (Number(r.panjang_km) || 0), 0);
+        const rusakKm = roads.filter(r => ['berat', 'ringan'].includes(r.kondisi)).reduce((acc, r) => acc + (Number(r.panjang_km) || 0), 0);
+        const persenRusak = totalKm > 0 ? (rusakKm / totalKm) * 100 : 0;
+
+        const elTotal = $('#counter-total-km');
+        if (elTotal) {
+          elTotal.dataset.target = totalKm.toFixed(0);
+          elTotal.textContent = totalKm.toLocaleString('id-ID', { maximumFractionDigits: 0 });
+        }
+
+        const elPersen = $('#counter-persen-rusak');
+        if (elPersen) {
+          elPersen.dataset.target = persenRusak.toFixed(1);
+          elPersen.textContent = persenRusak.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+        }
+      }
+
+      async function loadRoads() {
+        if (db) {
+          try {
+            const { data, error } = await db.from('ruas_jalan').select('*').order('id');
+            if (error) {
+              const code = error.code || '';
+              const isMissingTable = code === '42P01' || code === 'PGRST205' || error.message?.includes('does not exist');
+              if (!isMissingTable) {
+                console.error('Error saat mengambil data ruas_jalan:', error);
+                const roadListEl = $('#road-list');
+                if (roadListEl) {
+                  roadListEl.innerHTML = '<li class="p-3 text-xs text-major bg-major/10 rounded-xl text-center font-bold">Gagal memuat data ruas. Muat ulang halaman.</li>';
+                }
+                const roadCountEl = $('#road-count');
+                if (roadCountEl) roadCountEl.textContent = 'Gagal';
+                return; // Jangan fallback jika tabel ada tapi query error (misal masalah izin/jaringan)
+              }
+              // Jika tabel memang belum dibuat di DB, lanjutkan ke fallback OSRM
+            } else {
+              // Tabel ada dan query sukses
+              if (data && data.length > 0) {
+                loadedRoadsData = data;
+                data.forEach(r => {
+                  try {
+                    const conditionKey = r.kondisi || 'ringan';
+                    const color = CONDITION[conditionKey]?.color || CONDITION.ringan.color;
+                    const lengthKm = Number(r.panjang_km || 0).toFixed(1);
+
+                    const layer = L.geoJSON(r.geometry, {
+                      style: { color: color, weight: 6, opacity: 0.9, lineCap: 'round' }
+                    }).bindPopup(`
+                      <div class="min-w-[180px]">
+                        <p class="text-[11px] font-bold uppercase tracking-wider text-ink">${escapeHtml(r.kabupaten)}</p>
+                        <p class="mt-0.5 font-display text-base font-bold text-navy">${escapeHtml(r.nama)}</p>
+                        <span class="mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:${color}25;color:${color}">${CONDITION[conditionKey]?.label || conditionKey}</span>
+                        <p class="mt-2 text-xs font-semibold text-ink">Panjang Ruas: ${lengthKm} km</p>
+                      </div>
+                    `);
+
+                    layer.on('mouseover', () => layer.setStyle({ weight: 9, opacity: 1 }));
+                    layer.on('mouseout', () => layer.setStyle({ weight: 6, opacity: 0.9 }));
+
+                    roadLayers[r.id] = { layer, props: { id: r.id, name: r.nama, condition: conditionKey, kab: r.kabupaten, lengthKm, color } };
+                    layer.addTo(map);
+                  } catch (renderErr) {
+                    console.warn(`Gagal me-render geometri ruas ${r.id}:`, renderErr);
+                  }
+                });
+
+                updateUIList();
+                updateRoadStats(data);
+              } else {
+                // Tabel ada tapi data kosong (misal telah dikosongkan oleh admin)
+                updateUIList();
+                updateRoadStats([]);
+              }
+              return;
+            }
+          } catch (e) {
+            console.warn('Gagal membaca tabel ruas_jalan:', e);
+          }
+        }
+
+        // Fallback hanya jika tabel ruas_jalan belum dibuat di Supabase
+        drawSmartRoad('R-01', 105.41907, -4.86903, 105.54146, -4.84589, 'berat', 'Ruas Simpang Randu - Seputih Surabaya', 'Lampung Tengah');
+        drawSmartRoad('R-02', 104.62254, -5.49721, 104.73038, -5.44195, 'baik', 'Jalan Lintas Kota Agung - Gisting', 'Tanggamus');
+        drawSmartRoad('R-03', 105.19665, -5.25754, 105.23467, -5.34863, 'ringan', 'Jalan Raya Natar (Lintas Sumatera)', 'Lampung Selatan');
+      }
+
+      loadRoads();
+
+      function addReportMarker(report) {
+        const { nama, kategori_rusak, koordinat_lat, koordinat_lng, deskripsi, created_at, foto_url, status } = report;
+        const isSelesai = status === 'selesai';
+        const color = isSelesai ? '#22c55e' : (CONDITION[kategori_rusak]?.color || CONDITION.ringan.color);
+        const label = isSelesai ? 'Selesai Diperbaiki' : (CONDITION[kategori_rusak]?.label || CONDITION.ringan.label);
+        const date = new Date(created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        const fotoSrc = foto_url ? safeImageUrl(foto_url) : null;
+        const fotoHtml = fotoSrc ? `<a href="${escapeHtml(fotoSrc)}" target="_blank" rel="noopener" class="mb-2 mt-1.5 block overflow-hidden rounded-xl border border-slate-100"><img src="${escapeHtml(fotoSrc)}" alt="Foto dokumentasi kerusakan jalan" loading="lazy" class="h-28 w-full object-cover transition hover:scale-105" /></a>` : '';
+
+        const marker = L.marker([koordinat_lat, koordinat_lng], { icon: makePulseIcon(color) }).bindPopup(`
+            <div class="min-w-[180px] max-w-[220px]">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-ink">Laporan Warga</p>${fotoHtml}
+              <p class="mt-0.5 font-display text-base font-bold text-navy">${escapeHtml(formatNamaPublik(nama))}</p>
+              <span class="mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:${color}25;color:${color}">${label}</span>
+              <p class="mt-2 text-sm text-navy">${escapeHtml(deskripsi)}</p>
+              <p class="mt-2 text-[10px] font-medium text-ink">Dilaporkan pada ${date}</p>
+            </div>
+          `);
+
+        reportMarkers.push({
+          id: report.id,
+          marker,
+          kategori: kategori_rusak,
+          status: report.status,
+          lat: Number(koordinat_lat),
+          lng: Number(koordinat_lng)
+        });
+        const match = activeFilter === 'all'
+          || (activeFilter === 'baik' && (kategori_rusak === 'baik' || isSelesai))
+          || (kategori_rusak === activeFilter && !isSelesai);
+        if (match) {
+          marker.addTo(map);
+        }
+
+        if (fotoSrc) {
+          marker.on('popupopen', (e) => {
+            const img = e.popup.getElement()?.querySelector('img');
+            if (img && !img.complete) img.addEventListener('load', () => e.popup.update(), { once: true });
+          });
+        }
+      }
+
+      async function loadRealReports() {
+        if (!db) return;
+        try {
+          // Membaca secara aman hanya lewat view laporan_publik (bebas user_id & nama lengkap)
+          // Urutkan secara deterministik dengan created_at dan id untuk mencegah duplikasi/terlewat pada paginasi
+          let allPublicReports = [];
+          const PAGE_SIZE = 1000;
+          let from = 0;
+          let totalCount = 0;
+
+          const firstBatch = await db.from('laporan_publik')
+            .select('*', { count: 'exact' })
+            .order('created_at', { ascending: false })
+            .order('id', { ascending: false })
+            .range(from, from + PAGE_SIZE - 1);
+          if (firstBatch.error) throw firstBatch.error;
+
+          allPublicReports = allPublicReports.concat(firstBatch.data || []);
+          totalCount = firstBatch.count ?? allPublicReports.length;
+
+          // Ambil sisa batch jika total laporan melebihi 1000
+          while (allPublicReports.length < totalCount && (firstBatch.data?.length === PAGE_SIZE)) {
+            from += PAGE_SIZE;
+            const nextBatch = await db.from('laporan_publik')
+              .select('*')
+              .order('created_at', { ascending: false })
+              .order('id', { ascending: false })
+              .range(from, from + PAGE_SIZE - 1);
+            if (nextBatch.error) break;
+            if (!nextBatch.data || nextBatch.data.length === 0) break;
+            allPublicReports = allPublicReports.concat(nextBatch.data);
+          }
+
+          allPublicReports.forEach(report => addReportMarker(report));
+        } catch (err) { console.error('Error fetching reports from Supabase view laporan_publik:', err); }
+      }
+
+      // Ambil ringkasan agregat dari view statistik_publik (termasuk rata-rata waktu penyelesaian)
+      async function loadPublicStatistics() {
+        if (!db) return;
+        const fallbackToReportMarkers = () => {
+          const counterEl = $('#counter-laporan');
+          if (counterEl && reportMarkers.length > 0) {
+            counterEl.dataset.target = reportMarkers.length;
+            counterEl.textContent = reportMarkers.length.toLocaleString('id-ID');
+          }
+          const counterSelesai = $('#counter-selesai-text');
+          if (counterSelesai && reportMarkers.length > 0) {
+            const selesaiCount = reportMarkers.filter(m => m.status === 'selesai').length;
+            counterSelesai.textContent = `${selesaiCount.toLocaleString('id-ID')} selesai diperbaiki`;
+          }
+        };
+
+        try {
+          const { data, error } = await db.from('statistik_publik').select('*').maybeSingle();
+          if (error) {
+            console.warn('View statistik_publik belum dibuat di Supabase:', error.message);
+            fallbackToReportMarkers();
+            return;
+          }
+          if (data) {
+            // Update total laporan & selesai jika view tersedia
+            if (data.total_publik !== null && data.total_publik !== undefined) {
+              const counterEl = $('#counter-laporan');
+              if (counterEl) {
+                counterEl.dataset.target = data.total_publik;
+                counterEl.textContent = Number(data.total_publik).toLocaleString('id-ID');
+              }
+            } else {
+              fallbackToReportMarkers();
+            }
+            if (data.selesai !== null && data.selesai !== undefined) {
+              const counterSelesai = $('#counter-selesai-text');
+              if (counterSelesai) {
+                counterSelesai.textContent = `${Number(data.selesai).toLocaleString('id-ID')} selesai diperbaiki`;
+              }
+            }
+            // Rata-rata hari penyelesaian
+            const counterWaktu = $('#counter-waktu-selesai');
+            const unitWaktu = $('#unit-waktu-selesai');
+            if (counterWaktu) {
+              if (data.rata_hari_selesai !== null && data.rata_hari_selesai !== undefined) {
+                const val = Number(data.rata_hari_selesai);
+                counterWaktu.dataset.target = val.toFixed(1);
+                counterWaktu.textContent = val.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+                delete counterWaktu.dataset.done;
+                if (counterWaktu.closest('.reveal')?.classList.contains('is-visible')) {
+                  animateCounter(counterWaktu);
+                }
+                if (unitWaktu) unitWaktu.classList.remove('hidden');
+              } else {
+                counterWaktu.textContent = '—';
+                delete counterWaktu.dataset.target;
+                if (unitWaktu) unitWaktu.classList.add('hidden');
+              }
+            }
+          } else {
+            fallbackToReportMarkers();
+          }
+        } catch (err) {
+          console.warn('Gagal memuat statistik_publik:', err);
+          fallbackToReportMarkers();
+        }
+      }
+
+      const LAMPUNG_BOUNDS = L.latLngBounds([-6.25, 103.55], [-3.70, 106.25]);
+      const pickerMap = L.map('picker-map', { center: [-5.40, 105.26], zoom: 12, scrollWheelZoom: false });
+      L.tileLayer(`${ESRI}/World_Street_Map/MapServer/tile/{z}/{y}/{x}`, { attribution: TILE_ATTR, detectRetina: true, maxNativeZoom: 19, maxZoom: 20 }).addTo(pickerMap);
+
+      let pickerMarker = null, accuracyCircle = null;
+      const selectedColor = () => CONDITION[$('input[name="kategori"]:checked')?.value || 'ringan'].color;
+
+      function setPickedLocation(lat, lng, source = 'peta') {
+        const latF = Number(lat.toFixed(6)), lngF = Number(lng.toFixed(6));
+        $('#input-lat').value = latF; $('#input-lng').value = lngF;
+        $('#input-lokasi').value = `${latF}, ${lngF}  ·  via ${source}`;
+        if (pickerMarker) pickerMarker.setLatLng([latF, lngF]);
+        else {
+          pickerMarker = L.marker([latF, lngF], { icon: makePulseIcon(selectedColor()), draggable: true }).addTo(pickerMap);
+          pickerMarker.on('dragend', () => {
+            const p = pickerMarker.getLatLng();
+            if (accuracyCircle) { pickerMap.removeLayer(accuracyCircle); accuracyCircle = null; }
+            setPickedLocation(p.lat, p.lng, 'peta');
+          });
+        }
+        $('#picker-hint').classList.add('opacity-0');
+        if (!LAMPUNG_BOUNDS.contains([latF, lngF])) showStatus('warn', 'Titik di luar Provinsi Lampung.');
+        else hideStatus();
+
+        // Deteksi ruas jalan terdekat
+        const nearestRoadInfo = findNearestRoad(latF, lngF);
+        const roadBox = $('#detected-road-box');
+        if (roadBox) {
+          if (nearestRoadInfo) {
+            $('#detected-road-name').textContent = `${nearestRoadInfo.road.nama} (${nearestRoadInfo.road.id})`;
+            $('#detected-road-dist').textContent = `±${nearestRoadInfo.distKm.toFixed(1)} km`;
+            roadBox.classList.remove('hidden');
+          } else {
+            roadBox.classList.add('hidden');
+          }
+        }
+
+        // Deteksi laporan duplikat dalam radius 30 meter
+        const dupInfo = findNearbyDuplicateReport(latF, lngF, 30);
+        const dupBox = $('#duplicate-warning-box');
+        if (dupBox) {
+          if (dupInfo) {
+            $('#duplicate-warning-text').textContent = `Titik ini berjarak ${dupInfo.distMeters} m dari laporan aktif #${dupInfo.report.id} (${dupInfo.report.kategori}).`;
+            dupBox.classList.remove('hidden');
+          } else {
+            dupBox.classList.add('hidden');
+          }
+        }
+      }
+
+      function clearPickedLocation() {
+        $('#input-lat').value = ''; $('#input-lng').value = ''; $('#input-lokasi').value = '';
+        if (pickerMarker) { pickerMap.removeLayer(pickerMarker); pickerMarker = null; }
+        if (accuracyCircle) { pickerMap.removeLayer(accuracyCircle); accuracyCircle = null; }
+        $('#picker-hint').classList.remove('opacity-0');
+        const roadBox = $('#detected-road-box');
+        if (roadBox) roadBox.classList.add('hidden');
+        const dupBox = $('#duplicate-warning-box');
+        if (dupBox) dupBox.classList.add('hidden');
+      }
+
+      pickerMap.on('click', (e) => {
+        if (accuracyCircle) { pickerMap.removeLayer(accuracyCircle); accuracyCircle = null; }
+        setPickedLocation(e.latlng.lat, e.latlng.lng, 'peta');
+      });
+
+      $$('input[name="kategori"]').forEach((r) => r.addEventListener('change', () => {
+        if (pickerMarker) pickerMarker.setIcon(makePulseIcon(selectedColor()));
+      }));
+
+      new IntersectionObserver((entries, obs) => {
+        if (entries.some((en) => en.isIntersecting)) { setTimeout(() => pickerMap.invalidateSize(), 850); obs.disconnect(); }
+      }).observe($('#picker-map'));
+
+      const btnGeo = $('#btn-geolocate');
+      btnGeo.addEventListener('click', () => {
+        if (!('geolocation' in navigator)) return showStatus('error', 'Browser tidak mendukung GPS.');
+        const label = $('span', btnGeo), original = label.textContent;
+        label.textContent = 'Mencari...'; btnGeo.disabled = true;
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const { latitude, longitude, accuracy } = pos.coords;
+            setPickedLocation(latitude, longitude, `GPS ±${Math.round(accuracy)} m`);
+            if (accuracyCircle) pickerMap.removeLayer(accuracyCircle);
+            accuracyCircle = L.circle([latitude, longitude], { radius: accuracy, color: '#34d399', weight: 1, fillOpacity: 0.12 }).addTo(pickerMap);
+            pickerMap.flyTo([latitude, longitude], 17, { duration: 1.2 });
+            label.textContent = original; btnGeo.disabled = false;
+          },
+          (err) => {
+            const msgs = { 1: 'Izin lokasi ditolak.', 2: 'Lokasi tidak dapat ditentukan.', 3: 'Pencarian lokasi terlalu lama.' };
+            showStatus('error', msgs[err.code] || 'Gagal GPS.');
+            label.textContent = original; btnGeo.disabled = false;
+          }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+        );
+      });
+
+      const dropzone = $('#dropzone'), inputFoto = $('#input-foto');
+      let selectedFoto = null, previewUrl = null;
+
+      function setFoto(file) {
+        if (!file) return;
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { showStatus('error', 'Format foto harus JPG, PNG, atau WEBP.'); inputFoto.value = ''; return; }
+        if (file.size > 5 * 1024 * 1024) { showStatus('error', 'Ukuran foto melebihi 5 MB.'); inputFoto.value = ''; return; }
+        selectedFoto = file;
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = URL.createObjectURL(file);
+        $('#foto-preview-img').src = previewUrl; $('#foto-preview-name').textContent = file.name;
+        $('#foto-preview-size').textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+        $('#foto-preview').classList.replace('hidden', 'flex'); dropzone.classList.add('hidden'); hideStatus();
+      }
+
+      function clearFoto() {
+        selectedFoto = null; inputFoto.value = '';
+        if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
+        $('#foto-preview').classList.replace('flex', 'hidden'); dropzone.classList.remove('hidden');
+      }
+
+      inputFoto.addEventListener('change', () => setFoto(inputFoto.files[0]));
+      $('#btn-foto-remove').addEventListener('click', clearFoto);
+      ['dragenter', 'dragover'].forEach((ev) => dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); }));
+      ['dragleave', 'drop'].forEach((ev) => dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); }));
+      dropzone.addEventListener('drop', (e) => setFoto(e.dataTransfer.files[0]));
+
+      const statusEl = $('#form-status');
+      const STATUS_STYLE = { success: 'border border-good/30 bg-good/10 text-good', error: 'border border-major/30 bg-major/10 text-major', warn: 'border border-minor/30 bg-minor/10 text-minor' };
+      function showStatus(type, msg) { statusEl.className = `rounded-xl px-4 py-3 text-sm font-bold ${STATUS_STYLE[type]}`; statusEl.textContent = msg; }
+      function hideStatus() { statusEl.className = 'hidden'; statusEl.textContent = ''; }
+
+      // Menggambar ulang foto ke canvas (membuang seluruh metadata EXIF) lalu kompres ke JPEG.
+      // createImageBitmap dengan imageOrientation 'from-image' menjaga orientasi foto ponsel.
+      async function stripExifAndCompress(file, maxSide = 1600, quality = 0.82) {
+        let bitmap;
+        try {
+          bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
+        } catch {
+          const img = await new Promise((resolve, reject) => {
+            const el = new Image();
+            const url = URL.createObjectURL(file);
+            el.onload = () => { URL.revokeObjectURL(url); resolve(el); };
+            el.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Foto tidak dapat dibaca')); };
+            el.src = url;
+          });
+          bitmap = img;
+        }
+        const w0 = bitmap.width, h0 = bitmap.height;
+        const scale = Math.min(1, maxSide / Math.max(w0, h0));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(w0 * scale);
+        canvas.height = Math.round(h0 * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        if (bitmap.close) bitmap.close();
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+        if (!blob) throw new Error('Gagal memproses foto');
+        return blob;
+      }
+
+      async function submitReport(e) {
+        e.preventDefault();
+        const form = e.target, nama = $('#input-nama').value.trim(), deskripsi = $('#input-deskripsi').value.trim(), lat = parseFloat($('#input-lat').value), lng = parseFloat($('#input-lng').value), kategori = $('input[name="kategori"]:checked')?.value;
+
+        if (!db) { showStatus('error', 'Supabase belum terinisialisasi.'); return; }
+
+        const { data: { user } } = await db.auth.getUser();
+        if (!user) {
+          showStatus('error', 'Silakan login terlebih dahulu untuk membuat laporan.');
+          return;
+        }
+
+        if (!nama) { showStatus('error', 'Nama lengkap wajib diisi.'); $('#input-nama').focus(); return; }
+        if (Number.isNaN(lat) || Number.isNaN(lng)) { showStatus('error', 'Tandai lokasi kerusakan di peta.'); $('#picker-map').scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+        if (!LAMPUNG_BOUNDS.contains([lat, lng])) {
+          showStatus('error', 'Titik kerusakan berada di luar wilayah Provinsi Lampung.');
+          $('#picker-map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+        if (!kategori) { showStatus('error', 'Pilih tingkat kerusakan.'); return; }
+        if (!deskripsi) { showStatus('error', 'Deskripsi wajib diisi.'); $('#input-deskripsi').focus(); return; }
+
+        const btn = $('#btn-submit-report'), btnLabel = $('span', btn), originalText = btnLabel.textContent;
+        window.__isSubmittingReport = true;
+        form.dataset.submitting = 'true';
+        btn.disabled = true;
+        const nearestRoadInfo = findNearestRoad(lat, lng);
+        const payload = {
+          user_id: user.id,
+          nama,
+          kategori_rusak: kategori,
+          koordinat_lat: lat,
+          koordinat_lng: lng,
+          deskripsi,
+          foto_url: null,
+          ruas_id: nearestRoadInfo ? nearestRoadInfo.road.id : null
+        };
+        let uploadedPath = null;
+
+        try {
+          if (selectedFoto) {
+            btnLabel.textContent = 'Memproses foto...';
+            // Re-encode lewat canvas: menghapus EXIF (GPS, perangkat) sekaligus mengompresi
+            const clean = await stripExifAndCompress(selectedFoto);
+            btnLabel.textContent = 'Mengunggah foto...';
+            const ext = clean.type === 'image/png' ? 'png' : 'jpg';
+            const uniqueId = (crypto.randomUUID?.() || Math.random().toString(36).slice(2)).slice(0, 8);
+            const filePath = `laporan/${user.id}/${Date.now()}-${uniqueId}.${ext}`;
+            const { data: uploadData, error: uploadError } = await db.storage.from('foto_laporan').upload(filePath, clean, { cacheControl: '3600', contentType: clean.type, upsert: false });
+            if (uploadError) { uploadError.stage = 'upload'; throw uploadError; }
+            uploadedPath = uploadData.path;
+            const { data: urlData } = db.storage.from('foto_laporan').getPublicUrl(uploadedPath);
+            payload.foto_url = urlData.publicUrl;
+          }
+
+          btnLabel.textContent = 'Mengirim...';
+          const { data, error } = await db.from('laporan_warga').insert([payload]).select();
+          if (error) throw error;
+          uploadedPath = null;
+
+          showStatus('success', 'Laporan berhasil dikirim dan sedang menunggu verifikasi oleh tim. Terima kasih atas kontribusi Anda!');
+          openReportSuccessModal({ ...payload, id: data?.[0]?.id });
+          form.reset(); clearPickedLocation(); clearFoto();
+
+          // Isi ulang nama pengguna setelah form di-reset agar laporan berikutnya tidak kosong/terkunci
+          const { data: { user: currentUser } } = await db.auth.getUser();
+          const inputNamaEl = $('#input-nama');
+          if (inputNamaEl) {
+            inputNamaEl.value = currentUser?.user_metadata?.full_name || currentUser?.email || '';
+            inputNamaEl.disabled = false;
+            inputNamaEl.readOnly = true;
+          }
+        } catch (err) {
+          console.error('Error submitting report:', err);
+          if (uploadedPath) db.storage.from('foto_laporan').remove([uploadedPath]).catch((e) => console.warn('Gagal menghapus foto yatim:', e));
+          
+          let errMsg = 'Gagal mengirim laporan. Silakan coba lagi.';
+          const msg = (err?.message || '') + ' ' + (err?.details || '');
+          if (msg.includes('Batas harian') || msg.includes('batas harian')) {
+            errMsg = 'Batas kuota harian tercapai: maksimal 10 laporan per 24 jam untuk setiap akun pengguna.';
+          } else if (msg.includes('foto_url_valid')) {
+            errMsg = 'Format URL foto tidak valid.';
+          } else if (msg.includes('panjang_valid')) {
+            errMsg = 'Teks terlalu panjang (Nama maks. 100 karakter, Deskripsi maks. 1000 karakter).';
+          } else if (msg.includes('kategori_valid')) {
+            errMsg = 'Kategori jalan tidak valid (pilih: Kondisi Baik, Rusak Ringan, atau Rusak Berat).';
+          } else if (msg.includes('status_valid')) {
+            errMsg = 'Status laporan tidak valid.';
+          } else if (err?.code === '23514') {
+            errMsg = 'Data yang dikirim melanggar batasan validasi sistem (Constraint 23514).';
+          } else if (msg.includes('Batas kuota penyimpanan foto') || msg.includes('30 file aktif')) {
+            errMsg = 'Batas kuota penyimpanan foto tercapai (maksimal 30 file aktif per akun). Batalkan laporan berstatus "Menunggu" di menu "Laporan Saya" untuk membebaskan kuota, atau hubungi admin jika seluruh laporan Anda sudah diverifikasi.';
+          } else if (err?.stage === 'upload') {
+            errMsg = (err?.message && err.message.length < 150) ? err.message : 'Gagal mengunggah foto. Periksa koneksi internet Anda.';
+          }
+          showStatus('error', errMsg);
+        } finally {
+          window.__isSubmittingReport = false;
+          delete form.dataset.submitting;
+          btnLabel.textContent = originalText;
+          btn.disabled = false;
+        }
+      }
+
+      // =====================================================================
+      // FITUR LAPORAN SAYA (PELAPOR / WARGA)
+      // =====================================================================
+      const modalMyReports = $('#modal-my-reports');
+      const modalMyReportsClose = $('#modal-my-reports-close');
+      const myReportsContainer = $('#my-reports-list-container');
+      const myReportsBadge = $('#my-reports-badge');
+
+      const modalMyPhoto = $('#modal-my-reports-photo');
+      const modalMyPhotoClose = $('#modal-my-photo-close');
+      const modalMyPhotoImg = $('#modal-my-photo-img');
+      const modalMyPhotoTitle = $('#modal-my-photo-title');
+
+        // ==== Modal Laporan Terkirim ====
+        const modalSuccessReport = $('#modal-success-result');
+        const modalSuccessClose = $('#modal-success-close');
+        const modalSuccessPhoto = $('#modal-success-photo');
+        const modalSuccessCodeSpan = $('#modal-success-code').querySelector('span');
+        const modalSuccessShare = $('#modal-success-share');
+        const modalSuccessTrack = $('#modal-success-track');
+
+        // Kode laporan diturunkan dari id baris di database sehingga bisa dilacak.
+        function generateReportCode(id) {
+          return id == null ? '-' : `JK-${String(id).padStart(6, '0')}`;
+        }
+
+        function openReportSuccessModal(report) {
+          modalSuccessCodeSpan.textContent = generateReportCode(report.id);
+          if (report.foto_url) {
+            modalSuccessPhoto.src = report.foto_url;
+            modalSuccessPhoto.classList.remove('hidden');
+          } else {
+            modalSuccessPhoto.classList.add('hidden');
+          }
+          modalSuccessReport.classList.remove('hidden');
+        }
+
+        modalSuccessClose.addEventListener('click', () => {
+          modalSuccessReport.classList.add('hidden');
+        });
+        modalSuccessShare.addEventListener('click', async () => {
+          const shareData = {
+            title: 'Laporan JalanKitta',
+            text: `Kode laporan ${modalSuccessCodeSpan.textContent}.`,
+            url: window.location.href
+          };
+          try {
+            if (navigator.share) {
+              await navigator.share(shareData);
+            } else {
+              await navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${shareData.url}`);
+              alert('Kode laporan dan tautan JalanKitta disalin ke clipboard.');
+            }
+          } catch (e) {
+            console.warn('Share failed:', e);
+          }
+        });
+        modalSuccessTrack.addEventListener('click', () => {
+          modalSuccessReport.classList.add('hidden');
+          if (typeof openMyReports === 'function') openMyReports();
+        });
+        
+      const STATUS_CONFIG_PELAPOR = {
+        baru: { label: 'Menunggu Verifikasi', bg: 'bg-amber-100 text-amber-700 border-amber-200', desc: 'Laporan telah diterima dan sedang diperiksa oleh tim verifikator.' },
+        diverifikasi: { label: 'Terverifikasi', bg: 'bg-blue-100 text-blue-700 border-blue-200', desc: 'Laporan tervalidasi dan telah tampil pada Peta Jalan publik.' },
+        diproses: { label: 'Sedang Diproses', bg: 'bg-purple-100 text-purple-700 border-purple-200', desc: 'Dinas Pekerjaan Umum / mitra terkait sedang menjadwalkan perbaikan.' },
+        selesai: { label: 'Selesai Diperbaiki', bg: 'bg-emerald-100 text-emerald-700 border-emerald-200', desc: 'Perbaikan jalan telah rampung dikerjakan.' }
+      };
+
+      async function openMyReports() {
+        if (!db) return;
+        const { data: { user } } = await db.auth.getUser();
+        if (!user) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        modalMyReports.classList.remove('hidden');
+        myReportsContainer.innerHTML = `
+          <div class="py-12 text-center">
+            <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-accent border-r-transparent"></div>
+            <p class="mt-3 text-xs font-bold text-ink">Mengambil daftar laporan Anda...</p>
+          </div>
+        `;
+
+        try {
+          // Mengambil seluruh laporan milik user via policy "baca milik sendiri"
+          const { data, error } = await db.from('laporan_warga')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+
+          if (error) throw error;
+          const reports = data || [];
+          myReportsBadge.textContent = reports.length;
+
+          if (reports.length === 0) {
+            myReportsContainer.innerHTML = `
+              <div class="py-12 text-center max-w-sm mx-auto">
+                <div class="mx-auto h-14 w-14 rounded-2xl bg-slate-100 text-slate-400 grid place-items-center mb-3">
+                  <i data-lucide="inbox" class="h-7 w-7"></i>
+                </div>
+                <h4 class="font-bold text-navy text-base">Belum Ada Laporan</h4>
+                <p class="text-xs text-ink mt-1.5 leading-relaxed">Anda belum pernah mengirimkan laporan kerusakan jalan. Kirim laporan pertama Anda dengan mudah melalui form di bawah.</p>
+                <button type="button" id="btn-goto-lapor-now" class="mt-5 rounded-xl bg-accent px-5 py-2.5 text-xs font-bold text-white shadow-btn transition hover:brightness-110">Buat Laporan Baru</button>
+              </div>
+            `;
+            $('#btn-goto-lapor-now')?.addEventListener('click', () => {
+              modalMyReports.classList.add('hidden');
+              window.location.hash = '#lapor';
+              $('#picker-map')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+            if (window.lucide) window.lucide.createIcons();
+            return;
+          }
+
+          myReportsContainer.innerHTML = reports.map(r => {
+            const st = STATUS_CONFIG_PELAPOR[r.status] || STATUS_CONFIG_PELAPOR.baru;
+            const kat = CONDITION[r.kategori_rusak] || CONDITION.ringan;
+            const dateStr = new Date(r.created_at).toLocaleString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const foto = safeImageUrl(r.foto_url);
+            const lat = Number(r.koordinat_lat);
+            const lng = Number(r.koordinat_lng);
+
+            return `
+              <div class="bg-slate-50/70 rounded-2xl p-4 sm:p-5 border border-slate-200/80 hover:border-slate-300 transition space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${st.bg}">${st.label}</span>
+                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold text-white" style="background:${kat.color}">${kat.label}</span>
+                  </div>
+                  <span class="text-xs text-ink">${dateStr}</span>
+                </div>
+
+                <div class="flex gap-4 items-start">
+                  ${foto ? `
+                    <button type="button" aria-label="Perbesar foto bukti laporan" class="btn-open-my-photo shrink-0 rounded-xl overflow-hidden border border-slate-200 h-20 w-20 group relative" data-url="${escapeHtml(foto)}" data-title="Laporan Kerusakan">
+                      <img src="${escapeHtml(foto)}" alt="Foto bukti" class="h-full w-full object-cover transition group-hover:scale-105" />
+                      <span class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition grid place-items-center text-white"><i data-lucide="zoom-in" class="h-4 w-4"></i></span>
+                    </button>
+                  ` : `
+                    <div class="shrink-0 h-20 w-20 rounded-xl bg-white border border-slate-200 grid place-items-center text-slate-300 text-xs font-bold text-center p-1.5">
+                      <i data-lucide="image-off" class="h-5 w-5 mb-0.5"></i>
+                      <span class="text-[10px]">Tanpa Foto</span>
+                    </div>
+                  `}
+
+                  <div class="min-w-0 flex-1">
+                    <p class="text-xs font-medium text-ink leading-relaxed bg-white p-2.5 rounded-xl border border-slate-100 italic">"${escapeHtml(r.deskripsi || '-')}"</p>
+                    <p class="text-[11px] text-slate-500 mt-2 font-medium">${st.desc}</p>
+                  </div>
+                </div>
+
+                <div class="pt-2 border-t border-slate-200/60 flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <span class="text-ink font-semibold flex items-center gap-1"><i data-lucide="map-pin" class="h-3.5 w-3.5 text-accent"></i> ${lat}, ${lng}</span>
+                  <div class="flex items-center gap-3">
+                    <a href="https://maps.google.com/?q=${lat},${lng}" target="_blank" rel="noopener noreferrer" class="text-accent font-bold hover:underline flex items-center gap-0.5">Google Maps <i data-lucide="external-link" class="h-3 w-3"></i></a>
+                    ${r.status === 'baru' ? `
+                      <button type="button" class="btn-cancel-my-report text-xs font-bold text-major hover:underline flex items-center gap-1" data-id="${r.id}" data-foto="${escapeHtml(r.foto_url || '')}">
+                        <i data-lucide="trash-2" class="h-3 w-3"></i> Batalkan Laporan
+                      </button>
+                    ` : `
+                      <button type="button" class="btn-focus-in-map font-bold text-navy hover:underline flex items-center gap-0.5" data-lat="${lat}" data-lng="${lng}">Fokus di Peta <i data-lucide="arrow-right" class="h-3 w-3"></i></button>
+                    `}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          if (window.lucide) window.lucide.createIcons();
+        } catch (err) {
+          console.error('Error fetching my reports:', err);
+          myReportsContainer.innerHTML = `
+            <div class="py-8 text-center text-major bg-major/10 rounded-2xl p-4">
+              <p class="font-bold text-sm">Gagal memuat laporan Anda</p>
+              <p class="text-xs mt-1 text-slate-600">${escapeHtml(err.message)}</p>
+            </div>
+          `;
+        }
+      }
+
+      const closeMyReports = () => {
+        modalMyReports.classList.add('hidden');
+        if (window.location.hash === '#laporan-saya') {
+          history.replaceState(null, '', location.pathname + location.search);
+        }
+      };
+
+      modalMyReportsClose?.addEventListener('click', closeMyReports);
+      modalMyReports?.addEventListener('click', (e) => {
+        if (e.target === modalMyReports) closeMyReports();
+      });
+
+      // Delegation untuk modal photo & fokus peta di Laporan Saya
+      myReportsContainer?.addEventListener('click', (e) => {
+        const btnPhoto = e.target.closest('.btn-open-my-photo');
+        if (btnPhoto) {
+          const url = btnPhoto.dataset.url;
+          modalMyPhotoTitle.textContent = btnPhoto.dataset.title || 'Dokumentasi Kerusakan';
+          modalMyPhotoImg.src = url;
+          modalMyPhoto.classList.remove('hidden');
+          return;
+        }
+
+        const btnFocus = e.target.closest('.btn-focus-in-map');
+        if (btnFocus) {
+          closeMyReports();
+          const lat = Number(btnFocus.dataset.lat);
+          const lng = Number(btnFocus.dataset.lng);
+          map.setView([lat, lng], 14, { animate: true });
+          $('#peta')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          return;
+        }
+
+        const btnCancel = e.target.closest('.btn-cancel-my-report');
+        if (btnCancel) {
+          const reportId = btnCancel.dataset.id;
+          const fotoUrl = btnCancel.dataset.foto;
+          if (!confirm('Batalkan dan hapus laporan ini? Foto bukti laporan akan dibersihkan dari penyimpanan dan kuota unggah Anda akan dikembalikan.')) return;
+          (async () => {
+            const origHtml = btnCancel.innerHTML;
+            btnCancel.disabled = true;
+            btnCancel.innerHTML = '<i data-lucide="loader-2" class="h-3 w-3 animate-spin"></i> Menghapus...';
+            try {
+              // 1. Hapus laporan di database terlebih dahulu (hanya berstatus 'baru')
+              const { error: delErr } = await db.from('laporan_warga').delete().eq('id', reportId).eq('status', 'baru');
+              if (delErr) throw delErr;
+
+              // 2. Setelah laporan terhapus, bersihkan berkas foto di storage
+              let storageWarning = false;
+              if (fotoUrl) {
+                const marker = '/foto_laporan/';
+                const idx = fotoUrl.indexOf(marker);
+                if (idx !== -1) {
+                  const storagePath = decodeURIComponent(fotoUrl.substring(idx + marker.length));
+                  const { error: storageErr } = await db.storage.from('foto_laporan').remove([storagePath]);
+                  if (storageErr) {
+                    console.warn('Peringatan pembersihan foto storage:', storageErr);
+                    storageWarning = true;
+                  }
+                }
+              }
+
+              if (storageWarning) {
+                showStatus('warn', 'Laporan berhasil dibatalkan, tetapi berkas foto gagal dibersihkan dari penyimpanan.');
+              } else {
+                showStatus('success', 'Laporan berhasil dibatalkan dan kuota penyimpanan foto telah dibebaskan.');
+              }
+              fetchMyReports();
+            } catch (err) {
+              console.error('Batal laporan error:', err);
+              showStatus('error', 'Gagal membatalkan laporan: ' + err.message);
+              btnCancel.disabled = false;
+              btnCancel.innerHTML = origHtml;
+            }
+          })();
+          return;
+        }
+      });
+
+      const closeMyPhoto = () => {
+        modalMyPhoto.classList.add('hidden');
+        modalMyPhotoImg.src = '';
+      };
+
+      modalMyPhotoClose?.addEventListener('click', closeMyPhoto);
+      modalMyPhoto?.addEventListener('click', (e) => {
+        if (e.target === modalMyPhoto) closeMyPhoto();
+      });
+
+      // Dukungan tombol Escape keyboard untuk menutup modal
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          const modalSuccess = document.getElementById('modal-success-result');
+          if (modalSuccess && !modalSuccess.classList.contains('hidden')) {
+            modalSuccess.classList.add('hidden');
+          } else if (!modalMyPhoto.classList.contains('hidden')) {
+            closeMyPhoto();
+          } else if (!modalMyReports.classList.contains('hidden')) {
+            closeMyReports();
+          }
+        }
+      });
+
+      window.addEventListener('jk-open-my-reports', openMyReports);
+      if (window.location.hash === '#laporan-saya') {
+        openMyReports();
+      }
+      window.addEventListener('hashchange', () => {
+        if (window.location.hash === '#laporan-saya') openMyReports();
+      });
+
+      // Smooth Dark Mode Toggle & Icon Sync
+      const darkToggle = $('#dark-toggle');
+      const htmlEl = document.documentElement;
+
+      const updateThemeIcons = (isDark) => {
+        const sun = $('#theme-sun-icon');
+        const moon = $('#theme-moon-icon');
+        if (sun && moon) {
+          if (isDark) {
+            sun.classList.remove('hidden');
+            moon.classList.add('hidden');
+          } else {
+            sun.classList.add('hidden');
+            moon.classList.remove('hidden');
+          }
+        }
+      };
+
+      updateThemeIcons(htmlEl.classList.contains('dark'));
+
+      if (darkToggle) {
+        darkToggle.addEventListener('click', () => {
+          const isDark = htmlEl.classList.toggle('dark');
+          localStorage.setItem('theme', isDark ? 'dark' : 'light');
+          updateThemeIcons(isDark);
+          window.dispatchEvent(new Event('jk-theme-change'));
+          if (window.lucide) lucide.createIcons();
+        });
+      }
+
+      $('#report-form').addEventListener('submit', submitReport);
+      (async () => {
+        await loadRealReports();
+        await loadPublicStatistics();
+        const focusId = new URLSearchParams(location.search).get('laporan');
+        if (focusId) {
+          $('#peta')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (!window.focusReport(focusId)) console.info('Laporan belum tampil di peta publik (belum diverifikasi?):', focusId);
+        }
+      })();
+    })();
+  </script>
+</body>
+</html>
