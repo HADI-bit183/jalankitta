@@ -20,7 +20,7 @@ if (mobileMenu) {
     <li id="mobile-logout-li" class="hidden"><button id="btn-logout-mobile" class="w-full text-left flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-major/10 font-bold text-major"><i data-lucide="log-out" class="h-4 w-4 text-major"></i>Logout</button></li>
   `);
   if (window.lucide) window.lucide.createIcons();
-  
+
   const closeMobileMenu = () => {
     const menuToggle = document.getElementById('menu-toggle');
     if (menuToggle && !mobileMenu.classList.contains('hidden')) menuToggle.click();
@@ -31,7 +31,7 @@ if (mobileMenu) {
     closeMobileMenu();
     window.location.href = 'login.html';
   });
-  
+
   document.getElementById('btn-logout-mobile').addEventListener('click', async () => {
     closeMobileMenu();
     if (window.supabaseDb) await window.supabaseDb.auth.signOut();
@@ -173,7 +173,7 @@ if (authForm) {
     const nama = document.getElementById('auth-nama').value.trim();
     const btn = document.getElementById('btn-submit-auth');
     const errorEl = document.getElementById('auth-error');
-    
+
     btn.disabled = true;
     errorEl.classList.add('hidden');
     errorEl.classList.remove('text-good', 'bg-good/10', 'text-major', 'bg-major/10');
@@ -185,7 +185,7 @@ if (authForm) {
       btn.disabled = false;
       return;
     }
-    
+
     try {
       if (authMode === 'login') {
         const { error } = await window.supabaseDb.auth.signInWithPassword({ email, password });
@@ -206,7 +206,7 @@ if (authForm) {
         if (data?.user && (!data.user.identities || data.user.identities.length === 0)) {
           throw new Error('User already registered');
         }
-        
+
         if (data?.session) {
           window.location.href = 'app.html#lapor';
         } else {
@@ -317,158 +317,157 @@ async function syncAdminLinks(currentUser) {
 // 5. Auth State Listener & Form Lapor Logic (Hanya berjalan di halaman yang memiliki navbar/form)
 if (window.supabaseDb) {
   window.supabaseDb.auth.onAuthStateChange((event, session) => {
-  const user = session?.user;
+    const user = session?.user;
 
-  if (event === 'PASSWORD_RECOVERY') {
-    isRecovery = true;
-    window.dispatchEvent(new Event('jk-recovery'));
-  }
-  
-  // Dukung deteksi halaman login dengan clean URL (/login) atau file langsung (login.html)
-  const isLoginPage = /(^|\/)(login(\.html)?|\blogin\b)($|\?|#)/i.test(window.location.pathname);
-  if (user && isLoginPage && !isRecovery) {
-    window.location.href = 'app.html#lapor';
-  }
-  
-  // Update Navbar Desktop UI
-  const userMenu = document.getElementById('user-menu');
-  const userNameDisplay = document.getElementById('user-initial');
-
-  if (user) {
-    if (btnLoginNav) btnLoginNav.classList.add('hidden');
-    if (userMenu) {
-      userMenu.classList.remove('hidden');
-      userMenu.classList.add('flex');
-
-      // Tampilkan tombol "Laporan Saya" untuk pelapor login
-      let myReportsBtn = document.getElementById('btn-my-reports-nav');
-      if (!myReportsBtn) {
-        myReportsBtn = document.createElement('button');
-        myReportsBtn.id = 'btn-my-reports-nav';
-        myReportsBtn.type = 'button';
-        myReportsBtn.className = 'rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-navy hover:bg-slate-50 transition flex items-center gap-1.5 shadow-sm';
-        myReportsBtn.innerHTML = '<i data-lucide="clipboard-list" class="h-3.5 w-3.5 text-accent"></i> Laporan Saya';
-        myReportsBtn.addEventListener('click', () => {
-          if (window.location.pathname.includes('app.html') || window.location.pathname.endsWith('/app')) {
-            window.dispatchEvent(new Event('jk-open-my-reports'));
-          } else {
-            window.location.href = 'app.html#laporan-saya';
-          }
-        });
-        userMenu.prepend(myReportsBtn);
-        if (window.lucide) window.lucide.createIcons();
-      }
-    }
-    if (userNameDisplay) {
-      const fullName = user.user_metadata?.full_name || user.email;
-      userNameDisplay.textContent = fullName.charAt(0).toUpperCase();
-      userNameDisplay.title = fullName;
-    }
-    
-    // Mobile Menu UI
-    const mobLogin = document.getElementById('mobile-login-li');
-    const mobLogout = document.getElementById('mobile-logout-li');
-    if (mobLogin) mobLogin.classList.add('hidden');
-    if (mobLogout) mobLogout.classList.remove('hidden');
-
-    let mobMyReports = document.getElementById('mobile-my-reports-li');
-    if (!mobMyReports && mobileMenu) {
-      const ul = mobileMenu.querySelector('ul');
-      if (ul) {
-        ul.insertAdjacentHTML('afterbegin', `
-          <li id="mobile-my-reports-li"><button id="btn-my-reports-mob" class="w-full text-left flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-slate-100 font-bold text-navy"><i data-lucide="clipboard-list" class="h-4 w-4 text-accent"></i>Laporan Saya</button></li>
-        `);
-        document.getElementById('btn-my-reports-mob')?.addEventListener('click', () => {
-          const menuToggle = document.getElementById('menu-toggle');
-          if (menuToggle && !mobileMenu.classList.contains('hidden')) menuToggle.click();
-          else mobileMenu.classList.add('hidden');
-
-          if (window.location.pathname.includes('app.html') || window.location.pathname.endsWith('/app')) {
-            window.dispatchEvent(new Event('jk-open-my-reports'));
-          } else {
-            window.location.href = 'app.html#laporan-saya';
-          }
-        });
-        if (window.lucide) window.lucide.createIcons();
-      }
+    if (event === 'PASSWORD_RECOVERY') {
+      isRecovery = true;
+      window.dispatchEvent(new Event('jk-recovery'));
     }
 
-    // Sinkronisasi link admin (sekali query dengan cache)
-    setTimeout(() => syncAdminLinks(user), 0);
-    
-  } else {
-    if (btnLoginNav) btnLoginNav.classList.remove('hidden');
-    if (userMenu) {
-      userMenu.classList.add('hidden');
-      userMenu.classList.remove('flex');
+    // Dukung deteksi halaman login dengan clean URL (/login) atau file langsung (login.html)
+    const isLoginPage = /(^|\/)(login(\.html)?|\blogin\b)($|\?|#)/i.test(window.location.pathname);
+    if (user && isLoginPage && !isRecovery) {
+      window.location.href = 'app.html#lapor';
     }
 
-    const myReportsBtn = document.getElementById('btn-my-reports-nav');
-    if (myReportsBtn) myReportsBtn.remove();
-    
-    // Mobile Menu UI
-    const mobLogin = document.getElementById('mobile-login-li');
-    const mobLogout = document.getElementById('mobile-logout-li');
-    if (mobLogin) mobLogin.classList.remove('hidden');
-    if (mobLogout) mobLogout.classList.add('hidden');
-
-    const mobMyReports = document.getElementById('mobile-my-reports-li');
-    if (mobMyReports) mobMyReports.remove();
-
-    setTimeout(() => syncAdminLinks(null), 0);
-  }
-  
-  // Automasi Lapor Form (#report-form) di app.html
-  const reportForm = document.getElementById('report-form');
-  const inputNama = document.getElementById('input-nama');
-  const btnSubmitReport = document.getElementById('btn-submit-report');
-  
-  if (reportForm && inputNama && btnSubmitReport) {
-    const otherInputs = reportForm.querySelectorAll('input:not(#input-nama):not(#input-lat):not(#input-lng), textarea, button:not(#btn-submit-report)');
-    const dropzone = document.getElementById('dropzone');
+    // Update Navbar Desktop UI
+    const userMenu = document.getElementById('user-menu');
+    const userNameDisplay = document.getElementById('user-initial');
 
     if (user) {
-      // Pastikan disabled = false ketika user login, lalu set readonly
-      inputNama.disabled = false;
-      inputNama.value = user.user_metadata?.full_name || user.email;
-      inputNama.readOnly = true;
-      inputNama.classList.add('opacity-70', 'cursor-not-allowed', 'pointer-events-none');
-      // Jangan aktifkan tombol jika sedang dalam proses pengiriman laporan
-      if (!window.__isSubmittingReport && !reportForm.dataset?.submitting) {
-        btnSubmitReport.disabled = false;
+      if (btnLoginNav) btnLoginNav.classList.add('hidden');
+      if (userMenu) {
+        userMenu.classList.remove('hidden');
+        userMenu.classList.add('flex');
+
+        // Tampilkan tombol "Laporan Saya" untuk pelapor login
+        let myReportsBtn = document.getElementById('btn-my-reports-nav');
+        if (!myReportsBtn) {
+          myReportsBtn = document.createElement('button');
+          myReportsBtn.id = 'btn-my-reports-nav';
+          myReportsBtn.type = 'button';
+          myReportsBtn.className = 'rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-navy hover:bg-slate-50 transition flex items-center gap-1.5 shadow-sm';
+          myReportsBtn.innerHTML = '<i data-lucide="clipboard-list" class="h-3.5 w-3.5 text-accent"></i> Laporan Saya';
+          myReportsBtn.addEventListener('click', () => {
+            if (window.location.pathname.includes('app.html') || window.location.pathname.endsWith('/app')) {
+              window.dispatchEvent(new Event('jk-open-my-reports'));
+            } else {
+              window.location.href = 'app.html#laporan-saya';
+            }
+          });
+          userMenu.prepend(myReportsBtn);
+          if (window.lucide) window.lucide.createIcons();
+        }
       }
-      
-      otherInputs.forEach(el => el.disabled = false);
-      if (dropzone) dropzone.classList.remove('opacity-50', 'pointer-events-none');
-      
-      const prevWarning = document.getElementById('auth-warning-form');
-      if (prevWarning) prevWarning.remove();
+      if (userNameDisplay) {
+        const fullName = user.user_metadata?.full_name || user.email;
+        userNameDisplay.textContent = fullName.charAt(0).toUpperCase();
+        userNameDisplay.title = fullName;
+      }
+
+      // Mobile Menu UI
+      const mobLogin = document.getElementById('mobile-login-li');
+      const mobLogout = document.getElementById('mobile-logout-li');
+      if (mobLogin) mobLogin.classList.add('hidden');
+      if (mobLogout) mobLogout.classList.remove('hidden');
+
+      let mobMyReports = document.getElementById('mobile-my-reports-li');
+      if (!mobMyReports && mobileMenu) {
+        const ul = mobileMenu.querySelector('ul');
+        if (ul) {
+          ul.insertAdjacentHTML('afterbegin', `
+          <li id="mobile-my-reports-li"><button id="btn-my-reports-mob" class="w-full text-left flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-slate-100 font-bold text-navy"><i data-lucide="clipboard-list" class="h-4 w-4 text-accent"></i>Laporan Saya</button></li>
+        `);
+          document.getElementById('btn-my-reports-mob')?.addEventListener('click', () => {
+            const menuToggle = document.getElementById('menu-toggle');
+            if (menuToggle && !mobileMenu.classList.contains('hidden')) menuToggle.click();
+            else mobileMenu.classList.add('hidden');
+
+            if (window.location.pathname.includes('app.html') || window.location.pathname.endsWith('/app')) {
+              window.dispatchEvent(new Event('jk-open-my-reports'));
+            } else {
+              window.location.href = 'app.html#laporan-saya';
+            }
+          });
+          if (window.lucide) window.lucide.createIcons();
+        }
+      }
+
+      // Sinkronisasi link admin (sekali query dengan cache)
+      setTimeout(() => syncAdminLinks(user), 0);
+
     } else {
-      inputNama.value = '';
-      inputNama.readOnly = false;
-      inputNama.classList.remove('opacity-70', 'cursor-not-allowed', 'pointer-events-none');
-      inputNama.disabled = true; // Kunci input nama karena belum login
-      btnSubmitReport.disabled = true;
-      
-      // Disable form input lainnya
-      otherInputs.forEach(el => el.disabled = true);
-      if (dropzone) dropzone.classList.add('opacity-50', 'pointer-events-none');
-      
-      let warning = document.getElementById('auth-warning-form');
-      if (!warning) {
-        warning = document.createElement('div');
-        warning.id = 'auth-warning-form';
-        warning.className = 'mb-6 flex flex-col sm:flex-row gap-3 items-center justify-between rounded-xl bg-major/10 p-4 text-sm font-bold text-major border border-major/30';
-        warning.innerHTML = `
-          <span><i data-lucide="lock" class="h-4 w-4 inline mr-2"></i>Silakan login terlebih dahulu untuk membuat laporan jalan rusak.</span>
-          <a href="login.html" class="shrink-0 rounded-lg bg-major px-4 py-2 text-center text-xs font-bold text-white shadow hover:bg-major/90 transition w-full sm:w-auto">Login</a>
-        `;
-        reportForm.prepend(warning);
-        if (window.lucide) window.lucide.createIcons();
+      if (btnLoginNav) btnLoginNav.classList.remove('hidden');
+      if (userMenu) {
+        userMenu.classList.add('hidden');
+        userMenu.classList.remove('flex');
+      }
+
+      const myReportsBtn = document.getElementById('btn-my-reports-nav');
+      if (myReportsBtn) myReportsBtn.remove();
+
+      // Mobile Menu UI
+      const mobLogin = document.getElementById('mobile-login-li');
+      const mobLogout = document.getElementById('mobile-logout-li');
+      if (mobLogin) mobLogin.classList.remove('hidden');
+      if (mobLogout) mobLogout.classList.add('hidden');
+
+      const mobMyReports = document.getElementById('mobile-my-reports-li');
+      if (mobMyReports) mobMyReports.remove();
+
+      setTimeout(() => syncAdminLinks(null), 0);
+    }
+
+    // Automasi Lapor Form (#report-form) di app.html
+    const reportForm = document.getElementById('report-form');
+    const inputNama = document.getElementById('input-nama');
+    const btnSubmitReport = document.getElementById('btn-submit-report');
+
+    if (reportForm && inputNama && btnSubmitReport) {
+      const otherInputs = reportForm.querySelectorAll('input:not(#input-nama):not(#input-lat):not(#input-lng), textarea, button:not(#btn-submit-report)');
+      const dropzone = document.getElementById('dropzone');
+
+      if (user) {
+        // Pastikan disabled = false ketika user login, lalu set readonly
+        inputNama.disabled = false;
+        inputNama.value = user.user_metadata?.full_name || user.email;
+        inputNama.readOnly = true;
+        inputNama.classList.add('opacity-70', 'cursor-not-allowed', 'pointer-events-none');
+        // Jangan aktifkan tombol jika sedang dalam proses pengiriman laporan
+        if (!window.__isSubmittingReport && !reportForm.dataset?.submitting) {
+          btnSubmitReport.disabled = false;
+        }
+
+        otherInputs.forEach(el => el.disabled = false);
+        if (dropzone) dropzone.classList.remove('opacity-50', 'pointer-events-none');
+
+        const prevWarning = document.getElementById('auth-warning-form');
+        if (prevWarning) prevWarning.remove();
+      } else {
+        inputNama.value = '';
+        inputNama.readOnly = false;
+        inputNama.classList.remove('opacity-70', 'cursor-not-allowed', 'pointer-events-none');
+        inputNama.disabled = true; // Kunci input nama karena belum login
+        btnSubmitReport.disabled = true;
+
+        // Disable form input lainnya
+        otherInputs.forEach(el => el.disabled = true);
+        if (dropzone) dropzone.classList.add('opacity-50', 'pointer-events-none');
+
+        let warning = document.getElementById('auth-warning-form');
+        if (!warning) {
+          warning = document.createElement('div');
+          warning.id = 'auth-warning-form';
+          warning.innerHTML = `
+            <span><i data-lucide="lock" class="h-4 w-4 inline mr-2"></i>Silakan login terlebih dahulu untuk membuat laporan jalan rusak.</span>
+            <a href="login.html" class="shrink-0 rounded-lg bg-major px-4 py-2 text-center text-xs font-bold text-white shadow hover:bg-major/90 transition w-full sm:w-auto">Login</a>
+          `;
+          reportForm.prepend(warning);
+          if (window.lucide) window.lucide.createIcons();
+        }
       }
     }
-  }
-});
+  });
 }
 
 

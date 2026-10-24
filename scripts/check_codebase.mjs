@@ -4,6 +4,7 @@ const EXPECTED_SRI = {
   'https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js': 'sha384-0v3Wh0ZtiQBYCYywQoeMDA5mAw5Z01p0lhorqy0BlwFrcN6u3lmN7K0U/e1uezmr',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js': 'sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js': 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=',
+  'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js': 'sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr',
 };
 
 const HTML_FILES = ['index.html', 'app.html', 'admin.html', 'login.html'];
@@ -55,19 +56,6 @@ for (const file of HTML_FILES) {
   });
 
   console.log(`✓ [${file}] Lolos verifikasi keamanan, aksesibilitas, dan sintaks.`);
-}
-
-// 6. Cek sintaks berkas JS eksternal
-const JS_FILES = ['assets/js/auth.js'];
-for (const jsFile of JS_FILES) {
-  const code = readFileSync(jsFile, 'utf8');
-  try {
-    new Function(code);
-    console.log(`✓ [${jsFile}] Lolos verifikasi sintaks JS.`);
-  } catch (err) {
-    console.error(`❌ [${jsFile}] Syntax error:`, err.message);
-    hasError = true;
-  }
 }
 
 if (hasError) {

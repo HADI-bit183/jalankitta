@@ -14,6 +14,9 @@
 -- Jika memakai proyek Supabase lain, ganti host pada constraint foto_url_valid.
 -- ==============================================================================
 
+-- 0. EKSTENSI POSTGIS (Kalkulasi Spasial Skala Provinsi) -----------------------
+create extension if not exists postgis;
+
 -- 1. ADMINS & is_admin() -------------------------------------------------------
 create table if not exists public.admins (
   user_id    uuid primary key references auth.users(id) on delete cascade,
@@ -442,15 +445,17 @@ create trigger trg_laporan_nama
   for each row execute function public.set_laporan_nama();
 
 -- 8b. Ruas ID dikunci dan dihitung secara otoritatif di server:
---     Mencegah manipulasi/pemalsuan ruas_id dari kiriman API (mis. koordinat di R-01 tetapi kirim R-02).
+-- 8b. Ruas ID dikunci dan dihitung secara otoritatif di server:
+--     Menggunakan PostGIS spatial ST_DWithin & ST_Distance (didukung indeks GIST),
+--     dengan fallback algoritma iterasi koordinat jika PostGIS belum terpasang.
 create or replace function public.cari_ruas_terdekat(p_lat double precision, p_lng double precision)
 returns text
 language plpgsql
 stable
 as $$
 declare
+  v_best_id text;
   r record;
-  v_best_id text := null;
   v_min_dist double precision := 1e10;
   v_coord jsonb;
   v_dist double precision;
@@ -463,12 +468,35 @@ begin
     return null;
   end if;
 
+  -- 1. Evaluasi Cepat PostGIS (O(log N) melalui indeks spasial GIST)
+  begin
+    select r.id into v_best_id
+    from public.ruas_jalan r
+    where st_dwithin(
+      st_setsrid(st_makepoint(p_lng, p_lat), 4326)::geography,
+      st_setsrid(st_geomfromgeojson(r.geometry::text), 4326)::geography,
+      10000 -- toleransi radius 10 km
+    )
+    order by st_distance(
+      st_setsrid(st_makepoint(p_lng, p_lat), 4326)::geography,
+      st_setsrid(st_geomfromgeojson(r.geometry::text), 4326)::geography
+    ) asc
+    limit 1;
+
+    if v_best_id is not null then
+      return v_best_id;
+    end if;
+  exception when others then
+    -- Fallback halus jika fungsi geografi PostGIS belum terpasang
+    null;
+  end;
+
+  -- 2. Fallback Algoritma Geometrik (Kompatibel dengan DB polos tanpa PostGIS)
   for r in select id, geometry from public.ruas_jalan loop
     if r.geometry ->> 'type' = 'LineString' and jsonb_typeof(r.geometry -> 'coordinates') = 'array' then
       for v_coord in select * from jsonb_array_elements(r.geometry -> 'coordinates') loop
         v_c_lng := (v_coord ->> 0)::double precision;
         v_c_lat := (v_coord ->> 1)::double precision;
-        -- Proyeksi equirectangular km lokal
         v_dlat := (v_c_lat - p_lat) * 111.0;
         v_dlng := (v_c_lng - p_lng) * 111.0 * cos(radians(p_lat));
         v_dist := sqrt(v_dlat * v_dlat + v_dlng * v_dlng);
@@ -480,7 +508,6 @@ begin
     end if;
   end loop;
 
-  -- Kaitkan jika berada dalam toleransi jarak 10 km
   if v_min_dist <= 10.0 then
     return v_best_id;
   end if;
@@ -505,7 +532,7 @@ create trigger trg_laporan_ruas_id
   for each row execute function public.set_laporan_ruas_id();
 
 -- 8c. Batas laporan per pengguna: maks. 10 laporan per 24 jam.
--- Dilengkapi advisory xact lock untuk mencegah race condition (dua request insert paralel).
+-- Dilengkapi advisory xact lock ganda (UID pengguna + petak spasial 10m) untuk mencegah race condition.
 create or replace function public.batasi_laporan_harian()
 returns trigger
 language plpgsql
@@ -514,6 +541,9 @@ begin
   if new.user_id is not null then
     perform pg_advisory_xact_lock(hashtext(new.user_id::text));
   end if;
+
+  -- Kunci transaksi spasial per petak 10 meter untuk mencegah race condition insert paralel di titik identik
+  perform pg_advisory_xact_lock(hashtext('geo_' || round(new.koordinat_lat::numeric, 4)::text || '_' || round(new.koordinat_lng::numeric, 4)::text));
 
   if (select count(*) from public.laporan_warga
       where user_id = new.user_id and created_at > now() - interval '24 hours') >= 10 then
@@ -547,13 +577,25 @@ create trigger trg_batasi_subscriber
   before insert on public.subscribers
   for each row execute function public.batasi_subscriber();
 
--- 8e. Indeks untuk optimasi query berkala, RLS, dan trigger batas
+-- 8e. Indeks untuk optimasi query skala provinsi, RLS, dan pencarian spasial
 create index if not exists idx_laporan_warga_user_created on public.laporan_warga(user_id, created_at desc);
 create index if not exists idx_laporan_warga_status on public.laporan_warga(status);
 create index if not exists idx_laporan_warga_created_at on public.laporan_warga(created_at desc);
 create index if not exists idx_laporan_warga_ruas_id on public.laporan_warga(ruas_id);
 create index if not exists idx_laporan_warga_deleted_at on public.laporan_warga(deleted_at);
 create index if not exists idx_subscribers_created on public.subscribers(created_at desc);
+
+-- Indeks Spasial PostGIS (GIST) untuk efisiensi kueri radius dan Bounding-Box ratusan ribu baris data
+do $$
+begin
+  -- Indeks GIST koordinat titik laporan warga
+  if exists (select 1 from pg_proc where proname = 'st_makepoint') then
+    execute 'create index if not exists idx_laporan_warga_geom_gist on public.laporan_warga using gist (st_setsrid(st_makepoint(koordinat_lng, koordinat_lat), 4326))';
+    execute 'create index if not exists idx_ruas_jalan_geom_gist on public.ruas_jalan using gist (st_setsrid(st_geomfromgeojson(geometry::text), 4326))';
+  end if;
+exception when others then
+  null;
+end $$;
 
 -- 8f. Audit Log Admin untuk tindakan penting (hapus laporan, soft-delete, ubah status)
 create table if not exists public.laporan_audit_log (
@@ -784,6 +826,89 @@ drop trigger if exists trg_sinkron_kondisi_ruas on public.laporan_warga;
 create trigger trg_sinkron_kondisi_ruas
   after update or delete on public.laporan_warga
   for each row execute function public.trg_sinkron_kondisi_ruas_fn();
+
+-- 8k. Kueri Spasial Skala Provinsi (PostGIS RPCs) -------------------------------
+
+-- 8k.1 Cek Duplikasi Laporan Sekitar (Radius 30 Meter)
+-- Menghindari spam laporan identik dari banyak warga di titik lubang yang sama
+create or replace function public.cek_duplikat_laporan(
+  p_lat double precision,
+  p_lng double precision,
+  p_radius_meter double precision default 30.0
+)
+returns table (
+  id bigint,
+  status text,
+  jarak_meter double precision,
+  created_at timestamptz
+)
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+begin
+  return query
+  select
+    l.id,
+    l.status,
+    case
+      when exists (select 1 from pg_proc where proname = 'st_distance') then
+        st_distance(
+          st_setsrid(st_makepoint(p_lng, p_lat), 4326)::geography,
+          st_setsrid(st_makepoint(l.koordinat_lng, l.koordinat_lat), 4326)::geography
+        )
+      else
+        sqrt(power((l.koordinat_lat - p_lat) * 111000.0, 2) + power((l.koordinat_lng - p_lng) * 111000.0 * cos(radians(p_lat)), 2))
+    end as jarak_meter,
+    l.created_at
+  from public.laporan_warga l
+  where l.deleted_at is null
+    and l.status in ('baru', 'diverifikasi', 'diproses')
+    and (
+      (exists (select 1 from pg_proc where proname = 'st_dwithin') and
+       st_dwithin(
+         st_setsrid(st_makepoint(p_lng, p_lat), 4326)::geography,
+         st_setsrid(st_makepoint(l.koordinat_lng, l.koordinat_lat), 4326)::geography,
+         p_radius_meter
+       ))
+      or
+      (not exists (select 1 from pg_proc where proname = 'st_dwithin') and
+       sqrt(power((l.koordinat_lat - p_lat) * 111000.0, 2) + power((l.koordinat_lng - p_lng) * 111000.0 * cos(radians(p_lat)), 2)) <= p_radius_meter)
+    )
+  order by jarak_meter asc
+  limit 3;
+end;
+$$;
+grant execute on function public.cek_duplikat_laporan(double precision, double precision, double precision) to anon, authenticated;
+
+-- 8k.2 Lazy-Loading Bounding-Box Viewport Peta
+-- Memuat hanya titik dalam area pandang layar HP/Desktop untuk mencegah crash memori saat data mencapai ratusan ribu
+create or replace function public.get_laporan_viewport(
+  min_lng double precision,
+  min_lat double precision,
+  max_lng double precision,
+  max_lat double precision,
+  p_kategori text default null,
+  max_limit integer default 300
+)
+returns setof public.laporan_publik
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select *
+  from public.laporan_publik
+  where (
+    koordinat_lng between min_lng and max_lng
+    and koordinat_lat between min_lat and max_lat
+  )
+  and (p_kategori is null or p_kategori = 'all' or kategori_rusak = p_kategori)
+  order by created_at desc
+  limit least(max_limit, 500);
+$$;
+grant execute on function public.get_laporan_viewport(double precision, double precision, double precision, double precision, text, integer) to anon, authenticated;
 
 -- 9. RUAS TAMBAHAN: jalankan juga supabase/seed_ruas_tambahan.sql (11 ruas, data contoh).
 

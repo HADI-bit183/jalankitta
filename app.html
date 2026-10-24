@@ -35,6 +35,8 @@
     rel="stylesheet" />
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" integrity="sha384-pmjIAcz2bAn0xukfxADbZIb3t8oRT9Sv0rvO+BR5Csr6Dhqq+nZs59P0pPKQJkEV" crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" integrity="sha384-wgw+aLYNQ7dlhK47ZPK7FRACiq7ROZwgFNg0m04avm4CaXS+Z9Y7nMu8yNjBKYC+" crossorigin="" />
 
   <script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js" integrity="sha384-0v3Wh0ZtiQBYCYywQoeMDA5mAw5Z01p0lhorqy0BlwFrcN6u3lmN7K0U/e1uezmr" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="assets/css/style.css" />
@@ -132,10 +134,10 @@
               <span id="road-count" class="text-xs font-bold text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded-full"></span>
             </div>
             <div class="mb-6 grid grid-cols-2 gap-2.5 text-xs font-semibold">
-              <button data-filter="all" class="filter-btn is-active rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-800/60 px-3 py-2.5 transition hover:bg-slate-100 dark:hover:bg-slate-700">Semua</button>
-              <button data-filter="baik" class="filter-btn flex items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-800/60 px-3 py-2.5 transition hover:bg-slate-100 dark:hover:bg-slate-700"><span class="h-2.5 w-2.5 rounded-full bg-good"></span>Mantap</button>
-              <button data-filter="ringan" class="filter-btn flex items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-800/60 px-3 py-2.5 transition hover:bg-slate-100 dark:hover:bg-slate-700"><span class="h-2.5 w-2.5 rounded-full bg-minor"></span>Rusak Ringan</button>
-              <button data-filter="berat" class="filter-btn flex items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-800/60 px-3 py-2.5 transition hover:bg-slate-100 dark:hover:bg-slate-700"><span class="h-2.5 w-2.5 rounded-full bg-major"></span>Rusak Berat</button>
+              <button data-filter="all" class="filter-btn is-active min-h-[44px] flex items-center justify-center rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-800/60 px-3 py-2.5 transition hover:bg-slate-100 dark:hover:bg-slate-700">Semua</button>
+              <button data-filter="baik" class="filter-btn min-h-[44px] flex items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-800/60 px-3 py-2.5 transition hover:bg-slate-100 dark:hover:bg-slate-700"><span class="h-2.5 w-2.5 rounded-full bg-good"></span>Mantap</button>
+              <button data-filter="ringan" class="filter-btn min-h-[44px] flex items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-800/60 px-3 py-2.5 transition hover:bg-slate-100 dark:hover:bg-slate-700"><span class="h-2.5 w-2.5 rounded-full bg-minor"></span>Rusak Ringan</button>
+              <button data-filter="berat" class="filter-btn min-h-[44px] flex items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 bg-white/60 dark:bg-slate-800/60 px-3 py-2.5 transition hover:bg-slate-100 dark:hover:bg-slate-700"><span class="h-2.5 w-2.5 rounded-full bg-major"></span>Rusak Berat</button>
             </div>
             <h3 class="mb-3 text-sm font-bold text-slate-900 dark:text-white">Daftar Ruas Jalan</h3>
             <ul id="road-list" class="thin-scroll -mr-2 flex-1 space-y-2 overflow-y-auto pr-2"></ul>
@@ -416,10 +418,32 @@
             <button id="modal-success-track" class="ml-2 inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-bold text-white shadow-md transition hover:brightness-110"><i data-lucide="clipboard-list" class="h-4 w-4"></i>Lacak status</button>
           </div>
         </div>
-      </div>
     </div>
+
+    <!-- Mobile Bottom Navigation Bar (Ergonomis Layar Sentuh HP) -->
+    <nav id="mobile-bottom-nav" class="lg:hidden fixed inset-x-0 bottom-0 z-[990] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200/80 dark:border-white/10 px-3 py-1.5 flex items-center justify-around shadow-[0_-4px_20px_rgba(0,0,0,0.1)]" aria-label="Navigasi cepat ponsel">
+      <a href="#peta" class="mobile-nav-item flex flex-col items-center justify-center p-2 min-h-[48px] min-w-[48px] text-amber-500 font-bold transition">
+        <i data-lucide="map" class="h-5 w-5"></i>
+        <span class="text-[10px] mt-0.5 font-bold">Peta</span>
+      </a>
+      <a href="#lapor" class="mobile-nav-item flex flex-col items-center justify-center p-1.5 min-h-[48px] min-w-[48px] text-white transition">
+        <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/30 active:scale-95 transition-transform">
+          <i data-lucide="camera" class="h-5 w-5"></i>
+        </div>
+        <span class="text-[10px] mt-0.5 font-bold text-amber-600 dark:text-amber-400">Lapor</span>
+      </a>
+      <button type="button" id="btn-mob-my-reports-nav" class="mobile-nav-item flex flex-col items-center justify-center p-2 min-h-[48px] min-w-[48px] text-slate-600 dark:text-slate-300 transition hover:text-amber-500">
+        <i data-lucide="clipboard-list" class="h-5 w-5"></i>
+        <span class="text-[10px] mt-0.5">Laporan</span>
+      </button>
+      <a href="#statistik" class="mobile-nav-item flex flex-col items-center justify-center p-2 min-h-[48px] min-w-[48px] text-slate-600 dark:text-slate-300 transition hover:text-amber-500">
+        <i data-lucide="bar-chart-3" class="h-5 w-5"></i>
+        <span class="text-[10px] mt-0.5">Statistik</span>
+      </a>
+    </nav>
     
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
   <script src="assets/js/auth.js"></script>
 
@@ -797,26 +821,52 @@
       window.focusReport = (id) => {
         const entry = reportMarkers.find((m) => String(m.id) === String(id));
         if (!entry) return false;
-        if (!map.hasLayer(entry.marker)) entry.marker.addTo(map);
-        map.flyTo(entry.marker.getLatLng(), 16, { duration: 1.2 });
-        setTimeout(() => entry.marker.openPopup(), 1300);
+        if (typeof reportClusterGroup !== 'undefined' && reportClusterGroup.hasLayer(entry.marker)) {
+          reportClusterGroup.zoomToShowLayer(entry.marker, () => {
+            entry.marker.openPopup();
+          });
+        } else {
+          if (!map.hasLayer(entry.marker)) entry.marker.addTo(map);
+          map.flyTo(entry.marker.getLatLng(), 16, { duration: 1.2 });
+          setTimeout(() => entry.marker.openPopup(), 1300);
+        }
         return true;
       };
 
       const reportMarkers = [];
 
+      // Layer Marker Clustering Skala Provinsi (Mencegah peramban macet saat ratusan ribu titik)
+      const reportClusterGroup = L.markerClusterGroup({
+        chunkedLoading: true,
+        maxClusterRadius: 40,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        iconCreateFunction: (cluster) => {
+          const count = cluster.getChildCount();
+          let cClass = 'bg-amber-500/90 text-white shadow-amber-500/30';
+          if (count > 50) cClass = 'bg-rose-600/90 text-white shadow-rose-600/30';
+          else if (count > 15) cClass = 'bg-orange-500/90 text-white shadow-orange-500/30';
+          return L.divIcon({
+            html: `<div class="flex h-9 w-9 items-center justify-center rounded-2xl font-bold shadow-lg border-2 border-white dark:border-slate-800 ${cClass} text-xs tracking-tight">${count}</div>`,
+            className: 'cluster-marker-icon',
+            iconSize: [36, 36],
+            iconAnchor: [18, 18]
+          });
+        }
+      });
+      map.addLayer(reportClusterGroup);
+
       function filterReportMarkers() {
+        reportClusterGroup.clearLayers();
+        const toAdd = [];
         reportMarkers.forEach(({ marker, kategori, status }) => {
           const isSelesai = status === 'selesai';
           const match = activeFilter === 'all'
             || (activeFilter === 'baik' && (kategori === 'baik' || isSelesai))
             || (kategori === activeFilter && !isSelesai);
-          if (match) {
-            if (!map.hasLayer(marker)) marker.addTo(map);
-          } else {
-            if (map.hasLayer(marker)) map.removeLayer(marker);
-          }
+          if (match) toAdd.push(marker);
         });
+        reportClusterGroup.addLayers(toAdd);
       }
 
       $$('.filter-btn').forEach(btn => {
@@ -981,7 +1031,7 @@
           || (activeFilter === 'baik' && (kategori_rusak === 'baik' || isSelesai))
           || (kategori_rusak === activeFilter && !isSelesai);
         if (match) {
-          marker.addTo(map);
+          reportClusterGroup.addLayer(marker);
         }
 
         if (fotoSrc) {
@@ -992,41 +1042,101 @@
         }
       }
 
+      const loadedReportIds = new Set();
+
+      // Lazy-Loading Berbasis Viewport Bounding-Box (Optimasi Skala Provinsi)
+      async function loadViewportReports() {
+        if (!db) return;
+        const b = map.getBounds();
+        const minLng = b.getWest() - 0.05;
+        const maxLng = b.getEast() + 0.05;
+        const minLat = b.getSouth() - 0.05;
+        const maxLat = b.getNorth() + 0.05;
+
+        try {
+          // 1. Coba kueri RPC Spasial PostGIS Bounding-Box
+          const { data, error } = await db.rpc('get_laporan_viewport', {
+            min_lng: minLng,
+            min_lat: minLat,
+            max_lng: maxLng,
+            max_lat: maxLat,
+            p_kategori: activeFilter === 'all' ? null : activeFilter,
+            max_limit: 300
+          });
+
+          if (!error && Array.isArray(data)) {
+            data.forEach(r => {
+              if (!loadedReportIds.has(r.id)) {
+                loadedReportIds.add(r.id);
+                addReportMarker(r);
+              }
+            });
+            return;
+          }
+        } catch (e) {
+          // Fallback ke kueri view standar
+        }
+
+        try {
+          // 2. Fallback Kueri View Koordinat Terbatas
+          const { data, error } = await db.from('laporan_publik')
+            .select('*')
+            .gte('koordinat_lng', minLng)
+            .lte('koordinat_lng', maxLng)
+            .gte('koordinat_lat', minLat)
+            .lte('koordinat_lat', maxLat)
+            .order('created_at', { ascending: false })
+            .limit(300);
+
+          if (!error && Array.isArray(data)) {
+            data.forEach(r => {
+              if (!loadedReportIds.has(r.id)) {
+                loadedReportIds.add(r.id);
+                addReportMarker(r);
+              }
+            });
+          }
+        } catch (err) {
+          console.warn('Gagal memuat viewport laporan:', err);
+        }
+      }
+
+      // Muat ulang titik saat bidang pandang peta digeser/diperbesar (Debounce 350ms)
+      let moveViewportDebounce = null;
+      map.on('moveend', () => {
+        clearTimeout(moveViewportDebounce);
+        moveViewportDebounce = setTimeout(loadViewportReports, 350);
+      });
+
       async function loadRealReports() {
         if (!db) return;
         try {
-          // Membaca secara aman hanya lewat view laporan_publik (bebas user_id & nama lengkap)
-          // Urutkan secara deterministik dengan created_at dan id untuk mencegah duplikasi/terlewat pada paginasi
-          let allPublicReports = [];
-          const PAGE_SIZE = 1000;
-          let from = 0;
-          let totalCount = 0;
-
-          const firstBatch = await db.from('laporan_publik')
-            .select('*', { count: 'exact' })
+          // Muat batch awal laporan terverifikasi terbaru (Maksimal 500 titik awal agar memori HP ringan)
+          const { data, error } = await db.from('laporan_publik')
+            .select('*')
             .order('created_at', { ascending: false })
-            .order('id', { ascending: false })
-            .range(from, from + PAGE_SIZE - 1);
-          if (firstBatch.error) throw firstBatch.error;
+            .limit(500);
 
-          allPublicReports = allPublicReports.concat(firstBatch.data || []);
-          totalCount = firstBatch.count ?? allPublicReports.length;
-
-          // Ambil sisa batch jika total laporan melebihi 1000
-          while (allPublicReports.length < totalCount && (firstBatch.data?.length === PAGE_SIZE)) {
-            from += PAGE_SIZE;
-            const nextBatch = await db.from('laporan_publik')
-              .select('*')
-              .order('created_at', { ascending: false })
-              .order('id', { ascending: false })
-              .range(from, from + PAGE_SIZE - 1);
-            if (nextBatch.error) break;
-            if (!nextBatch.data || nextBatch.data.length === 0) break;
-            allPublicReports = allPublicReports.concat(nextBatch.data);
+          if (error) throw error;
+          if (Array.isArray(data)) {
+            data.forEach(report => {
+              if (!loadedReportIds.has(report.id)) {
+                loadedReportIds.add(report.id);
+                addReportMarker(report);
+              }
+            });
           }
+        } catch (err) {
+          console.error('Error fetching initial reports from Supabase view laporan_publik:', err);
+        }
+      }
 
-          allPublicReports.forEach(report => addReportMarker(report));
-        } catch (err) { console.error('Error fetching reports from Supabase view laporan_publik:', err); }
+      // Handler Navigasi Bawah Ponsel (Mobile Bottom Nav)
+      const btnMobReports = $('#btn-mob-my-reports-nav');
+      if (btnMobReports) {
+        btnMobReports.addEventListener('click', () => {
+          window.dispatchEvent(new Event('jk-open-my-reports'));
+        });
       }
 
       // Ambil ringkasan agregat dari view statistik_publik (termasuk rata-rata waktu penyelesaian)
