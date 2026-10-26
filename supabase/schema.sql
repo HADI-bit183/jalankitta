@@ -1,7 +1,7 @@
 -- ==============================================================================
--- JalanKitta — Skema Supabase (RLS, view publik, storage, seed)
+-- JalanKitta — Skema Supabase (RLS, view publik, storage)
 -- AMAN DIJALANKAN BERULANG: semua policy di-drop lalu dibuat ulang, view dibuat
--- ulang, seed memakai ON CONFLICT, backfill hanya jalan saat kolom pertama dibuat.
+-- ulang, backfill hanya jalan saat kolom pertama dibuat.
 --
 -- Prinsip keamanan:
 --   * Tabel laporan_warga TIDAK dapat dibaca publik. Publik membaca lewat view
@@ -120,7 +120,7 @@ alter table public.laporan_warga add column if not exists ruas_id text reference
 alter table public.laporan_warga add column if not exists deleted_at timestamptz default null;
 
 -- Migrasi satu kali untuk upgrade dari versi yang kolomnya sempat dibuat dengan default 'baik':
--- Hanya mengisi ruas non-seed yang belum pernah disurvei (kondisi_dasar masih 'baik' bawaan default),
+-- Hanya mengisi ruas yang belum pernah disurvei (kondisi_dasar masih 'baik' bawaan default),
 -- kolom kondisi terdata <> 'baik', dan TIDAK sedang memiliki laporan aktif diverifikasi/diproses.
 -- Ini diletakkan di sini agar tabel laporan_warga dan kolom ruas_id sudah dipastikan ada.
 update public.ruas_jalan r
@@ -307,10 +307,11 @@ create policy "pelapor hapus laporan baru milik sendiri" on public.laporan_warga
   for delete to authenticated using (auth.uid() = user_id and status = 'baru');
 
 -- 4. VIEW PUBLIK -----------------------------------------------------------------
--- Dibuat ulang (drop) agar kolom lama (mis. user_id) pasti hilang.
+-- Dibuat ulang (drop cascade) agar kolom lama pasti hilang dan fungsi dependen
+-- (seperti get_laporan_viewport) di-refresh tanpa error dependency.
 -- View berjalan dengan hak pemilik sehingga melewati RLS tabel: sengaja, karena
 -- hanya memuat kolom aman. Peringatan Advisor "Security Definer View" boleh diabaikan.
-drop view if exists public.laporan_publik;
+drop view if exists public.laporan_publik cascade;
 create view public.laporan_publik as
 select
   id,
@@ -334,7 +335,7 @@ where status in ('diverifikasi','diproses','selesai')
   and deleted_at is null;
 grant select on public.laporan_publik to anon, authenticated;
 
-drop view if exists public.statistik_publik;
+drop view if exists public.statistik_publik cascade;
 create view public.statistik_publik as
 select
   count(*) filter (where status in ('diverifikasi','diproses','selesai') and deleted_at is null) as total_publik,
@@ -406,25 +407,9 @@ create policy "foto_laporan hapus pemilik atau admin" on storage.objects
     and (owner_id = auth.uid()::text or (storage.foldername(name))[2] = auth.uid()::text or public.is_admin())
   );
 
--- 7. SEED RUAS JALAN (idempoten; geometri hasil routing, panjang dalam km) ------------
--- Membersihkan baris duplikat dari seed versi lama yang memakai id angka
-delete from public.ruas_jalan
-where nama in ('Ruas Simpang Randu - Seputih Surabaya',
-               'Jalan Lintas Kota Agung - Gisting',
-               'Jalan Raya Natar (Lintas Sumatera)')
-  and id not in ('R-01','R-02','R-03');
-
-insert into public.ruas_jalan (id, nama, kabupaten, kondisi_dasar, kondisi, geometry, panjang_km) values
-('R-01', 'Ruas Simpang Randu - Seputih Surabaya', 'Lampung Tengah', 'berat', 'berat',
- '{"type":"LineString","coordinates":[[105.418571,-4.867231],[105.411273,-4.869059],[105.413419,-4.862718],[105.409256,-4.854406],[105.42228,-4.84431],[105.428155,-4.838178],[105.431736,-4.836644],[105.444974,-4.845152],[105.447831,-4.844901],[105.450991,-4.841247],[105.465995,-4.846954],[105.47976,-4.84305],[105.490384,-4.829428],[105.491821,-4.831567],[105.494886,-4.844728],[105.499696,-4.853141],[105.500847,-4.852492],[105.50583,-4.852956],[105.50616,-4.853899],[105.528371,-4.855258],[105.530908,-4.855526],[105.530942,-4.856597],[105.538308,-4.857038],[105.538473,-4.855245],[105.539826,-4.855221],[105.539901,-4.853502],[105.54196,-4.853523],[105.543143,-4.848166]]}'::jsonb, 22.46),
-('R-02', 'Jalan Lintas Kota Agung - Gisting', 'Tanggamus', 'baik', 'baik',
- '{"type":"LineString","coordinates":[[104.62246,-5.497491],[104.620892,-5.496984],[104.622475,-5.491447],[104.62618,-5.493632],[104.630485,-5.501143],[104.634721,-5.502774],[104.646182,-5.502982],[104.649857,-5.503504],[104.654095,-5.505112],[104.657692,-5.504311],[104.664108,-5.508388],[104.670593,-5.510455],[104.679623,-5.50823],[104.6829,-5.504175],[104.682298,-5.502526],[104.682083,-5.495948],[104.686468,-5.485988],[104.689694,-5.484669],[104.692887,-5.48065],[104.701133,-5.477612],[104.700023,-5.47287],[104.697117,-5.471452],[104.698661,-5.469677],[104.697276,-5.468399],[104.697462,-5.466831],[104.696346,-5.465343],[104.698342,-5.465272],[104.69984,-5.46322],[104.700014,-5.464669],[104.701315,-5.465385],[104.700904,-5.461835],[104.701805,-5.46119],[104.704353,-5.461319],[104.704787,-5.459718],[104.703879,-5.458363],[104.705582,-5.457205],[104.706387,-5.455054],[104.705585,-5.452659],[104.707547,-5.453339],[104.708667,-5.452838],[104.709126,-5.45171],[104.709561,-5.452677],[104.71092,-5.452747],[104.713245,-5.451012],[104.716394,-5.442795],[104.7222,-5.435583],[104.729512,-5.442271],[104.730217,-5.441697]]}'::jsonb, 21.97),
-('R-03', 'Jalan Raya Natar (Lintas Sumatera)', 'Lampung Selatan', 'ringan', 'ringan',
- '{"type":"LineString","coordinates":[[105.196879,-5.257433],[105.197343,-5.260921],[105.196775,-5.266436],[105.192158,-5.266744],[105.189106,-5.266123],[105.185938,-5.267006],[105.18872,-5.280425],[105.190943,-5.284113],[105.192149,-5.296652],[105.191776,-5.304435],[105.192538,-5.306756],[105.195051,-5.311261],[105.196895,-5.316602],[105.19973,-5.32002],[105.200807,-5.324554],[105.202375,-5.326481],[105.206041,-5.328303],[105.208467,-5.331431],[105.215205,-5.345156],[105.217367,-5.348162],[105.218723,-5.35312],[105.221083,-5.356065],[105.223923,-5.353081],[105.232474,-5.347334],[105.234917,-5.348382]]}'::jsonb, 15.26)
-on conflict (id) do update set
-  nama = excluded.nama, kabupaten = excluded.kabupaten,
-  kondisi_dasar = excluded.kondisi_dasar, kondisi = excluded.kondisi,
-  geometry = excluded.geometry, panjang_km = excluded.panjang_km, updated_at = now();
+-- 7. RUAS JALAN ------------------------------------------------------------------------
+-- Data ruas jalan nyata diimpor melalui berkas SQL hasil scripts/import_ruas.mjs
+-- (misal: supabase/ruas_real.sql).
 
 -- 8. PENGUATAN KEAMANAN (idempoten) ---------------------------------------------------
 -- 8a. Kolom nama dikunci di server: nama diambil dari token login (bukan kiriman klien),
@@ -848,7 +833,7 @@ returns table (
 language plpgsql
 stable
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 begin
   return query
@@ -899,7 +884,7 @@ returns setof public.laporan_publik
 language sql
 stable
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
   select *
   from public.laporan_publik
@@ -916,8 +901,6 @@ as $$
   limit least(max_limit, 500);
 $$;
 grant execute on function public.get_laporan_viewport(double precision, double precision, double precision, double precision, text, integer) to anon, authenticated;
-
--- 9. RUAS TAMBAHAN: jalankan juga supabase/seed_ruas_tambahan.sql (11 ruas, data contoh).
 
 -- ==============================================================================
 -- ADMIN PERTAMA: daftar akun lewat login.html, salin UID di Authentication > Users:

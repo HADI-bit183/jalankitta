@@ -2,11 +2,12 @@
   "name": "jalankitta",
   "private": true,
   "version": "1.0.0",
-  "description": "JalanKitta - prototipe pemantauan jalan Lampung (SDG 9)",
+  "description": "JalanKitta - platform pemantauan infrastruktur jalan Lampung (SDG 9)",
   "scripts": {
     "build:css": "tailwindcss -c tailwind.config.js -i src/tailwind.input.css -o assets/css/tailwind.css --minify",
     "watch:css": "tailwindcss -c tailwind.config.js -i src/tailwind.input.css -o assets/css/tailwind.css --watch",
-    "seed:ruas": "node scripts/generate_seed_ruas.mjs",
+    "seed:ruas": "node scripts/import_ruas.mjs",
+    "import:ruas": "node scripts/import_ruas.mjs",
     "test": "node scripts/check_codebase.mjs",
     "package": "bash scripts/package.sh"
   },

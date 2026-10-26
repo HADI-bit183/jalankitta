@@ -6,7 +6,9 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://server.arcgisonline.com https://unpkg.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://router.project-osrm.org; object-src 'none'; base-uri 'self'; form-action 'self'" />
   <title>Login - JalanKitta</title>
   <meta name="theme-color" content="#0F172A" />
-  <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/logo-192.png" />
+  <link rel="apple-touch-icon" href="assets/icons/logo-192.png" />
   
   <script>
     (function() {
@@ -50,7 +52,7 @@
         
         <!-- Ilustrasi Utama -->
         <!-- Memakai mix-blend-multiply agar background putih dari gambar hero-worker.webp bisa menyatu dengan bg-soft -->
-        <img src="assets/img/hero-worker.webp" alt="Pekerja Jalan" class="relative z-10 w-full max-w-md object-contain mix-blend-multiply animate-float" onerror="this.style.display='none'" />
+        <img id="hero-worker-img" src="assets/img/hero-worker.webp" alt="Pekerja Jalan" class="relative z-10 w-full max-w-md object-contain mix-blend-multiply animate-float" />
       </div>
 
       <!-- Kolom Kanan: Form Login -->
@@ -63,9 +65,9 @@
         
         <div class="w-full max-w-sm mt-10 sm:mt-0">
           <div class="text-center mb-8">
-            <a href="index.html" class="inline-flex items-center gap-3 mb-8 group">
-              <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/30 transition-transform group-hover:scale-105">
-                <i data-lucide="map-pin" class="h-5 w-5"></i>
+            <a href="index.html" class="inline-flex items-center gap-3.5 mb-8 group">
+              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-amber-500/10 dark:bg-white/10 p-1.5 shadow-md shadow-amber-500/20 transition-transform group-hover:scale-105">
+                <img src="assets/img/logo-icon.png" alt="Logo JalanKitta" class="h-9 w-9 object-contain" />
               </div>
               <span class="font-logo text-3xl font-bold tracking-tight text-navy">Jalan<span class="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Kitta</span></span>
             </a>
@@ -76,11 +78,11 @@
           <form id="auth-form" class="space-y-5">
             <div id="field-nama" class="hidden">
               <label class="mb-1.5 block text-sm font-bold text-navy">Nama Lengkap</label>
-              <input type="text" id="auth-nama" maxlength="100" placeholder="cth. Budi Santoso" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm text-navy outline-none focus:border-accent focus:bg-white focus:ring-4 focus:ring-accent/20 transition" />
+              <input type="text" id="auth-nama" maxlength="100" placeholder="Nama lengkap Anda" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm text-navy outline-none focus:border-accent focus:bg-white focus:ring-4 focus:ring-accent/20 transition" />
             </div>
             <div>
               <label class="mb-1.5 block text-sm font-bold text-navy">Email</label>
-              <input type="email" id="auth-email" required placeholder="email@contoh.com" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm text-navy outline-none focus:border-accent focus:bg-white focus:ring-4 focus:ring-accent/20 transition" />
+              <input type="email" id="auth-email" required placeholder="nama@email.com" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm text-navy outline-none focus:border-accent focus:bg-white focus:ring-4 focus:ring-accent/20 transition" />
             </div>
             <div>
               <label class="mb-1.5 block text-sm font-bold text-navy">Password</label>
@@ -112,6 +114,8 @@
   <script src="assets/js/auth.js"></script>
   <script>
     lucide.createIcons();
+    const heroImg = document.getElementById('hero-worker-img');
+    if (heroImg) heroImg.addEventListener('error', () => { heroImg.style.display = 'none'; });
     document.getElementById('dark-toggle').addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark');
       localStorage.setItem('theme', isDark ? 'dark' : 'light');

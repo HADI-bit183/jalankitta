@@ -26,6 +26,9 @@ jobs:
     - name: Verify Tailwind CSS compilation
       run: npm run build:css
 
+    - name: Verify no uncommitted CSS drift
+      run: git diff --exit-code assets/css/tailwind.css
+
     - name: Run codebase integrity & security test
       run: npm test
 

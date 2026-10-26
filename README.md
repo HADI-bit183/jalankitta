@@ -10,7 +10,7 @@ Fokus: **SDG 9 — Industri, Inovasi, dan Infrastruktur**
 
 **JalanKitta** adalah platform web multi-halaman yang mengintegrasikan pemetaan spasial interaktif dan partisipasi warga (*civic tech*) untuk memantau dan mempercepat penanganan jalan rusak di Provinsi Lampung.
 
-> **Status: prototipe kompetisi.** Data ruas jalan dan kondisinya adalah **data contoh** (bukan survei/data resmi), gambar hero dan kartu kondisi adalah **ilustrasi buatan AI**, dan belum ada kemitraan resmi dengan instansi pemerintah. Rute alternatif dan statistik per kabupaten/kota belum diimplementasikan.
+> **Status:** Data ruas jalan bersumber dari **survei lapangan jalan Provinsi Lampung (2026)** mencakup wilayah Lampung Timur, Pesawaran, dan Pringsewu dengan geometri via OSRM. Gambar hero dan kartu kondisi adalah **ilustrasi buatan AI**, dan daftar mitra merupakan rencana kolaborasi lintas sektor. Rute alternatif dan statistik per kabupaten/kota dapat dikembangkan lebih lanjut.
 
 Platform terhubung langsung ke **Supabase** (PostgreSQL dengan *Row Level Security*) dan menerapkan sanitasi XSS, validasi berkas, penghapusan EXIF foto, serta *Subresource Integrity* untuk Leaflet. CSS Tailwind dibuild dengan CLI menjadi satu berkas (`assets/css/tailwind.css`).
 
@@ -36,10 +36,10 @@ jalankitta/
 ├── src/tailwind.input.css  # Input Tailwind CLI
 ├── tailwind.config.js      # Konfigurasi tema bersama (satu sumber untuk semua halaman)
 ├── supabase/
-│   ├── schema.sql              # Skema, View, RLS, Storage, trigger keamanan, seed 3 ruas
-│   └── seed_ruas_tambahan.sql  # 11 ruas contoh tambahan (hasil scripts/generate_seed_ruas.mjs)
+│   ├── schema.sql              # Skema, View, RLS, Storage, trigger keamanan
+│   └── ruas_real.sql           # Data ruas jalan nyata Lampung (hasil scripts/import_ruas.mjs)
 ├── scripts/
-│   ├── generate_seed_ruas.mjs  # Ambil geometri dari OSRM -> SQL
+│   ├── import_ruas.mjs         # Impor data ruas nyata dari data/ruas_jalan.csv -> SQL
 │   └── package.sh              # Buat zip pengumpulan bersih
 ├── pengumpulan/            # Draf surat orisinalitas, proposal, template link demo
 ├── .gitignore
@@ -61,7 +61,7 @@ Untuk mereplikasi backend database secara mandiri:
    - Kebijakan *Row Level Security* (RLS) lengkap.
    - Bucket Storage `foto_laporan` berstatus publik beserta aturan keamanannya.
    - Trigger keamanan: nama pelapor diambil dari token login, batas 10 laporan/24 jam per pengguna, batas 200 subscriber/jam.
-   - Seed 3 ruas contoh. Untuk 11 ruas tambahan, jalankan juga [`supabase/seed_ruas_tambahan.sql`](supabase/seed_ruas_tambahan.sql) (total 14 ruas, **data contoh**).
+   - Data ruas jalan nyata: Jalankan [`supabase/ruas_real.sql`](supabase/ruas_real.sql) yang dihasilkan oleh `npm run import:ruas` (data survei lapangan Lampung Timur, Pesawaran, Pringsewu 2026).
 > **Catatan:** Skema ini aman dijalankan berulang kali (*idempotent*), dan host pada constraint `foto_url_valid` perlu disesuaikan jika memakai proyek Supabase lain.
 
 ### 2. Konfigurasi URL Autentikasi (Redirect URLs)
@@ -168,7 +168,7 @@ Platform dirancang dengan gaya visual modern, ramah pengguna, dan berstandar aks
 ## 💡 Keputusan Desain & Catatan Produksi
 
 1. **Pemisahan Koridor Ruas Jalan vs Aduan Warga:**
-   - **`ruas_jalan` (Geometri Linier):** Merepresentasikan koridor jalan lintas kabupaten/kota. Saat ini berisi data contoh (bukan survei resmi).
+   - **`ruas_jalan` (Geometri Linier):** Merepresentasikan koridor jalan lintas kabupaten/kota bersumber dari survei lapangan Provinsi Lampung (2026).
    - **`laporan_warga` (Titik Geospasial Insidental):** Berfungsi sebagai kanal partisipasi publik (*crowdsourcing*) untuk menandai lubang/kerusakan spesifik. Laporan yang diselesaikan diverifikasi oleh admin secara independen dan tidak serta-merta mengubah survei resmi panjang koridor jalan sebelum pembaruan berkala dari dinas terkait.
 2. **Roadmap Menuju Produksi Skala Penuh:**
    - **Pembatas Laju Lanjutan:** Trigger SQL sudah membatasi laporan/subscriber per periode; untuk produksi tambahkan Edge Function / Cloudflare Turnstile.

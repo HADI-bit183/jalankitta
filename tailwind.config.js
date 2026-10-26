@@ -17,8 +17,6 @@ module.exports = {
         ink: '#64748B',
         soft: '#FEF3C7',
         coral: '#EA580C',
-        cyan: '#06B6D4',
-        emerald: '#10B981',
         good: '#10B981',
         minor: '#F59E0B',
         major: '#EF4444',

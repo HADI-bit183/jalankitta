@@ -11,7 +11,7 @@ if (!isSupabaseLoaded) {
 
 window.supabaseDb = isSupabaseLoaded ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
-// 2. Setup Menu Mobile Inject
+
 const mobileMenu = document.getElementById('mobile-menu');
 if (mobileMenu) {
   const ul = mobileMenu.querySelector('ul');
@@ -38,7 +38,7 @@ if (mobileMenu) {
   });
 }
 
-// Helper Terjemahan Pesan Error Supabase
+
 function getIndonesianAuthError(msg) {
   if (!msg) return 'Terjadi kesalahan sistem. Silakan coba lagi.';
   const lower = msg.toLowerCase();
@@ -56,7 +56,7 @@ function getIndonesianAuthError(msg) {
   return msg;
 }
 
-// Deteksi sesi pemulihan kata sandi (Recovery Hash / URL query)
+
 let isRecovery = location.hash.includes('type=recovery') || new URLSearchParams(location.search).get('type') === 'recovery';
 
 // 3. Logic Halaman Login (Hanya berjalan jika elemen form login ada)
@@ -424,7 +424,10 @@ if (window.supabaseDb) {
     const btnSubmitReport = document.getElementById('btn-submit-report');
 
     if (reportForm && inputNama && btnSubmitReport) {
-      const otherInputs = reportForm.querySelectorAll('input:not(#input-nama):not(#input-lat):not(#input-lng), textarea, button:not(#btn-submit-report)');
+      // Input dan textarea yang dikontrol auth state.
+      // Kecualikan #btn-geolocate dan #btn-foto-remove agar tidak tertimpa saat TOKEN_REFRESHED / proses geolokasi GPS berjalan
+      const formFields = reportForm.querySelectorAll('input:not(#input-nama):not(#input-lat):not(#input-lng), textarea');
+      const btnGeo = document.getElementById('btn-geolocate');
       const dropzone = document.getElementById('dropzone');
 
       if (user) {
@@ -433,13 +436,21 @@ if (window.supabaseDb) {
         inputNama.value = user.user_metadata?.full_name || user.email;
         inputNama.readOnly = true;
         inputNama.classList.add('opacity-70', 'cursor-not-allowed', 'pointer-events-none');
-        // Jangan aktifkan tombol jika sedang dalam proses pengiriman laporan
-        if (!window.__isSubmittingReport && !reportForm.dataset?.submitting) {
-          btnSubmitReport.disabled = false;
-        }
 
-        otherInputs.forEach(el => el.disabled = false);
-        if (dropzone) dropzone.classList.remove('opacity-50', 'pointer-events-none');
+        const isSubmitting = Boolean(window.__isSubmittingReport || reportForm.dataset?.submitting === 'true');
+
+        // Jangan aktifkan tombol jika sedang dalam proses pengiriman laporan
+        if (!isSubmitting) {
+          btnSubmitReport.disabled = false;
+          formFields.forEach(el => el.disabled = false);
+
+          // Aktifkan kembali tombol geolocate hanya jika tidak sedang aktif mencari GPS
+          if (btnGeo && !btnGeo.querySelector('span')?.textContent?.includes('Mencari')) {
+            btnGeo.disabled = false;
+          }
+
+          if (dropzone) dropzone.classList.remove('opacity-50', 'pointer-events-none');
+        }
 
         const prevWarning = document.getElementById('auth-warning-form');
         if (prevWarning) prevWarning.remove();
@@ -451,7 +462,8 @@ if (window.supabaseDb) {
         btnSubmitReport.disabled = true;
 
         // Disable form input lainnya
-        otherInputs.forEach(el => el.disabled = true);
+        formFields.forEach(el => el.disabled = true);
+        if (btnGeo) btnGeo.disabled = true;
         if (dropzone) dropzone.classList.add('opacity-50', 'pointer-events-none');
 
         let warning = document.getElementById('auth-warning-form');

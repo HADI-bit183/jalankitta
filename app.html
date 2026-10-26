@@ -6,9 +6,11 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://server.arcgisonline.com https://unpkg.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://router.project-osrm.org; object-src 'none'; base-uri 'self'; form-action 'self'" />
   <title>JalanKitta — Peta &amp; Laporan Infrastruktur Jalan Provinsi Lampung</title>
   <meta name="description"
-    content="JalanKitta: platform pemantauan kondisi jalan Provinsi Lampung berbasis peta interaktif dan laporan warga. Mendukung SDG 9 — Industri, Inovasi, dan Infrastruktur." />
+    content="JalanKitta: platform pemantauan kondisi jalan Provinsi Lampung berbasis peta interaktif dan laporan warga." />
   <meta name="theme-color" content="#0F172A" />
-  <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/logo-192.png" />
+  <link rel="apple-touch-icon" href="assets/icons/logo-192.png" />
 
   <!-- Preload theme to avoid flickering -->
   <script>
@@ -56,11 +58,11 @@
     <nav class="mx-auto flex max-w-7xl items-center justify-between rounded-2xl px-5 py-3.5 glass transition-all" aria-label="Navigasi utama">
       <!-- Logo -->
       <a href="index.html#home" class="flex items-center gap-3 group" id="nav-logo">
-        <div class="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/30 transition-transform group-hover:scale-105">
-          <i data-lucide="map-pin" class="h-5 w-5"></i>
-          <span class="absolute -top-1 -right-1 flex h-3 w-3">
+        <div class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 dark:bg-white/10 p-1 transition-transform group-hover:scale-105">
+          <img src="assets/img/logo-icon.png" alt="Logo JalanKitta" class="h-8 w-8 object-contain" />
+          <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
           </span>
         </div>
         <div>
@@ -73,7 +75,6 @@
       <ul class="hidden items-center gap-1 lg:flex text-sm font-semibold text-slate-700 dark:text-slate-300">
         <li><a href="index.html#home" class="nav-link relative px-4 py-2 rounded-xl transition hover:text-amber-500 dark:hover:text-amber-400">Home</a></li>
         <li><a href="index.html#layanan" class="nav-link relative px-4 py-2 rounded-xl transition hover:text-amber-500 dark:hover:text-amber-400">Layanan</a></li>
-        <li><a href="index.html#sdg" class="nav-link relative px-4 py-2 rounded-xl transition hover:text-amber-500 dark:hover:text-amber-400">SDG 9</a></li>
         <li><a href="#peta" class="nav-link active relative px-4 py-2 rounded-xl text-amber-500 font-bold transition">Peta Jalan</a></li>
         <li><a href="#statistik" class="nav-link relative px-4 py-2 rounded-xl transition hover:text-amber-500 dark:hover:text-amber-400">Statistik</a></li>
       </ul>
@@ -109,7 +110,6 @@
       <ul class="flex flex-col gap-1 text-sm font-semibold text-slate-800 dark:text-slate-200">
         <li><a href="index.html#home" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="home" class="h-4 w-4 text-amber-500"></i>Home</a></li>
         <li><a href="index.html#layanan" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="layers" class="h-4 w-4 text-amber-500"></i>Layanan</a></li>
-        <li><a href="index.html#sdg" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="target" class="h-4 w-4 text-amber-500"></i>SDG 9</a></li>
         <li><a href="#peta" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 bg-amber-500/10 text-amber-500"><i data-lucide="map" class="h-4 w-4"></i>Peta Jalan</a></li>
         <li><a href="#statistik" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="bar-chart-3" class="h-4 w-4 text-amber-500"></i>Statistik</a></li>
         <li><a href="#lapor" class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i data-lucide="megaphone" class="h-4 w-4 text-amber-500"></i>Lapor Kerusakan</a></li>
@@ -123,7 +123,7 @@
         <div class="mx-auto mb-12 max-w-2xl text-center">
           <span class="rounded-full bg-amber-500/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Peta Interaktif Spasial</span>
           <h1 class="mt-3 font-display text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl lg:text-[44px]">Kondisi Jalan Provinsi Lampung</h1>
-          <p class="mt-3 text-slate-600 dark:text-slate-400 text-sm sm:text-base">Garis ruas digambar mengikuti jalan sebenarnya menggunakan layanan routing OSRM. <strong>Prototipe:</strong> data ruas dan kondisinya adalah data contoh untuk demonstrasi, bukan data resmi pemerintah.</p>
+          <p class="mt-3 text-slate-600 dark:text-slate-400 text-sm sm:text-base">Garis ruas digambar mengikuti jalan sebenarnya menggunakan layanan routing OSRM.</p>
         </div>
 
         <div class="grid gap-8 lg:grid-cols-3">
@@ -251,7 +251,7 @@
                 <label for="input-nama" class="mb-2 block text-sm font-bold text-slate-900 dark:text-white">Nama Lengkap</label>
                 <div class="relative">
                   <i data-lucide="user" class="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
-                  <input type="text" id="input-nama" required maxlength="100" placeholder="cth. Siti Rahmawati" autocomplete="name"
+                  <input type="text" id="input-nama" required maxlength="100" placeholder="Nama lengkap Anda" autocomplete="name"
                     class="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/80 py-3 pl-11 pr-4 text-sm text-slate-900 dark:text-white outline-none focus:border-amber-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-amber-500/20 transition" />
                 </div>
               </div>
@@ -345,7 +345,7 @@
               <div>
                 <label for="input-deskripsi" class="mb-2 block text-sm font-bold text-navy">Deskripsi</label>
                 <textarea id="input-deskripsi" rows="3" required maxlength="1000"
-                  placeholder="cth. Lubang ±1 m di lajur kiri, tergenang saat hujan..."
+                  placeholder="Jelaskan kerusakan: ukuran, letak lajur, dan dampaknya"
                   class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-navy outline-none focus:border-accent focus:bg-white focus:ring-4 focus:ring-accent/20 transition"></textarea>
               </div>
 
@@ -360,6 +360,12 @@
         </div>
       </div>
     </section>
+
+    <footer class="border-t border-slate-200/80 dark:border-white/10 py-6 text-center text-xs text-slate-500 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-5">
+        <p>&copy; 2026 JalanKitta. Sumber data ruas: Survei Lapangan Jalan Provinsi Lampung (2026). Geometri via OSRM.</p>
+      </div>
+    </footer>
   </main>
 
   <!-- Modal Laporan Saya -->
@@ -477,13 +483,18 @@
         let nearest = null;
         let minDist = Infinity;
         for (const road of loadedRoadsData) {
-          const coords = road.geometry?.coordinates;
-          if (!Array.isArray(coords)) continue;
-          for (const pt of coords) {
-            const d = haversineDistKm(lat, lng, pt[1], pt[0]);
-            if (d < minDist) {
-              minDist = d;
-              nearest = road;
+          const geom = road.geometry;
+          if (!geom || !Array.isArray(geom.coordinates)) continue;
+          const lineList = geom.type === 'MultiLineString' ? geom.coordinates : [geom.coordinates];
+          for (const line of lineList) {
+            if (!Array.isArray(line)) continue;
+            for (const pt of line) {
+              if (!Array.isArray(pt) || pt.length < 2) continue;
+              const d = haversineDistKm(lat, lng, pt[1], pt[0]);
+              if (d < minDist) {
+                minDist = d;
+                nearest = road;
+              }
             }
           }
         }
@@ -694,68 +705,6 @@
       const roadLayers = {};
       let activeFilter = 'all';
 
-      async function drawSmartRoad(id, startLng, startLat, endLng, endLat, conditionKey, roadName, kab) {
-        try {
-          const url = `https://router.project-osrm.org/route/v1/driving/${startLng},${startLat};${endLng},${endLat}?geometries=geojson&overview=full`;
-          const res = await fetch(url);
-          const data = await res.json();
-
-          if (data.code === 'Ok' && data.routes.length > 0) {
-            const color = CONDITION[conditionKey].color;
-            const geojson = data.routes[0].geometry;
-            const lengthKm = (data.routes[0].distance / 1000).toFixed(1);
-
-            const layer = L.geoJSON(geojson, {
-              style: { color: color, weight: 6, opacity: 0.9, lineCap: 'round' }
-            }).bindPopup(`
-              <div class="min-w-[180px]">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-ink">${escapeHtml(kab)}</p>
-                <p class="mt-0.5 font-display text-base font-bold text-navy">${escapeHtml(roadName)}</p>
-                <span class="mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:${color}25;color:${color}">${CONDITION[conditionKey].label}</span>
-                <p class="mt-2 text-xs font-semibold text-ink">Estimasi Panjang: ${lengthKm} km</p>
-              </div>
-            `);
-
-            layer.on('mouseover', () => layer.setStyle({ weight: 9, opacity: 1 }));
-            layer.on('mouseout', () => layer.setStyle({ weight: 6, opacity: 0.9 }));
-
-            roadLayers[id] = { layer: layer, props: { id, name: roadName, condition: conditionKey, kab, lengthKm, color } };
-            layer.addTo(map);
-            updateUIList();
-            updateRoadStats(Object.values(roadLayers).map(r => ({ kondisi: r.props.condition, panjang_km: parseFloat(r.props.lengthKm) })));
-            return;
-          }
-          throw new Error('OSRM route unavailable');
-        } catch (err) {
-          console.warn(`OSRM routing fallback ke garis lurus untuk ruas ${id}:`, err.message || err);
-          // Visual Fallback: Jika OSRM offline/rate-limited, gambar polyline garis lurus agar peta tidak kosong
-          try {
-            const color = CONDITION[conditionKey]?.color || CONDITION.ringan.color;
-            const distEstKm = (map.distance([startLat, startLng], [endLat, endLng]) / 1000 * 1.25).toFixed(1);
-            const fallbackLayer = L.polyline([[startLat, startLng], [endLat, endLng]], {
-              color: color, weight: 6, opacity: 0.85, lineCap: 'round', dashArray: '6, 8'
-            }).bindPopup(`
-              <div class="min-w-[180px]">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-ink">${escapeHtml(kab)}</p>
-                <p class="mt-0.5 font-display text-base font-bold text-navy">${escapeHtml(roadName)}</p>
-                <span class="mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:${color}25;color:${color}">${CONDITION[conditionKey]?.label || conditionKey} (Estimasi)</span>
-                <p class="mt-2 text-xs font-semibold text-ink">Estimasi Panjang: ~${distEstKm} km</p>
-              </div>
-            `);
-
-            fallbackLayer.on('mouseover', () => fallbackLayer.setStyle({ weight: 9, opacity: 1 }));
-            fallbackLayer.on('mouseout', () => fallbackLayer.setStyle({ weight: 6, opacity: 0.85 }));
-
-            roadLayers[id] = { layer: fallbackLayer, props: { id, name: roadName, condition: conditionKey, kab, lengthKm: distEstKm, color } };
-            fallbackLayer.addTo(map);
-            updateUIList();
-            updateRoadStats(Object.values(roadLayers).map(r => ({ kondisi: r.props.condition, panjang_km: parseFloat(r.props.lengthKm) })));
-          } catch (renderFallbackErr) {
-            console.error('Gagal me-render fallback ruas:', renderFallbackErr);
-          }
-        }
-      }
-
       function updateUIList() {
         const list = $('#road-list');
         const visibleRoads = Object.values(roadLayers)
@@ -763,6 +712,10 @@
           .sort((a, b) => a.props.id.localeCompare(b.props.id));
 
         $('#road-count').textContent = `${visibleRoads.length} ruas`;
+        if (visibleRoads.length === 0) {
+          list.innerHTML = '<li class="p-4 text-xs text-slate-500 dark:text-slate-400 text-center font-medium">Belum ada data ruas</li>';
+          return;
+        }
         list.innerHTML = visibleRoads.map(r => `
           <li>
             <button data-road-id="${escapeHtml(r.props.id)}" class="btn-focus-road group flex w-full items-center gap-3 rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white/60 dark:bg-slate-800/60 p-3 text-left hover:border-amber-500 hover:bg-amber-500/5 dark:hover:bg-slate-800 transition">
@@ -942,57 +895,38 @@
           try {
             const { data, error } = await db.from('ruas_jalan').select('*').order('id');
             if (error) {
-              const code = error.code || '';
-              const isMissingTable = code === '42P01' || code === 'PGRST205' || error.message?.includes('does not exist');
-              if (!isMissingTable) {
-                console.error('Error saat mengambil data ruas_jalan:', error);
-                const roadListEl = $('#road-list');
-                if (roadListEl) {
-                  roadListEl.innerHTML = '<li class="p-3 text-xs text-major bg-major/10 rounded-xl text-center font-bold">Gagal memuat data ruas. Muat ulang halaman.</li>';
+              console.warn('Gagal memuat ruas_jalan:', error);
+            } else if (data && data.length > 0) {
+              loadedRoadsData = data;
+              data.forEach(r => {
+                try {
+                  const conditionKey = r.kondisi || 'ringan';
+                  const color = CONDITION[conditionKey]?.color || CONDITION.ringan.color;
+                  const lengthKm = Number(r.panjang_km || 0).toFixed(1);
+
+                  const layer = L.geoJSON(r.geometry, {
+                    style: { color: color, weight: 6, opacity: 0.9, lineCap: 'round' }
+                  }).bindPopup(`
+                    <div class="min-w-[180px]">
+                      <p class="text-[11px] font-bold uppercase tracking-wider text-ink">${escapeHtml(r.kabupaten)}</p>
+                      <p class="mt-0.5 font-display text-base font-bold text-navy">${escapeHtml(r.nama)}</p>
+                      <span class="mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:${color}25;color:${color}">${CONDITION[conditionKey]?.label || conditionKey}</span>
+                      <p class="mt-2 text-xs font-semibold text-ink">Panjang Ruas: ${lengthKm} km</p>
+                    </div>
+                  `);
+
+                  layer.on('mouseover', () => layer.setStyle({ weight: 9, opacity: 1 }));
+                  layer.on('mouseout', () => layer.setStyle({ weight: 6, opacity: 0.9 }));
+
+                  roadLayers[r.id] = { layer, props: { id: r.id, name: r.nama, condition: conditionKey, kab: r.kabupaten, lengthKm, color } };
+                  layer.addTo(map);
+                } catch (renderErr) {
+                  console.warn(`Gagal me-render geometri ruas ${r.id}:`, renderErr);
                 }
-                const roadCountEl = $('#road-count');
-                if (roadCountEl) roadCountEl.textContent = 'Gagal';
-                return; // Jangan fallback jika tabel ada tapi query error (misal masalah izin/jaringan)
-              }
-              // Jika tabel memang belum dibuat di DB, lanjutkan ke fallback OSRM
-            } else {
-              // Tabel ada dan query sukses
-              if (data && data.length > 0) {
-                loadedRoadsData = data;
-                data.forEach(r => {
-                  try {
-                    const conditionKey = r.kondisi || 'ringan';
-                    const color = CONDITION[conditionKey]?.color || CONDITION.ringan.color;
-                    const lengthKm = Number(r.panjang_km || 0).toFixed(1);
+              });
 
-                    const layer = L.geoJSON(r.geometry, {
-                      style: { color: color, weight: 6, opacity: 0.9, lineCap: 'round' }
-                    }).bindPopup(`
-                      <div class="min-w-[180px]">
-                        <p class="text-[11px] font-bold uppercase tracking-wider text-ink">${escapeHtml(r.kabupaten)}</p>
-                        <p class="mt-0.5 font-display text-base font-bold text-navy">${escapeHtml(r.nama)}</p>
-                        <span class="mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:${color}25;color:${color}">${CONDITION[conditionKey]?.label || conditionKey}</span>
-                        <p class="mt-2 text-xs font-semibold text-ink">Panjang Ruas: ${lengthKm} km</p>
-                      </div>
-                    `);
-
-                    layer.on('mouseover', () => layer.setStyle({ weight: 9, opacity: 1 }));
-                    layer.on('mouseout', () => layer.setStyle({ weight: 6, opacity: 0.9 }));
-
-                    roadLayers[r.id] = { layer, props: { id: r.id, name: r.nama, condition: conditionKey, kab: r.kabupaten, lengthKm, color } };
-                    layer.addTo(map);
-                  } catch (renderErr) {
-                    console.warn(`Gagal me-render geometri ruas ${r.id}:`, renderErr);
-                  }
-                });
-
-                updateUIList();
-                updateRoadStats(data);
-              } else {
-                // Tabel ada tapi data kosong (misal telah dikosongkan oleh admin)
-                updateUIList();
-                updateRoadStats([]);
-              }
+              updateUIList();
+              updateRoadStats(data);
               return;
             }
           } catch (e) {
@@ -1000,10 +934,9 @@
           }
         }
 
-        // Fallback hanya jika tabel ruas_jalan belum dibuat di Supabase
-        drawSmartRoad('R-01', 105.41907, -4.86903, 105.54146, -4.84589, 'berat', 'Ruas Simpang Randu - Seputih Surabaya', 'Lampung Tengah');
-        drawSmartRoad('R-02', 104.62254, -5.49721, 104.73038, -5.44195, 'baik', 'Jalan Lintas Kota Agung - Gisting', 'Tanggamus');
-        drawSmartRoad('R-03', 105.19665, -5.25754, 105.23467, -5.34863, 'ringan', 'Jalan Raya Natar (Lintas Sumatera)', 'Lampung Selatan');
+        // Jika data kosong atau belum tersedia, tampilkan keadaan kosong rapi dan statistik 0
+        updateUIList();
+        updateRoadStats([]);
       }
 
       loadRoads();
@@ -1707,8 +1640,12 @@
             btnCancel.innerHTML = '<i data-lucide="loader-2" class="h-3 w-3 animate-spin"></i> Menghapus...';
             try {
               // 1. Hapus laporan di database terlebih dahulu (hanya berstatus 'baru')
-              const { error: delErr } = await db.from('laporan_warga').delete().eq('id', reportId).eq('status', 'baru');
+              const { data: del, error: delErr } = await db.from('laporan_warga')
+                .delete().eq('id', reportId).eq('status', 'baru').select('id');
               if (delErr) throw delErr;
+              if (!del || del.length === 0) {
+                throw new Error('Laporan sudah diproses admin dan tidak bisa dibatalkan.');
+              }
 
               // 2. Setelah laporan terhapus, bersihkan berkas foto di storage
               let storageWarning = false;
@@ -1736,6 +1673,7 @@
               showStatus('error', 'Gagal membatalkan laporan: ' + err.message);
               btnCancel.disabled = false;
               btnCancel.innerHTML = origHtml;
+              fetchMyReports();
             }
           })();
           return;

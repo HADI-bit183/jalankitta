@@ -30,7 +30,7 @@ Gambar berikut **dihasilkan dengan alat AI generatif** (sebutkan alat: _(isi, mi
 | Google Fonts: Plus Jakarta Sans, Poppins | SIL Open Font License |
 
 ## Data
-Data ruas jalan dan kondisinya adalah **data contoh untuk demonstrasi prototipe**; geometri diperoleh dari routing OSRM antar titik kota/kecamatan. Bukan data survei atau data resmi instansi mana pun. Tidak ada kemitraan resmi dengan instansi pemerintah.
+Data ruas jalan dan kondisinya bersumber dari **survei lapangan jalan Provinsi Lampung tahun 2026** (wilayah Lampung Timur, Pesawaran, dan Pringsewu); geometri linier diperoleh dari routing OSRM mengikuti koridor jalan nyata. Belum ada kemitraan resmi dengan instansi pemerintah.
 
 ## Alat bantu pengembangan
 Sebutkan penggunaan asisten AI untuk kode/teks bila ada: _(isi)_

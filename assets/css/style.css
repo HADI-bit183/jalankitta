@@ -437,3 +437,8 @@ html.dark #modal-my-reports .border-slate-100,
 html.dark #modal-my-reports .border-slate-200,
 html.dark #modal-my-reports-photo .border-slate-100 { border-color: rgba(255, 255, 255, 0.1); }
 html.dark #modal-my-reports-photo .hover\:bg-slate-100:hover { background: rgba(255, 255, 255, 0.08); }
+
+/* Safeguard badge emerald & status */
+.bg-emerald-500 { background-color: #10b981 !important; }
+.text-emerald-500 { color: #10b981 !important; }
+.shadow-emerald-500\/30 { box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3), 0 2px 4px -2px rgba(16, 185, 129, 0.3) !important; }

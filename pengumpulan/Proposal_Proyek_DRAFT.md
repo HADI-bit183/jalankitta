@@ -25,7 +25,7 @@ Kerusakan jalan di Provinsi Lampung memengaruhi konektivitas dan keselamatan. Pe
 HTML + Tailwind (build CLI) + JS; Supabase (PostgreSQL, Auth, Storage). RLS, view publik dengan nama disamarkan, trigger integritas, pembatas harian, nama diambil dari token.
 
 ## 6. Data & Sumber
-Data ruas = **contoh** (11+3 ruas); geometri OSRM/OpenStreetMap; kondisi bukan hasil survei. Ilustrasi dibuat dengan AI (lihat Surat Orisinalitas).
+Data ruas = Survei Lapangan Jalan Provinsi Lampung 2026 (Lampung Timur, Pesawaran, Pringsewu); geometri linier OSRM/OpenStreetMap; kondisi bersumber dari pendataan lapangan aktual. Ilustrasi dibuat dengan AI (lihat Surat Orisinalitas).
 
 ## 7. Akses Demo (untuk juri)
 - URL situs: _(isi URL deploy)_
