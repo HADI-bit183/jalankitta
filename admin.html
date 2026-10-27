@@ -45,7 +45,8 @@
     html.dark main .bg-slate-50, html.dark main .bg-slate-100 { background: rgba(255,255,255,.06); }
     html.dark main .border-slate-100, html.dark main .border-slate-200 { border-color: rgba(255,255,255,.1); }
     html.dark main .bg-navy.text-white { background: #f59e0b; color: #0f172a; }
-    html.dark main input { color: #f8fafc; }
+    html.dark main input, html.dark main select, html.dark main textarea { color: #f8fafc; background: rgba(30, 41, 59, 0.8); border-color: rgba(255, 255, 255, 0.1); }
+    html.dark main select option { background: #0f172a; color: #f8fafc; }
     html.dark main code { color: #fcd34d; background: rgba(255,255,255,.1) !important; }
   </style>
 </head>
@@ -114,10 +115,23 @@
     </div>
 
     <!-- Dashboard Konten Admin -->
-    <div id="admin-content" class="hidden space-y-8">
+    <div id="admin-content" class="hidden space-y-6">
       
-      <!-- Ringkasan Statistik -->
-      <section>
+      <!-- Navigasi Tab Utama Admin Portal -->
+      <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-white/10 pb-4">
+        <button id="tab-nav-reports" type="button" class="admin-main-tab inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition bg-navy text-white shadow-sm">
+          <i data-lucide="layout-dashboard" class="h-4 w-4 text-accent"></i> Verifikasi Laporan & Analitik
+        </button>
+        <button id="tab-nav-db" type="button" class="admin-main-tab inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
+          <i data-lucide="database" class="h-4 w-4 text-accent"></i> Database Editor (Supabase)
+        </button>
+      </div>
+
+      <!-- VIEW 1: Verifikasi Laporan & Analitik (View Utama) -->
+      <div id="view-reports-analytics" class="space-y-8">
+        
+        <!-- Ringkasan Statistik -->
+        <section>
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
             <h1 class="font-display text-2xl sm:text-3xl font-bold text-navy">Verifikasi & Pengelolaan Laporan</h1>
@@ -239,6 +253,177 @@
           <p class="text-xs text-ink mt-1">Coba sesuaikan filter status atau kata kunci pencarian Anda.</p>
         </div>
       </section>
+      </div> <!-- Akhir VIEW 1: view-reports-analytics -->
+
+      <!-- VIEW 2: Database Editor (Supabase Data Manager) -->
+      <div id="view-db-editor" class="hidden space-y-6">
+        <!-- Header Database Editor -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="rounded-lg bg-accent/20 px-2 py-0.5 text-[11px] font-bold text-accent uppercase tracking-wider">Direct DB Access</span>
+              <h1 class="font-display text-2xl sm:text-3xl font-bold text-navy dark:text-white">Supabase Database Editor</h1>
+            </div>
+            <p class="text-sm text-ink dark:text-slate-400 mt-1">Kelola data tabel Supabase (Admins, Laporan, Ruas Jalan) langsung dari sini tanpa perlu membuka console web Supabase.</p>
+          </div>
+          <button id="btn-refresh-db" type="button" class="self-start sm:self-auto rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-bold text-navy dark:text-white shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition flex items-center gap-2">
+            <i data-lucide="refresh-cw" class="h-4 w-4"></i> Segarkan Data DB
+          </button>
+        </div>
+
+        <!-- Sub-tab Navigasi Tabel -->
+        <div class="flex flex-wrap items-center gap-2 bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-2xl w-fit">
+          <button id="subtab-btn-admins" type="button" class="db-subtab-btn rounded-xl px-4 py-2 text-xs font-bold transition bg-white text-navy dark:bg-slate-700 dark:text-white shadow-sm flex items-center gap-1.5">
+            <i data-lucide="shield-check" class="h-4 w-4 text-accent"></i>
+            <span>Akun Admin (admins)</span>
+            <span id="badge-count-admins" class="ml-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-extrabold text-navy dark:text-white">...</span>
+          </button>
+          <button id="subtab-btn-laporan" type="button" class="db-subtab-btn rounded-xl px-4 py-2 text-xs font-bold transition text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white flex items-center gap-1.5">
+            <i data-lucide="file-text" class="h-4 w-4 text-blue-500"></i>
+            <span>Laporan Warga (laporan_warga)</span>
+            <span id="badge-count-laporan" class="ml-1 rounded-full bg-slate-200 dark:bg-slate-700 px-2 py-0.5 text-[10px] font-extrabold text-ink dark:text-slate-300">...</span>
+          </button>
+          <button id="subtab-btn-ruas" type="button" class="db-subtab-btn rounded-xl px-4 py-2 text-xs font-bold transition text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white flex items-center gap-1.5">
+            <i data-lucide="map-pin" class="h-4 w-4 text-emerald-500"></i>
+            <span>Ruas Jalan (ruas_jalan)</span>
+            <span id="badge-count-ruas" class="ml-1 rounded-full bg-slate-200 dark:bg-slate-700 px-2 py-0.5 text-[10px] font-extrabold text-ink dark:text-slate-300">...</span>
+          </button>
+        </div>
+
+        <!-- ================= SUB-PANEL 1: ADMINS ================= -->
+        <div id="panel-db-admins" class="space-y-6">
+          <!-- Card Tambah Admin -->
+          <div class="bg-white p-6 rounded-2xl shadow-card border border-slate-100 dark:border-white/10">
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="user-plus" class="h-5 w-5 text-accent"></i>
+              <h3 class="font-display text-base font-bold text-navy dark:text-white">Tambah Administrator Baru</h3>
+            </div>
+            <p class="text-xs text-ink dark:text-slate-400 mb-4 leading-relaxed">
+              Daftarkan email pengguna agar memiliki hak akses penuh ke portal admin. 
+              <span class="text-accent font-semibold">Catatan:</span> Pengguna harus sudah pernah mendaftar/login di JalanKitta agar akunnya ada di sistem autentikasi Supabase.
+            </p>
+            <form id="form-add-admin" class="flex flex-col sm:flex-row gap-3">
+              <div class="relative flex-1">
+                <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"></i>
+                <input type="email" id="input-new-admin-email" required placeholder="Masukkan email pengguna (contoh: rekan_admin@instansi.go.id)" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 pl-10 pr-4 py-2.5 text-xs text-navy dark:text-white outline-none focus:border-accent focus:bg-white dark:focus:bg-slate-900 transition" />
+              </div>
+              <button type="submit" id="btn-submit-add-admin" class="rounded-xl bg-navy dark:bg-amber-500 hover:bg-navy/90 dark:hover:bg-amber-400 text-white dark:text-slate-900 font-bold px-5 py-2.5 text-xs transition flex items-center justify-center gap-2 shadow-sm shrink-0">
+                <i data-lucide="plus" class="h-4 w-4"></i> Tambah Hak Admin
+              </button>
+            </form>
+            <p id="msg-add-admin" class="hidden mt-3 text-xs font-semibold"></p>
+          </div>
+
+          <!-- Card Tabel Admins -->
+          <div class="bg-white rounded-2xl shadow-card border border-slate-100 dark:border-white/10 overflow-hidden">
+            <div class="p-5 border-b border-slate-100 dark:border-white/10 flex items-center justify-between">
+              <div>
+                <h3 class="font-display text-base font-bold text-navy dark:text-white">Daftar Akun Administrator Aktif</h3>
+                <p class="text-xs text-ink dark:text-slate-400 mt-0.5">Akun-akun berikut memiliki izin penuh mengelola seluruh data sistem.</p>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 dark:bg-slate-800/60 text-ink dark:text-slate-400 uppercase font-bold tracking-wider text-[10px]">
+                  <tr>
+                    <th class="py-3 px-5">Pengguna</th>
+                    <th class="py-3 px-5">User ID (UUID)</th>
+                    <th class="py-3 px-5">Tanggal Ditambahkan</th>
+                    <th class="py-3 px-5 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-admins" class="divide-y divide-slate-100 dark:divide-white/5">
+                  <tr>
+                    <td colspan="4" class="py-8 text-center text-ink dark:text-slate-400">
+                      <div class="inline-block h-6 w-6 animate-spin rounded-full border-2 border-accent border-r-transparent mb-2"></div>
+                      <p>Memuat daftar admin...</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= SUB-PANEL 2: LAPORAN WARGA ================= -->
+        <div id="panel-db-laporan" class="hidden space-y-4">
+          <div class="bg-white p-5 rounded-2xl shadow-card border border-slate-100 dark:border-white/10 flex flex-col md:flex-row gap-3 items-center justify-between">
+            <div class="relative w-full md:w-80">
+              <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400"></i>
+              <input type="text" id="input-search-db-laporan" placeholder="Cari nama, ID, deskripsi..." class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 pl-9 pr-3 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent transition" />
+            </div>
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+              <select id="select-filter-db-status" class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-bold text-navy dark:text-white outline-none focus:border-accent">
+                <option value="all">Semua Status</option>
+                <option value="baru">Menunggu (Baru)</option>
+                <option value="diverifikasi">Diverifikasi</option>
+                <option value="diproses">Diproses</option>
+                <option value="selesai">Selesai</option>
+              </select>
+              <select id="select-filter-db-kategori" class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-bold text-navy dark:text-white outline-none focus:border-accent">
+                <option value="all">Semua Kategori</option>
+                <option value="berat">Rusak Berat</option>
+                <option value="ringan">Rusak Ringan</option>
+                <option value="baik">Kondisi Baik</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-card border border-slate-100 dark:border-white/10 overflow-hidden">
+            <div class="overflow-x-auto max-h-[650px] overflow-y-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="sticky top-0 z-10 bg-slate-50 dark:bg-slate-800 text-ink dark:text-slate-400 uppercase font-bold tracking-wider text-[10px] shadow-sm">
+                  <tr>
+                    <th class="py-3 px-4">ID & Foto</th>
+                    <th class="py-3 px-4">Pelapor & Tanggal</th>
+                    <th class="py-3 px-4">Tingkat Rusak</th>
+                    <th class="py-3 px-4">Ruas Jalan</th>
+                    <th class="py-3 px-4">Status Database</th>
+                    <th class="py-3 px-4 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-db-laporan" class="divide-y divide-slate-100 dark:divide-white/5">
+                  <!-- Diisi dinamis -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= SUB-PANEL 3: RUAS JALAN ================= -->
+        <div id="panel-db-ruas" class="hidden space-y-4">
+          <div class="bg-white p-5 rounded-2xl shadow-card border border-slate-100 dark:border-white/10 flex flex-col md:flex-row gap-3 items-center justify-between">
+            <div class="relative w-full md:w-80">
+              <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400"></i>
+              <input type="text" id="input-search-db-ruas" placeholder="Cari nama ruas atau kabupaten..." class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 pl-9 pr-3 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent transition" />
+            </div>
+            <button type="button" id="btn-open-add-ruas" class="rounded-xl bg-accent hover:brightness-110 text-white font-bold px-4 py-2 text-xs transition flex items-center gap-1.5 shrink-0 shadow-sm">
+              <i data-lucide="plus-circle" class="h-4 w-4"></i> Tambah Ruas Jalan
+            </button>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-card border border-slate-100 dark:border-white/10 overflow-hidden">
+            <div class="overflow-x-auto max-h-[650px] overflow-y-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="sticky top-0 z-10 bg-slate-50 dark:bg-slate-800 text-ink dark:text-slate-400 uppercase font-bold tracking-wider text-[10px] shadow-sm">
+                  <tr>
+                    <th class="py-3 px-4">ID Ruas</th>
+                    <th class="py-3 px-4">Nama Ruas Jalan</th>
+                    <th class="py-3 px-4">Kabupaten / Kota</th>
+                    <th class="py-3 px-4">Panjang (KM)</th>
+                    <th class="py-3 px-4">Kondisi Dasar</th>
+                    <th class="py-3 px-4">Kondisi Efektif</th>
+                    <th class="py-3 px-4 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-db-ruas" class="divide-y divide-slate-100 dark:divide-white/5">
+                  <!-- Diisi dinamis -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div> <!-- Akhir VIEW 2: view-db-editor -->
 
     </div>
   </main>
@@ -376,6 +561,68 @@
     </div>
   </div>
 
+  <!-- Modal Tambah / Edit Ruas Jalan -->
+  <div id="modal-edit-ruas" role="dialog" aria-modal="true" aria-labelledby="modal-edit-ruas-title" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center">
+    <div class="relative max-w-lg w-full bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col border border-slate-200 dark:border-slate-800">
+      <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+        <h3 id="modal-edit-ruas-title" class="text-base font-extrabold text-navy dark:text-white flex items-center gap-2">
+          <i data-lucide="edit-3" class="h-5 w-5 text-accent"></i> <span>Edit Data Ruas Jalan</span>
+        </h3>
+        <button id="modal-edit-ruas-close" aria-label="Tutup jendela edit ruas" class="rounded-xl p-2 text-ink dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"><i data-lucide="x" class="h-5 w-5"></i></button>
+      </div>
+      <form id="form-ruas" class="p-5 space-y-4">
+        <input type="hidden" id="input-ruas-mode" value="add" />
+        <div>
+          <label for="input-ruas-id" class="block text-xs font-bold text-navy dark:text-white mb-1">ID Ruas (Kode)</label>
+          <input type="text" id="input-ruas-id" required placeholder="Contoh: 18.01.001" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent" />
+        </div>
+        <div>
+          <label for="input-ruas-nama" class="block text-xs font-bold text-navy dark:text-white mb-1">Nama Ruas Jalan</label>
+          <input type="text" id="input-ruas-nama" required maxlength="150" placeholder="Contoh: Jl. Lintas Sumatra KM 45" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="input-ruas-kabupaten" class="block text-xs font-bold text-navy dark:text-white mb-1">Kabupaten / Kota</label>
+            <input type="text" id="input-ruas-kabupaten" required placeholder="Contoh: Lampung Selatan" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent" />
+          </div>
+          <div>
+            <label for="input-ruas-panjang" class="block text-xs font-bold text-navy dark:text-white mb-1">Panjang (KM)</label>
+            <input type="number" id="input-ruas-panjang" step="0.01" min="0" placeholder="Contoh: 12.50" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent" />
+          </div>
+        </div>
+        <div>
+          <label for="input-ruas-kondisi" class="block text-xs font-bold text-navy dark:text-white mb-1">Kondisi Dasar Awal</label>
+          <select id="input-ruas-kondisi" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-xs font-bold text-navy dark:text-white outline-none focus:border-accent">
+            <option value="baik">Kondisi Baik</option>
+            <option value="ringan">Rusak Ringan</option>
+            <option value="berat">Rusak Berat</option>
+          </select>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" id="btn-cancel-ruas" class="rounded-xl px-4 py-2 text-xs font-bold text-ink dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
+          <button type="submit" id="btn-save-ruas-form" class="rounded-xl bg-accent hover:brightness-110 text-white font-bold px-5 py-2 text-xs transition flex items-center gap-1.5 shadow-sm">
+            <i data-lucide="save" class="h-3.5 w-3.5"></i> Simpan ke Supabase
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Konfirmasi Universal (Aman untuk Hapus) -->
+  <div id="modal-confirm" role="dialog" aria-modal="true" aria-labelledby="modal-confirm-title" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center">
+    <div class="relative max-w-sm w-full bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800 text-center">
+      <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-rose-500/10 text-rose-500 mb-4">
+        <i data-lucide="alert-triangle" class="h-7 w-7"></i>
+      </div>
+      <h3 id="modal-confirm-title" class="text-base font-extrabold text-navy dark:text-white">Konfirmasi Penghapusan</h3>
+      <p id="modal-confirm-desc" class="text-xs text-ink dark:text-slate-400 mt-2 leading-relaxed">Apakah Anda yakin ingin menghapus data ini dari Supabase?</p>
+      <div class="mt-6 flex items-center justify-center gap-2.5">
+        <button type="button" id="btn-confirm-cancel" class="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-xs font-bold text-navy dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition">Batal</button>
+        <button type="button" id="btn-confirm-ok" class="flex-1 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2.5 text-xs transition shadow-sm">Hapus Sekarang</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notifikasi -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 hidden rounded-xl bg-navy text-white px-5 py-3.5 shadow-2xl text-sm font-bold flex items-center gap-3 transition-all duration-300">
     <i data-lucide="check-circle" class="h-5 w-5 text-good"></i>
@@ -396,6 +643,7 @@
       let allReports = [];
       let currentFilterStatus = 'all';
       let searchQuery = '';
+      let currentAdminUser = null;
 
       const STATUS_CONFIG = {
         baru: { label: 'Menunggu Verifikasi', bg: 'bg-amber-100 text-amber-700 border-amber-200' },
@@ -446,6 +694,7 @@
             return;
           }
 
+          currentAdminUser = user;
           $('#admin-email').textContent = user.email;
 
           // Cek tabel admins
@@ -1406,6 +1655,701 @@
           }
         });
       }
+
+      // =========================================================================
+      // DATABASE EDITOR ENGINE (SUPABASE DIRECT DATA MANAGEMENT)
+      // =========================================================================
+      let allAdmins = [];
+      let dbLaporanSearch = '';
+      let dbLaporanFilterStatus = 'all';
+      let dbLaporanFilterKategori = 'all';
+      let dbRuasSearch = '';
+      let currentConfirmCallback = null;
+
+      // 1. Tab Navigasi Utama
+      const tabNavReports = $('#tab-nav-reports');
+      const tabNavDb = $('#tab-nav-db');
+      const viewReports = $('#view-reports-analytics');
+      const viewDb = $('#view-db-editor');
+
+      function switchMainTab(target) {
+        if (target === 'reports') {
+          tabNavReports.className = 'admin-main-tab inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition bg-navy text-white shadow-sm';
+          tabNavDb.className = 'admin-main-tab inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700';
+          viewReports?.classList.remove('hidden');
+          viewDb?.classList.add('hidden');
+        } else {
+          tabNavDb.className = 'admin-main-tab inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition bg-navy text-white shadow-sm';
+          tabNavReports.className = 'admin-main-tab inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700';
+          viewDb?.classList.remove('hidden');
+          viewReports?.classList.add('hidden');
+          loadDatabaseEditor();
+        }
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      tabNavReports?.addEventListener('click', () => switchMainTab('reports'));
+      tabNavDb?.addEventListener('click', () => switchMainTab('db'));
+
+      // 2. Sub-tab Navigasi Database Editor
+      const subtabBtns = {
+        admins: $('#subtab-btn-admins'),
+        laporan: $('#subtab-btn-laporan'),
+        ruas: $('#subtab-btn-ruas')
+      };
+      const subtabPanels = {
+        admins: $('#panel-db-admins'),
+        laporan: $('#panel-db-laporan'),
+        ruas: $('#panel-db-ruas')
+      };
+
+      function switchDbSubtab(tab) {
+        Object.keys(subtabBtns).forEach(k => {
+          if (subtabBtns[k] && subtabPanels[k]) {
+            if (k === tab) {
+              subtabBtns[k].className = 'db-subtab-btn rounded-xl px-4 py-2 text-xs font-bold transition bg-white text-navy dark:bg-slate-700 dark:text-white shadow-sm flex items-center gap-1.5';
+              subtabPanels[k].classList.remove('hidden');
+            } else {
+              subtabBtns[k].className = 'db-subtab-btn rounded-xl px-4 py-2 text-xs font-bold transition text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white flex items-center gap-1.5';
+              subtabPanels[k].classList.add('hidden');
+            }
+          }
+        });
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      subtabBtns.admins?.addEventListener('click', () => switchDbSubtab('admins'));
+      subtabBtns.laporan?.addEventListener('click', () => switchDbSubtab('laporan'));
+      subtabBtns.ruas?.addEventListener('click', () => switchDbSubtab('ruas'));
+
+      $('#btn-refresh-db')?.addEventListener('click', async () => {
+        showToast('Memperbarui data dari database...');
+        await Promise.all([fetchAdmins(), fetchReports(), loadRuasJalan()]);
+        renderDbLaporan();
+        renderDbRuas();
+        showToast('Seluruh data database terbaru berhasil dimuat!');
+      });
+
+      // 3. Modal Konfirmasi Universal
+      const modalConfirm = $('#modal-confirm');
+      const btnConfirmCancel = $('#btn-confirm-cancel');
+      const btnConfirmOk = $('#btn-confirm-ok');
+      const modalConfirmTitle = $('#modal-confirm-title');
+      const modalConfirmDesc = $('#modal-confirm-desc');
+
+      function openConfirmModal(title, desc, onConfirm, btnText = 'Hapus Sekarang') {
+        if (!modalConfirm) return;
+        if (modalConfirmTitle) modalConfirmTitle.textContent = title;
+        if (modalConfirmDesc) modalConfirmDesc.textContent = desc;
+        if (btnConfirmOk) btnConfirmOk.textContent = btnText;
+        currentConfirmCallback = onConfirm;
+        modalConfirm.classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      btnConfirmCancel?.addEventListener('click', () => {
+        modalConfirm?.classList.add('hidden');
+        currentConfirmCallback = null;
+      });
+
+      modalConfirm?.addEventListener('click', (e) => {
+        if (e.target === modalConfirm) {
+          modalConfirm.classList.add('hidden');
+          currentConfirmCallback = null;
+        }
+      });
+
+      btnConfirmOk?.addEventListener('click', async () => {
+        if (typeof currentConfirmCallback === 'function') {
+          const cb = currentConfirmCallback;
+          currentConfirmCallback = null;
+          modalConfirm?.classList.add('hidden');
+          await cb();
+        }
+      });
+
+      // 4. Panel Admins Engine
+      async function fetchAdmins() {
+        const tbody = $('#tbody-admins');
+        const badgeCount = $('#badge-count-admins');
+        try {
+          const { data, error } = await db.rpc('admin_list_users');
+          if (!error && Array.isArray(data)) {
+            allAdmins = data;
+          } else {
+            const { data: directData, error: directError } = await db.from('admins').select('user_id, created_at');
+            if (directError) throw directError;
+            allAdmins = (directData || []).map(a => ({
+              user_id: a.user_id,
+              email: (currentAdminUser && a.user_id === currentAdminUser.id) ? currentAdminUser.email : 'Akun Terdaftar',
+              created_at: a.created_at
+            }));
+          }
+          if (badgeCount) badgeCount.textContent = allAdmins.length;
+          renderAdmins();
+        } catch (err) {
+          console.error('Fetch admins error:', err);
+          if (tbody) {
+            tbody.innerHTML = `
+              <tr>
+                <td colspan="4" class="py-6 text-center text-major">
+                  <p class="font-bold">Gagal memuat daftar admin: ${esc(err.message || err)}</p>
+                </td>
+              </tr>
+            `;
+          }
+        }
+      }
+
+      function renderAdmins() {
+        const tbody = $('#tbody-admins');
+        if (!tbody) return;
+
+        if (allAdmins.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="4" class="py-8 text-center text-ink dark:text-slate-400">
+                <i data-lucide="shield-off" class="h-8 w-8 mx-auto mb-2 opacity-40"></i>
+                <p class="font-bold">Tidak ada admin terdaftar.</p>
+              </td>
+            </tr>
+          `;
+          if (window.lucide) window.lucide.createIcons();
+          return;
+        }
+
+        tbody.innerHTML = allAdmins.map(admin => {
+          const isCurrentUser = currentAdminUser && admin.user_id === currentAdminUser.id;
+          const emailSafe = esc(admin.email || 'Admin');
+          const userIdSafe = esc(admin.user_id);
+          const tglSafe = admin.created_at ? new Date(admin.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-';
+
+          return `
+            <tr class="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition">
+              <td class="py-3 px-5">
+                <div class="flex items-center gap-3">
+                  <div class="h-8 w-8 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600 font-bold shrink-0">
+                    <i data-lucide="shield" class="h-4 w-4"></i>
+                  </div>
+                  <div>
+                    <span class="font-bold text-navy dark:text-white block">${emailSafe}</span>
+                    ${isCurrentUser ? '<span class="inline-block mt-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400">Akun Anda (Aktif)</span>' : ''}
+                  </div>
+                </div>
+              </td>
+              <td class="py-3 px-5 font-mono text-[11px] text-ink dark:text-slate-400">${userIdSafe}</td>
+              <td class="py-3 px-5 text-ink dark:text-slate-400">${tglSafe}</td>
+              <td class="py-3 px-5 text-right">
+                ${isCurrentUser && allAdmins.length === 1 ? `
+                  <span class="text-[11px] text-slate-400 italic">Admin Utama</span>
+                ` : `
+                  <button type="button" class="btn-remove-admin rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 px-3 py-1.5 font-bold hover:bg-rose-100 dark:hover:bg-rose-900/60 transition inline-flex items-center gap-1.5" data-id="${userIdSafe}" data-email="${emailSafe}">
+                    <i data-lucide="user-x" class="h-3.5 w-3.5"></i> Cabut Akses
+                  </button>
+                `}
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      // Event listener form tambah admin
+      $('#form-add-admin')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const input = $('#input-new-admin-email');
+        const btn = $('#btn-submit-add-admin');
+        const msg = $('#msg-add-admin');
+        const email = (input?.value || '').trim();
+        if (!email) return;
+
+        const origHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" class="h-4 w-4 animate-spin"></i> Menambahkan...';
+        if (msg) msg.className = 'hidden';
+
+        try {
+          const { data, error } = await db.rpc('admin_add_user', { p_email: email });
+          if (error) throw error;
+
+          if (data && !data.ok) {
+            if (msg) {
+              msg.className = 'mt-3 text-xs font-semibold text-major';
+              msg.textContent = data.message;
+            }
+            showToast(data.message, true);
+          } else {
+            input.value = '';
+            if (msg) {
+              msg.className = 'mt-3 text-xs font-semibold text-good';
+              msg.textContent = data?.message || `Admin ${email} berhasil ditambahkan!`;
+            }
+            showToast(`Admin ${email} berhasil ditambahkan!`);
+            await fetchAdmins();
+          }
+        } catch (err) {
+          console.error('Add admin error:', err);
+          if (msg) {
+            msg.className = 'mt-3 text-xs font-semibold text-major';
+            msg.textContent = 'Gagal menambahkan admin: ' + (err.message || err);
+          }
+          showToast('Gagal menambahkan admin: ' + (err.message || err), true);
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
+          if (window.lucide) window.lucide.createIcons();
+        }
+      });
+
+      // Event delegation cabut akses admin
+      $('#tbody-admins')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-remove-admin');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        const email = btn.dataset.email;
+
+        openConfirmModal(
+          'Cabut Akses Administrator',
+          `Apakah Anda yakin ingin mencabut hak akses administrator untuk akun "${email}"? Pengguna tidak akan bisa mengakses Dashboard Admin lagi.`,
+          async () => {
+            try {
+              const { data, error } = await db.rpc('admin_remove_user', { p_user_id: id });
+              if (error) throw error;
+              if (data && !data.ok) {
+                showToast(data.message, true);
+                return;
+              }
+              showToast(`Akses admin untuk "${email}" telah dicabut.`);
+              await fetchAdmins();
+            } catch (err) {
+              console.error('Remove admin error:', err);
+              try {
+                const { error: delErr } = await db.from('admins').delete().eq('user_id', id);
+                if (delErr) throw delErr;
+                showToast(`Akses admin untuk "${email}" telah dicabut.`);
+                await fetchAdmins();
+              } catch (del2Err) {
+                showToast('Gagal mencabut akses admin: ' + (del2Err.message || del2Err), true);
+              }
+            }
+          },
+          'Ya, Cabut Akses'
+        );
+      });
+
+      // 5. Panel Laporan Database Table Engine
+      function renderDbLaporan() {
+        const tbody = $('#tbody-db-laporan');
+        const badgeCount = $('#badge-count-laporan');
+        if (!tbody) return;
+
+        if (badgeCount) badgeCount.textContent = allReports.length;
+
+        const q = dbLaporanSearch.toLowerCase();
+        const filtered = allReports.filter(r => {
+          const matchQ = !q ||
+            (r.nama || '').toLowerCase().includes(q) ||
+            (r.deskripsi || '').toLowerCase().includes(q) ||
+            String(r.id).toLowerCase().includes(q);
+          const matchStatus = dbLaporanFilterStatus === 'all' || r.status === dbLaporanFilterStatus;
+          const matchKategori = dbLaporanFilterKategori === 'all' || r.kategori_rusak === dbLaporanFilterKategori;
+          return matchQ && matchStatus && matchKategori;
+        });
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" class="py-12 text-center text-ink dark:text-slate-400">
+                <i data-lucide="file-question" class="h-8 w-8 mx-auto mb-2 opacity-40"></i>
+                <p class="font-bold">Tidak ada laporan yang sesuai dengan filter.</p>
+              </td>
+            </tr>
+          `;
+          if (window.lucide) window.lucide.createIcons();
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(r => {
+          const id = r.id;
+          const idSafe = esc(id);
+          const namaSafe = esc(r.nama);
+          const tglSafe = r.created_at ? new Date(r.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
+          const katSafe = KATEGORI_CONFIG[r.kategori_rusak] || { label: esc(r.kategori_rusak), color: '#94a3b8' };
+          const fotoHtml = r.foto_url ? `
+            <img src="${esc(r.foto_url)}" alt="Foto" class="h-9 w-9 rounded-lg object-cover cursor-pointer hover:opacity-80 transition shrink-0" onclick="window.adminOpenFotoModal && window.adminOpenFotoModal(${id})" />
+          ` : `
+            <div class="h-9 w-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 shrink-0"><i data-lucide="image-off" class="h-4 w-4"></i></div>
+          `;
+
+          const ruasOptions = `
+            <option value="">-- Tanpa Ruas --</option>
+            ${allRuas.map(ruas => `
+              <option value="${esc(ruas.id)}" ${r.ruas_id === ruas.id ? 'selected' : ''}>${esc(ruas.nama)} (${esc(ruas.kabupaten)})</option>
+            `).join('')}
+          `;
+
+          return `
+            <tr class="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition">
+              <td class="py-3 px-4">
+                <div class="flex items-center gap-2.5">
+                  ${fotoHtml}
+                  <div>
+                    <span class="font-mono font-bold text-accent">#${idSafe}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="py-3 px-4">
+                <span class="font-bold text-navy dark:text-white block">${namaSafe}</span>
+                <span class="text-[11px] text-ink dark:text-slate-400">${tglSafe}</span>
+              </td>
+              <td class="py-3 px-4">
+                <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold" style="background-color: ${katSafe.color}15; color: ${katSafe.color}; border: 1px solid ${katSafe.color}30">
+                  ${katSafe.label}
+                </span>
+              </td>
+              <td class="py-3 px-4">
+                <select class="select-db-laporan-ruas max-w-[200px] truncate rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-xs text-navy dark:text-white outline-none focus:border-accent" data-id="${idSafe}">
+                  ${ruasOptions}
+                </select>
+              </td>
+              <td class="py-3 px-4">
+                <select class="select-db-laporan-status rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-xs font-bold text-navy dark:text-white outline-none focus:border-accent" data-id="${idSafe}">
+                  <option value="baru" ${r.status === 'baru' ? 'selected' : ''}>Menunggu (Baru)</option>
+                  <option value="diverifikasi" ${r.status === 'diverifikasi' ? 'selected' : ''}>Diverifikasi</option>
+                  <option value="diproses" ${r.status === 'diproses' ? 'selected' : ''}>Diproses</option>
+                  <option value="selesai" ${r.status === 'selesai' ? 'selected' : ''}>Selesai</option>
+                </select>
+              </td>
+              <td class="py-3 px-4 text-right">
+                <button type="button" class="btn-delete-laporan rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 p-1.5 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition" data-id="${idSafe}" title="Hapus Laporan dari Database">
+                  <i data-lucide="trash-2" class="h-4 w-4"></i>
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      $('#input-search-db-laporan')?.addEventListener('input', (e) => {
+        dbLaporanSearch = e.target.value.trim();
+        renderDbLaporan();
+      });
+      $('#select-filter-db-status')?.addEventListener('change', (e) => {
+        dbLaporanFilterStatus = e.target.value;
+        renderDbLaporan();
+      });
+      $('#select-filter-db-kategori')?.addEventListener('change', (e) => {
+        dbLaporanFilterKategori = e.target.value;
+        renderDbLaporan();
+      });
+
+      $('#tbody-db-laporan')?.addEventListener('change', async (e) => {
+        if (e.target.classList.contains('select-db-laporan-status')) {
+          const id = e.target.dataset.id;
+          const newStatus = e.target.value;
+          try {
+            const { error } = await db.from('laporan_warga').update({ status: newStatus }).eq('id', id);
+            if (error) throw error;
+            showToast(`Status laporan #${id} diubah menjadi "${STATUS_CONFIG[newStatus]?.label || newStatus}"`);
+            const rep = allReports.find(r => String(r.id) === String(id));
+            if (rep) rep.status = newStatus;
+            updateStats();
+            renderReports();
+          } catch (err) {
+            console.error('Update status error:', err);
+            showToast('Gagal update status: ' + (err.message || err), true);
+            renderDbLaporan();
+          }
+        } else if (e.target.classList.contains('select-db-laporan-ruas')) {
+          const id = e.target.dataset.id;
+          const newRuasId = e.target.value || null;
+          try {
+            const { error } = await db.from('laporan_warga').update({ ruas_id: newRuasId }).eq('id', id);
+            if (error) throw error;
+            showToast(`Ruas jalan laporan #${id} berhasil diperbarui!`);
+            const rep = allReports.find(r => String(r.id) === String(id));
+            if (rep) rep.ruas_id = newRuasId;
+            renderReports();
+          } catch (err) {
+            console.error('Update ruas error:', err);
+            showToast('Gagal mengubah ruas jalan: ' + (err.message || err), true);
+            renderDbLaporan();
+          }
+        }
+      });
+
+      $('#tbody-db-laporan')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-delete-laporan');
+        if (!btn) return;
+        const id = btn.dataset.id;
+
+        openConfirmModal(
+          'Hapus Laporan Warga',
+          `Apakah Anda yakin ingin menghapus laporan #${id} secara permanen dari Supabase? Tindakan ini tidak dapat dibatalkan.`,
+          async () => {
+            try {
+              const { error } = await db.from('laporan_warga').delete().eq('id', id);
+              if (error) throw error;
+              showToast(`Laporan #${id} berhasil dihapus dari database.`);
+              allReports = allReports.filter(r => String(r.id) !== String(id));
+              updateStats();
+              renderReports();
+              renderDbLaporan();
+            } catch (err) {
+              console.error('Delete laporan error:', err);
+              showToast('Gagal menghapus laporan: ' + (err.message || err), true);
+            }
+          }
+        );
+      });
+
+      // 6. Panel Ruas Jalan Database Table Engine
+      function renderDbRuas() {
+        const tbody = $('#tbody-db-ruas');
+        const badgeCount = $('#badge-count-ruas');
+        if (!tbody) return;
+
+        if (badgeCount) badgeCount.textContent = allRuas.length;
+
+        const q = dbRuasSearch.toLowerCase();
+        const filtered = allRuas.filter(r => 
+          (r.nama || '').toLowerCase().includes(q) || 
+          (r.kabupaten || '').toLowerCase().includes(q) ||
+          String(r.id || '').toLowerCase().includes(q)
+        );
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="py-12 text-center text-ink dark:text-slate-400">
+                <i data-lucide="map-pin-off" class="h-8 w-8 mx-auto mb-2 opacity-40"></i>
+                <p class="font-bold">Tidak ada ruas jalan yang sesuai.</p>
+              </td>
+            </tr>
+          `;
+          if (window.lucide) window.lucide.createIcons();
+          return;
+        }
+
+        tbody.innerHTML = filtered.map(r => {
+          const idSafe = esc(r.id);
+          const namaSafe = esc(r.nama);
+          const kabSafe = esc(r.kabupaten);
+          const pjgSafe = esc(r.panjang_km ?? '-');
+          const kEfektif = KATEGORI_CONFIG[r.kondisi] || { label: esc(r.kondisi), color: '#94a3b8' };
+
+          return `
+            <tr class="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition">
+              <td class="py-3 px-4 font-mono font-bold text-accent text-[11px]">${idSafe}</td>
+              <td class="py-3 px-4 font-bold text-navy dark:text-white">${namaSafe}</td>
+              <td class="py-3 px-4 text-ink dark:text-slate-400">${kabSafe}</td>
+              <td class="py-3 px-4 font-semibold text-navy dark:text-white">${pjgSafe} km</td>
+              <td class="py-3 px-4">
+                <select class="select-db-ruas-kondisi rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-xs font-bold text-navy dark:text-white outline-none focus:border-accent" data-id="${idSafe}">
+                  <option value="baik" ${r.kondisi_dasar === 'baik' ? 'selected' : ''}>Kondisi Baik</option>
+                  <option value="ringan" ${r.kondisi_dasar === 'ringan' ? 'selected' : ''}>Rusak Ringan</option>
+                  <option value="berat" ${r.kondisi_dasar === 'berat' ? 'selected' : ''}>Rusak Berat</option>
+                </select>
+              </td>
+              <td class="py-3 px-4">
+                <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-bold" style="background-color: ${kEfektif.color}15; color: ${kEfektif.color}; border: 1px solid ${kEfektif.color}30">
+                  ${kEfektif.label}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-right">
+                <div class="flex items-center justify-end gap-1.5">
+                  <button type="button" class="btn-edit-ruas rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-1.5 text-navy dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition" data-id="${idSafe}" title="Edit Data Ruas">
+                    <i data-lucide="edit-2" class="h-4 w-4"></i>
+                  </button>
+                  <button type="button" class="btn-delete-ruas rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 p-1.5 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition" data-id="${idSafe}" data-nama="${namaSafe}" title="Hapus Ruas dari Database">
+                    <i data-lucide="trash-2" class="h-4 w-4"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      $('#input-search-db-ruas')?.addEventListener('input', (e) => {
+        dbRuasSearch = e.target.value.trim();
+        renderDbRuas();
+      });
+
+      $('#tbody-db-ruas')?.addEventListener('change', async (e) => {
+        if (e.target.classList.contains('select-db-ruas-kondisi')) {
+          const id = e.target.dataset.id;
+          const newKondisi = e.target.value;
+          await updateKondisiDasarRuas(id, newKondisi);
+          renderDbRuas();
+        }
+      });
+
+      $('#tbody-db-ruas')?.addEventListener('click', (e) => {
+        const btnEdit = e.target.closest('.btn-edit-ruas');
+        if (btnEdit) {
+          const id = btnEdit.dataset.id;
+          const ruas = allRuas.find(r => String(r.id) === String(id));
+          if (!ruas) return;
+          openRuasModal('edit', ruas);
+          return;
+        }
+
+        const btnDel = e.target.closest('.btn-delete-ruas');
+        if (btnDel) {
+          const id = btnDel.dataset.id;
+          const nama = btnDel.dataset.nama;
+          openConfirmModal(
+            'Hapus Ruas Jalan',
+            `Apakah Anda yakin ingin menghapus ruas jalan "${nama}" (ID: ${id}) dari database Supabase?`,
+            async () => {
+              try {
+                const { error } = await db.from('ruas_jalan').delete().eq('id', id);
+                if (error) throw error;
+                showToast(`Ruas jalan "${nama}" berhasil dihapus.`);
+                await loadRuasJalan();
+                renderDbRuas();
+              } catch (err) {
+                console.error('Delete ruas error:', err);
+                showToast('Gagal menghapus ruas jalan: ' + (err.message || err), true);
+              }
+            }
+          );
+        }
+      });
+
+      // Modal Tambah / Edit Ruas
+      const modalEditRuas = $('#modal-edit-ruas');
+      const formRuas = $('#form-ruas');
+
+      function openRuasModal(mode = 'add', ruas = null) {
+        if (!modalEditRuas) return;
+        const modeInput = $('#input-ruas-mode');
+        if (modeInput) modeInput.value = mode;
+        const inputId = $('#input-ruas-id');
+        const inputNama = $('#input-ruas-nama');
+        const inputKab = $('#input-ruas-kabupaten');
+        const inputPjg = $('#input-ruas-panjang');
+        const inputKondisi = $('#input-ruas-kondisi');
+        const titleSpan = $('#modal-edit-ruas-title span');
+
+        if (mode === 'edit' && ruas) {
+          if (titleSpan) titleSpan.textContent = 'Edit Data Ruas Jalan';
+          if (inputId) {
+            inputId.value = ruas.id;
+            inputId.readOnly = true;
+            inputId.classList.add('opacity-60', 'cursor-not-allowed');
+          }
+          if (inputNama) inputNama.value = ruas.nama || '';
+          if (inputKab) inputKab.value = ruas.kabupaten || '';
+          if (inputPjg) inputPjg.value = ruas.panjang_km || '';
+          if (inputKondisi) inputKondisi.value = ruas.kondisi_dasar || 'baik';
+        } else {
+          if (titleSpan) titleSpan.textContent = 'Tambah Ruas Jalan Baru';
+          if (inputId) {
+            inputId.value = '';
+            inputId.readOnly = false;
+            inputId.classList.remove('opacity-60', 'cursor-not-allowed');
+          }
+          if (inputNama) inputNama.value = '';
+          if (inputKab) inputKab.value = 'Lampung';
+          if (inputPjg) inputPjg.value = '';
+          if (inputKondisi) inputKondisi.value = 'baik';
+        }
+
+        modalEditRuas.classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      $('#btn-open-add-ruas')?.addEventListener('click', () => openRuasModal('add'));
+      $('#modal-edit-ruas-close')?.addEventListener('click', () => modalEditRuas?.classList.add('hidden'));
+      $('#btn-cancel-ruas')?.addEventListener('click', () => modalEditRuas?.classList.add('hidden'));
+
+      modalEditRuas?.addEventListener('click', (e) => {
+        if (e.target === modalEditRuas) modalEditRuas.classList.add('hidden');
+      });
+
+      formRuas?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const mode = $('#input-ruas-mode')?.value || 'add';
+        const id = ($('#input-ruas-id')?.value || '').trim();
+        const nama = ($('#input-ruas-nama')?.value || '').trim();
+        const kab = ($('#input-ruas-kabupaten')?.value || '').trim();
+        const pjg = parseFloat($('#input-ruas-panjang')?.value) || null;
+        const kondisi = $('#input-ruas-kondisi')?.value || 'baik';
+        const btnSave = $('#btn-save-ruas-form');
+
+        if (!id || !nama || !kab) {
+          showToast('Harap lengkapi semua bidang yang wajib diisi!', true);
+          return;
+        }
+
+        const origHtml = btnSave?.innerHTML;
+        if (btnSave) {
+          btnSave.disabled = true;
+          btnSave.innerHTML = '<i data-lucide="loader-2" class="h-3.5 w-3.5 animate-spin"></i> Menyimpan...';
+        }
+
+        try {
+          if (mode === 'add') {
+            const { error } = await db.from('ruas_jalan').insert({
+              id,
+              nama,
+              kabupaten: kab,
+              panjang_km: pjg,
+              kondisi_dasar: kondisi,
+              kondisi: kondisi,
+              geometry: { type: 'LineString', coordinates: [] }
+            });
+            if (error) throw error;
+            showToast(`Ruas jalan "${nama}" berhasil ditambahkan ke Supabase!`);
+          } else {
+            const { error } = await db.from('ruas_jalan').update({
+              nama,
+              kabupaten: kab,
+              panjang_km: pjg,
+              kondisi_dasar: kondisi
+            }).eq('id', id);
+            if (error) throw error;
+            showToast(`Data ruas jalan "${nama}" berhasil diperbarui!`);
+          }
+
+          modalEditRuas?.classList.add('hidden');
+          await loadRuasJalan();
+          renderDbRuas();
+        } catch (err) {
+          console.error('Save ruas error:', err);
+          showToast('Gagal menyimpan data ruas: ' + (err.message || err), true);
+        } finally {
+          if (btnSave) {
+            btnSave.disabled = false;
+            btnSave.innerHTML = origHtml;
+          }
+          if (window.lucide) window.lucide.createIcons();
+        }
+      });
+
+      // 7. Inisialisasi Database Editor
+      async function loadDatabaseEditor() {
+        await Promise.all([
+          fetchAdmins(),
+          (allReports.length ? Promise.resolve() : fetchReports()),
+          (allRuas.length ? Promise.resolve() : loadRuasJalan())
+        ]);
+        renderDbLaporan();
+        renderDbRuas();
+      }
+
+      // Ekspos helper buka modal foto untuk thumbnail tabel DB
+      window.adminOpenFotoModal = (id) => {
+        const rep = allReports.find(r => r.id === id);
+        if (rep && typeof openModalFoto === 'function') openModalFoto(rep);
+      };
 
       // Logout Admin
       $('#btn-admin-logout').addEventListener('click', async () => {
