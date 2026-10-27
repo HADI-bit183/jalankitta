@@ -355,27 +355,27 @@
                 </div>
 
                 <!-- Kotak Centang Pembanding Kertas A4 (Hanya tampil jika foto dipilih) -->
-                <div id="wrapper-checkbox-a4" class="mt-3 hidden rounded-2xl border border-slate-200 bg-slate-50/80 p-3.5 transition">
+                <div id="wrapper-checkbox-a4" class="mt-3 hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/80 dark:bg-slate-800/60 p-3.5 transition">
                   <label for="check-ada-a4" class="flex items-start gap-3 cursor-pointer select-none">
-                    <input type="checkbox" id="check-ada-a4" class="mt-0.5 h-4 w-4 rounded border-slate-300 text-accent focus:ring-accent" />
+                    <input type="checkbox" id="check-ada-a4" class="mt-0.5 h-4 w-4 rounded border-slate-300 dark:border-white/20 text-accent focus:ring-accent dark:bg-slate-900" />
                     <span class="text-xs">
-                      <span class="block font-bold text-navy">Ada kertas A4 di samping lubang</span>
-                      <span class="block text-ink mt-0.5">Foto dari atas; letakkan kertas A4 di tanah di samping lubang.</span>
+                      <span class="block font-bold text-navy dark:text-white">Ada kertas A4 di samping lubang</span>
+                      <span class="block text-ink dark:text-slate-400 mt-0.5">Foto dari atas; letakkan kertas A4 di tanah di samping lubang.</span>
                     </span>
                   </label>
                 </div>
 
                 <!-- Kartu Saran AI (Perkiraan) -->
-                <div id="ai-suggestion-card" class="mt-3 hidden rounded-2xl border border-slate-200 bg-slate-50 p-4 transition shadow-sm" aria-live="polite">
+                <div id="ai-suggestion-card" class="mt-3 hidden rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-800/80 p-4 transition shadow-sm" aria-live="polite">
                   <!-- State Awal: Tombol Eksplisit Analisis dengan AI -->
                   <div id="ai-suggestion-prompt" class="space-y-2">
                     <div class="flex items-center gap-1.5">
                       <i data-lucide="sparkles" class="h-4 w-4 text-accent"></i>
-                      <span class="text-xs font-bold text-navy">Saran AI (opsional)</span>
+                      <span class="text-xs font-bold text-navy dark:text-white">Saran AI (opsional)</span>
                     </div>
-                    <p class="text-xs text-ink leading-relaxed">Dapatkan rekomendasi kategori kerusakan dan perkiraan ukuran lubang menggunakan AI.</p>
-                    <button type="button" id="btn-start-ai" class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-navy px-3.5 py-2 text-xs font-bold text-white transition hover:bg-navy/90 active:scale-95">
-                      <i data-lucide="sparkles" class="h-3.5 w-3.5 text-accent"></i> Analisis dengan AI
+                    <p class="text-xs text-ink dark:text-slate-300 leading-relaxed">Dapatkan rekomendasi kategori kerusakan dan perkiraan ukuran lubang menggunakan AI.</p>
+                    <button type="button" id="btn-start-ai" class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-navy dark:bg-amber-500 px-3.5 py-2 text-xs font-bold text-white dark:text-slate-900 transition hover:bg-navy/90 dark:hover:bg-amber-400 active:scale-95">
+                      <i data-lucide="sparkles" class="h-3.5 w-3.5 text-accent dark:text-slate-900"></i> Analisis dengan AI
                     </button>
                   </div>
 
@@ -383,15 +383,15 @@
                   <div id="ai-suggestion-loading" class="hidden space-y-3 py-1">
                     <div class="flex items-center justify-between">
                       <div class="flex items-center gap-2">
-                        <div class="h-4 w-4 rounded bg-slate-200 animate-pulse"></div>
-                        <div class="h-4 w-32 rounded bg-slate-200 animate-pulse"></div>
+                        <div class="h-4 w-4 rounded bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
+                        <div class="h-4 w-32 rounded bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
                       </div>
-                      <div class="h-4 w-14 rounded-full bg-slate-200 animate-pulse"></div>
+                      <div class="h-4 w-14 rounded-full bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
                     </div>
-                    <div class="h-3 w-3/4 rounded bg-slate-200 animate-pulse"></div>
+                    <div class="h-3 w-3/4 rounded bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
                     <div class="grid grid-cols-2 gap-2 pt-1">
-                      <div class="h-10 rounded-xl bg-slate-200 animate-pulse"></div>
-                      <div class="h-10 rounded-xl bg-slate-200 animate-pulse"></div>
+                      <div class="h-10 rounded-xl bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
+                      <div class="h-10 rounded-xl bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
                     </div>
                   </div>
 
@@ -400,31 +400,31 @@
                     <div class="flex items-center justify-between gap-2">
                       <div class="flex items-center gap-1.5">
                         <i data-lucide="sparkles" class="h-4 w-4 text-accent"></i>
-                        <span class="text-xs font-bold text-navy">Saran AI (perkiraan)</span>
+                        <span class="text-xs font-bold text-navy dark:text-white">Saran AI (perkiraan)</span>
                       </div>
                       <span id="ai-badge-kategori" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold"></span>
                     </div>
 
-                    <p id="ai-text-deskripsi" class="text-xs text-navy leading-relaxed"></p>
+                    <p id="ai-text-deskripsi" class="text-xs text-navy dark:text-slate-200 leading-relaxed"></p>
 
-                    <div class="grid grid-cols-2 gap-2 text-[11px] bg-white rounded-xl p-3 border border-slate-200/60 shadow-sm">
+                    <div class="grid grid-cols-2 gap-2 text-[11px] bg-white dark:bg-slate-900/80 rounded-xl p-3 border border-slate-200/60 dark:border-white/10 shadow-sm">
                       <div>
-                        <span class="block text-slate-400 text-[10px] font-medium">Perkiraan Diameter</span>
-                        <span id="ai-text-diameter" class="font-bold text-navy mt-0.5 block leading-snug"></span>
+                        <span class="block text-slate-400 dark:text-slate-400 text-[10px] font-medium">Perkiraan Diameter</span>
+                        <span id="ai-text-diameter" class="font-bold text-navy dark:text-white mt-0.5 block leading-snug"></span>
                       </div>
                       <div>
-                        <span class="block text-slate-400 text-[10px] font-medium">Kelas Kedalaman</span>
-                        <span id="ai-text-kedalaman" class="font-bold text-navy mt-0.5 block leading-snug"></span>
+                        <span class="block text-slate-400 dark:text-slate-400 text-[10px] font-medium">Kelas Kedalaman</span>
+                        <span id="ai-text-kedalaman" class="font-bold text-navy dark:text-white mt-0.5 block leading-snug"></span>
                       </div>
                     </div>
 
-                    <p class="text-[10px] text-ink italic leading-tight">Perkiraan AI, bukan pengukuran. Akan diverifikasi admin.</p>
+                    <p class="text-[10px] text-ink dark:text-slate-400 italic leading-tight">Perkiraan AI, bukan pengukuran. Akan diverifikasi admin.</p>
 
                     <div class="flex flex-wrap items-center gap-2">
-                      <button type="button" id="btn-use-ai-suggestion" class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-navy px-3.5 py-2 text-xs font-bold text-white transition hover:bg-navy/90 active:scale-95">
+                      <button type="button" id="btn-use-ai-suggestion" class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-navy dark:bg-amber-500 px-3.5 py-2 text-xs font-bold text-white dark:text-slate-900 transition hover:bg-navy/90 dark:hover:bg-amber-400 active:scale-95">
                         <i data-lucide="check" class="h-3.5 w-3.5"></i> Gunakan saran
                       </button>
-                      <button type="button" id="btn-reanalyze-ai" class="hidden inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-navy transition hover:bg-slate-100 active:scale-95">
+                      <button type="button" id="btn-reanalyze-ai" class="hidden inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 dark:border-white/15 bg-white dark:bg-slate-700/80 px-3 py-2 text-xs font-bold text-navy dark:text-white transition hover:bg-slate-100 dark:hover:bg-slate-700 active:scale-95">
                         <i data-lucide="refresh-cw" class="h-3.5 w-3.5 text-accent"></i> Analisis ulang
                       </button>
                     </div>
@@ -432,8 +432,8 @@
 
                   <!-- Pesan Netral Ketika Gagal / Bukan Foto Jalan / Kepercayaan Rendah -->
                   <div id="ai-suggestion-neutral" class="hidden space-y-2 py-1">
-                    <p id="ai-neutral-msg" class="text-xs text-ink"></p>
-                    <button type="button" id="btn-retry-ai" class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-navy transition hover:bg-slate-100">
+                    <p id="ai-neutral-msg" class="text-xs text-ink dark:text-slate-300"></p>
+                    <button type="button" id="btn-retry-ai" class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 dark:border-white/15 bg-white dark:bg-slate-700/80 px-3 py-1.5 text-xs font-bold text-navy dark:text-white transition hover:bg-slate-100 dark:hover:bg-slate-700">
                       <i data-lucide="refresh-cw" class="h-3.5 w-3.5"></i> Coba lagi
                     </button>
                   </div>

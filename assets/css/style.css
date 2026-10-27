@@ -477,6 +477,50 @@ html.dark #modal-my-reports .border-slate-200,
 html.dark #modal-my-reports-photo .border-slate-100 { border-color: rgba(255, 255, 255, 0.1); }
 html.dark #modal-my-reports-photo .hover\:bg-slate-100:hover { background: rgba(255, 255, 255, 0.08); }
 
+/* Dark mode: wrapper A4 & kartu rekomendasi AI di app.html */
+html.dark #wrapper-checkbox-a4 {
+  background: rgba(30, 41, 59, 0.6) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+html.dark #wrapper-checkbox-a4 input[type="checkbox"] {
+  background-color: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+html.dark #ai-suggestion-card {
+  background: rgba(30, 41, 59, 0.75) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+html.dark #ai-suggestion-card .bg-white {
+  background: rgba(15, 23, 42, 0.75) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+html.dark #ai-suggestion-card #ai-text-diameter,
+html.dark #ai-suggestion-card #ai-text-kedalaman {
+  color: #f8fafc !important;
+}
+html.dark #btn-start-ai,
+html.dark #btn-use-ai-suggestion {
+  background: #f59e0b !important;
+  color: #0f172a !important;
+}
+html.dark #btn-start-ai:hover,
+html.dark #btn-use-ai-suggestion:hover {
+  background: #fbbf24 !important;
+}
+html.dark #btn-start-ai i,
+html.dark #btn-use-ai-suggestion i {
+  color: #0f172a !important;
+}
+html.dark #btn-reanalyze-ai,
+html.dark #btn-retry-ai {
+  background: rgba(51, 65, 85, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #f8fafc !important;
+}
+html.dark #ai-suggestion-loading .bg-slate-200 {
+  background: rgba(51, 65, 85, 0.6) !important;
+}
+
 /* Safeguard badge emerald & status */
 .bg-emerald-500 { background-color: #10b981 !important; }
 .text-emerald-500 { color: #10b981 !important; }
