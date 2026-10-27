@@ -1455,7 +1455,7 @@
       $('#btn-picker-clear')?.addEventListener('click', clearPickedPath);
 
       // Tempelkan klik ke jalan terdekat (OSRM nearest); tolak jika terlalu jauh dari jalan.
-      const SNAP_MAX_METERS = 40;
+      const SNAP_MAX_METERS = 25;
       let pickerBusy = false;
 
       async function osrmFetch(url, ms = 6000) {
@@ -1488,18 +1488,28 @@
         if (hintEl) { hintEl.textContent = 'Mencari jalan terdekat...'; hintEl.classList.remove('opacity-0'); }
         try {
           const snap = await snapToRoad(lat, lng);
-          if (snap && snap.distM > SNAP_MAX_METERS) {
-            showStatus('warn', `Titik berjarak ±${Math.round(snap.distM)} m dari jalan. Klik tepat pada garis jalan.`);
+          if (!snap) {
             updatePickerPathDisplay('peta');
+            showStatus('error', 'Tidak bisa memeriksa posisi jalan (layanan peta tidak merespons). Coba klik lagi sebentar lagi.');
             return;
           }
-          const pt = snap || { lat, lng };
+          if (snap.distM > SNAP_MAX_METERS) {
+            updatePickerPathDisplay('peta');
+            showStatus('warn', `Titik berjarak \u00b1${Math.round(snap.distM)} m dari jalan. Klik tepat pada jalan (maks ${SNAP_MAX_METERS} m).`);
+            return;
+          }
+          const pt = snap;
           let route = null;
-          if (snap && pickedPoints.length >= 1) {
+          if (pickedPoints.length >= 1) {
             const prev = pickedPoints[pickedPoints.length - 1];
             route = await routeBetween(prev, pt);
+            if (!route) {
+              updatePickerPathDisplay('peta');
+              showStatus('warn', 'Tidak ditemukan jalan yang menghubungkan titik ini dengan titik sebelumnya. Pilih titik di jalan yang sama.');
+              return;
+            }
           }
-          addPickerPoint(pt.lat, pt.lng, snap ? `${source} (menempel ke jalan)` : source, route);
+          addPickerPoint(pt.lat, pt.lng, `${source} (menempel ke jalan)`, route);
         } finally {
           pickerBusy = false;
         }
