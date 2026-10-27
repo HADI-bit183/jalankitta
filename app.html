@@ -976,6 +976,35 @@
         }
       }
 
+      // Garis ruas hasil klik titik (<=4 titik) berbentuk lurus; tempelkan ke jalan nyata via OSRM lalu cache.
+      async function snapRoadLayerToRoad(r, layer) {
+        const g = r.geometry;
+        if (!g || g.type !== 'LineString' || !Array.isArray(g.coordinates) || g.coordinates.length < 2 || g.coordinates.length > 4) return;
+        const cacheKey = `snap:${r.id}:${r.updated_at || ''}:${JSON.stringify(g.coordinates)}`.slice(0, 480);
+        try {
+          let snapped = null;
+          const cached = safeStore.get(cacheKey);
+          if (cached) { try { snapped = JSON.parse(cached); } catch {} }
+          if (!snapped) {
+            const path = g.coordinates.map(c => `${c[0]},${c[1]}`).join(';');
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), 7000);
+            const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${path}?overview=full&geometries=geojson`, { signal: ctrl.signal });
+            clearTimeout(timer);
+            if (!res.ok) return;
+            const data = await res.json();
+            const sg = data.routes?.[0]?.geometry;
+            if (data.code !== 'Ok' || !sg || sg.coordinates.length < 2) return;
+            snapped = sg;
+            safeStore.set(cacheKey, JSON.stringify(sg));
+          }
+          layer.clearLayers();
+          layer.addData(snapped);
+        } catch (e) {
+          console.warn(`Snap ruas ${r.id} dilewati:`, e);
+        }
+      }
+
       async function loadRoads() {
         if (db) {
           try {
@@ -1008,6 +1037,7 @@
 
                   roadLayers[r.id] = { layer, props: { id: r.id, name: r.nama, condition: conditionKey, kab: r.kabupaten, lengthKm: lengthShort, color } };
                   layer.addTo(map);
+                  snapRoadLayerToRoad(r, layer);
                 } catch (renderErr) {
                   console.warn(`Gagal me-render geometri ruas ${r.id}:`, renderErr);
                 }
