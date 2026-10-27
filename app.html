@@ -162,13 +162,8 @@
             </div>
 
             <div class="absolute right-4 top-4 z-[500] flex flex-col items-end gap-2">
-              <div class="glass inline-flex rounded-xl p-1 text-xs font-bold text-slate-800 dark:text-white shadow" role="group" aria-label="Gaya peta">
-                <button type="button" data-style="jalan" class="map-style-btn inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition" aria-pressed="true">
-                  <i data-lucide="map" class="h-3.5 w-3.5"></i> Jalan
-                </button>
-                <button type="button" data-style="satelit" class="map-style-btn inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 transition" aria-pressed="false">
-                  <i data-lucide="satellite" class="h-3.5 w-3.5"></i> Satelit HD
-                </button>
+              <div class="glass inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-white shadow">
+                <i data-lucide="satellite" class="h-3.5 w-3.5 text-amber-500"></i> Satelit HD
               </div>
               <button id="btn-reset-view" class="inline-flex items-center gap-2 rounded-xl glass px-3.5 py-2 text-xs font-bold text-slate-800 dark:text-white shadow hover:scale-105 transition">
                 <i data-lucide="locate-fixed" class="h-4 w-4 text-amber-500"></i> Reset Peta
@@ -272,14 +267,9 @@
                 </div>
                 <div class="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10 z-0">
                   <div id="picker-map" class="h-64 w-full sm:h-72 bg-slate-100 dark:bg-slate-900"></div>
-                  <!-- Switcher Mode Peta Penanda Lokasi -->
-                  <div class="absolute right-3 top-3 z-[500] flex items-center rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md p-1 shadow-md border border-slate-200/80 dark:border-white/10" role="group" aria-label="Model Peta Penanda Lokasi">
-                    <button type="button" id="btn-picker-style-jalan" class="picker-style-btn inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition bg-amber-500 text-white shadow-sm" aria-pressed="true">
-                      <i data-lucide="map" class="h-3.5 w-3.5"></i> Jalan
-                    </button>
-                    <button type="button" id="btn-picker-style-satelit" class="picker-style-btn inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-700 dark:text-slate-300 transition hover:bg-slate-100 dark:hover:bg-slate-800" aria-pressed="false">
-                      <i data-lucide="satellite" class="h-3.5 w-3.5"></i> Satelit HD
-                    </button>
+                  <!-- Mode Peta Penanda Lokasi -->
+                  <div class="absolute right-3 top-3 z-[500] flex items-center gap-1.5 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-2.5 py-1 text-xs font-bold text-slate-700 dark:text-slate-300 shadow-md border border-slate-200/80 dark:border-white/10">
+                    <i data-lucide="satellite" class="h-3.5 w-3.5 text-amber-500"></i> Satelit HD
                   </div>
                   <p id="picker-hint"
                     class="pointer-events-none absolute left-3 bottom-3 z-[500] whitespace-nowrap rounded-full bg-white/95 dark:bg-slate-900/95 px-3 py-1.5 text-[11px] font-bold text-navy dark:text-slate-200 shadow-sm transition-opacity border border-slate-200/60 dark:border-white/10">
@@ -753,38 +743,17 @@
         scrollWheelZoom: false,
       });
 
-      // Tile HD dari Esri & Carto (gratis, tanpa API key) — gaya Jalan Modern atau Satelit HD
+      // Tile HD dari Esri (gratis, tanpa API key) — Satelit HD dengan batas wilayah & jaringan jalan
       const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services';
-      const CARTO_VOYAGER = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-      const CARTO_DARK = 'https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png';
-      const TILE_ATTR_STREET = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>';
       const TILE_ATTR_SATELIT = 'Tiles &copy; Esri &mdash; Esri, Maxar, Earthstar Geographics, HERE, Garmin, OpenStreetMap contributors';
 
-      const makeBaseTiles = (isDark, style) => {
-        if (style === 'satelit') {
-          const opts = { attribution: TILE_ATTR_SATELIT, detectRetina: true, maxZoom: 20 };
-          return L.layerGroup([
-            L.tileLayer(`${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 19, zIndex: 1 }),
-            L.tileLayer(`${ESRI}/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 19, zIndex: 2 }),
-            L.tileLayer(`${ESRI}/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 19, zIndex: 3 }),
-          ]);
-        }
-        if (!isDark) {
-          return L.tileLayer(CARTO_VOYAGER, {
-            subdomains: 'abcd',
-            attribution: TILE_ATTR_STREET,
-            detectRetina: true,
-            maxZoom: 20,
-            maxNativeZoom: 19
-          });
-        }
-        return L.tileLayer(CARTO_DARK, {
-          subdomains: 'abcd',
-          attribution: TILE_ATTR_STREET,
-          detectRetina: true,
-          maxZoom: 20,
-          maxNativeZoom: 19
-        });
+      const makeBaseTiles = () => {
+        const opts = { attribution: TILE_ATTR_SATELIT, detectRetina: true, maxZoom: 20 };
+        return L.layerGroup([
+          L.tileLayer(`${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 19, zIndex: 1 }),
+          L.tileLayer(`${ESRI}/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 19, zIndex: 2 }),
+          L.tileLayer(`${ESRI}/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 19, zIndex: 3 }),
+        ]);
       };
 
       const safeStore = window.safeStore || {
@@ -792,25 +761,7 @@
         set(k, v) { try { localStorage.setItem(k, v); } catch {} }
       };
 
-      let mapStyle = safeStore.get('jk-map-style') === 'satelit' ? 'satelit' : 'jalan';
-      let baseTiles = null;
-      const applyBaseTiles = () => {
-        if (baseTiles) map.removeLayer(baseTiles);
-        baseTiles = makeBaseTiles(document.documentElement.classList.contains('dark'), mapStyle).addTo(map);
-        $$('.map-style-btn').forEach((b) => {
-          const active = b.dataset.style === mapStyle;
-          b.classList.toggle('bg-amber-500', active);
-          b.classList.toggle('text-white', active);
-          b.setAttribute('aria-pressed', active);
-        });
-      };
-      applyBaseTiles();
-      window.addEventListener('jk-theme-change', applyBaseTiles);
-      $$('.map-style-btn').forEach((btn) => btn.addEventListener('click', () => {
-        mapStyle = btn.dataset.style;
-        safeStore.set('jk-map-style', mapStyle);
-        applyBaseTiles();
-      }));
+      let baseTiles = makeBaseTiles().addTo(map);
 
       // Invalidate size immediately and after load so tiles render fully
       map.whenReady(() => {
@@ -1271,34 +1222,7 @@
       const LAMPUNG_BOUNDS = L.latLngBounds([-6.25, 103.55], [-3.70, 106.25]);
       const pickerMap = L.map('picker-map', { center: [-5.40, 105.26], zoom: 12, scrollWheelZoom: false });
 
-      let pickerMapStyle = safeStore.get('jk-picker-map-style') === 'satelit' ? 'satelit' : 'jalan';
-      let pickerBaseTiles = null;
-      const applyPickerBaseTiles = () => {
-        if (pickerBaseTiles) pickerMap.removeLayer(pickerBaseTiles);
-        pickerBaseTiles = makeBaseTiles(document.documentElement.classList.contains('dark'), pickerMapStyle).addTo(pickerMap);
-        const btnJalan = $('#btn-picker-style-jalan');
-        const btnSatelit = $('#btn-picker-style-satelit');
-        if (btnJalan && btnSatelit) {
-          const isJalan = pickerMapStyle === 'jalan';
-          btnJalan.className = `picker-style-btn inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition ${isJalan ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}`;
-          btnJalan.setAttribute('aria-pressed', isJalan ? 'true' : 'false');
-          btnSatelit.className = `picker-style-btn inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-bold transition ${!isJalan ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'}`;
-          btnSatelit.setAttribute('aria-pressed', !isJalan ? 'true' : 'false');
-        }
-      };
-      applyPickerBaseTiles();
-      window.addEventListener('jk-theme-change', applyPickerBaseTiles);
-
-      $('#btn-picker-style-jalan')?.addEventListener('click', () => {
-        pickerMapStyle = 'jalan';
-        safeStore.set('jk-picker-map-style', 'jalan');
-        applyPickerBaseTiles();
-      });
-      $('#btn-picker-style-satelit')?.addEventListener('click', () => {
-        pickerMapStyle = 'satelit';
-        safeStore.set('jk-picker-map-style', 'satelit');
-        applyPickerBaseTiles();
-      });
+      let pickerBaseTiles = makeBaseTiles().addTo(pickerMap);
 
       let pickerMarker = null, accuracyCircle = null;
       const selectedColor = () => CONDITION[$('input[name="kategori"]:checked')?.value || 'ringan'].color;
