@@ -518,8 +518,8 @@ create trigger trg_laporan_ruas_id
   before insert on public.laporan_warga
   for each row execute function public.set_laporan_ruas_id();
 
--- 8c. Batas laporan per pengguna: maks. 10 laporan per 24 jam.
--- Dilengkapi advisory xact lock ganda (UID pengguna + petak spasial 10m) untuk mencegah race condition.
+-- 8c. Batas laporan harian per pengguna DINONAKTIFKAN (tanpa batas kuota).
+-- Fungsi tetap dipertahankan hanya untuk advisory xact lock agar insert paralel di titik identik tidak race.
 create or replace function public.batasi_laporan_harian()
 returns trigger
 language plpgsql
@@ -532,10 +532,6 @@ begin
   -- Kunci transaksi spasial per petak 10 meter untuk mencegah race condition insert paralel di titik identik
   perform pg_advisory_xact_lock(hashtext('geo_' || round(new.koordinat_lat::numeric, 4)::text || '_' || round(new.koordinat_lng::numeric, 4)::text));
 
-  if (select count(*) from public.laporan_warga
-      where user_id = new.user_id and created_at > now() - interval '24 hours') >= 10 then
-    raise exception 'Batas harian tercapai: maksimal 10 laporan per 24 jam.';
-  end if;
   return new;
 end;
 $$;

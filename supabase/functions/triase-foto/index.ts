@@ -159,22 +159,8 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ ok: false, alasan: 'Akses path foto tidak diizinkan' });
     }
 
-    // 3. Batas kuota: maksimal 10 panggilan per user per 24 jam (fail-closed jika countErr)
+    // 3. Batas kuota harian dinonaktifkan (tanpa batas panggilan triase per pengguna)
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-    const { count: dailyCount, error: countErr } = await supabaseAdmin
-      .from('ai_triase')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .gte('created_at', oneDayAgo);
-
-    if (countErr) {
-      return jsonResponse({ ok: false, alasan: 'Gagal memverifikasi kuota pengguna' });
-    }
-
-    if ((dailyCount || 0) >= 10) {
-      return jsonResponse({ ok: false, alasan: 'Batas kuota harian triase AI (10 kali per 24 jam) telah tercapai' });
-    }
 
     // 4. Unduh gambar dari Supabase Storage (bucket foto_laporan)
     const { data: fileBlob, error: downloadErr } = await supabaseAdmin
