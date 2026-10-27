@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://server.arcgisonline.com https://unpkg.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://router.project-osrm.org; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://server.arcgisonline.com https://unpkg.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://router.project-osrm.org; object-src 'none'; base-uri 'self'; form-action 'self'" />
   <title>Dashboard Admin — JalanKitta</title>
   <meta name="theme-color" content="#0F172A" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png" />
@@ -11,10 +13,10 @@
   <link rel="apple-touch-icon" href="assets/icons/logo-192.png" />
 
   <script>
-    (function() {
+    (function () {
       const safeStore = {
         get(k) { try { return localStorage.getItem(k); } catch { return null; } },
-        set(k, v) { try { localStorage.setItem(k, v); } catch {} }
+        set(k, v) { try { localStorage.setItem(k, v); } catch { } }
       };
       window.safeStore = safeStore;
       const savedTheme = safeStore.get('theme');
@@ -30,26 +32,79 @@
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap"
     rel="stylesheet" />
 
-  <script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js" integrity="sha384-0v3Wh0ZtiQBYCYywQoeMDA5mAw5Z01p0lhorqy0BlwFrcN6u3lmN7K0U/e1uezmr" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" integrity="sha384-vsrfeLOOY6KuIYKDlmVH5UiBmgIdB1oEf7p01YgWHuqmOHfZr374+odEv96n9tNC" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js"
+    integrity="sha384-0v3Wh0ZtiQBYCYywQoeMDA5mAw5Z01p0lhorqy0BlwFrcN6u3lmN7K0U/e1uezmr"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
+    integrity="sha384-vsrfeLOOY6KuIYKDlmVH5UiBmgIdB1oEf7p01YgWHuqmOHfZr374+odEv96n9tNC"
+    crossorigin="anonymous"></script>
   <link rel="stylesheet" href="assets/css/style.css" />
   <link rel="stylesheet" href="assets/css/tailwind.css" />
   <style>
     /* Kartu admin mengikuti gaya glass-card pada halaman utama */
-    main .bg-white { background: rgba(255,255,255,.82); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-color: rgba(226,232,240,.8); }
-    main .shadow-card { box-shadow: 0 10px 30px -10px rgba(0,0,0,.05); }
-    html.dark main .bg-white { background: rgba(15,23,42,.65); border-color: rgba(255,255,255,.08); }
-    html.dark main .shadow-card { box-shadow: 0 20px 40px -15px rgba(0,0,0,.6); }
-    html.dark .text-navy { color: #f8fafc; }
-    html.dark .text-ink { color: #94a3b8; }
-    html.dark main .bg-slate-50, html.dark main .bg-slate-100 { background: rgba(255,255,255,.06); }
-    html.dark main .border-slate-100, html.dark main .border-slate-200 { border-color: rgba(255,255,255,.1); }
-    html.dark main .bg-navy.text-white { background: #f59e0b; color: #0f172a; }
-    html.dark main input, html.dark main select, html.dark main textarea { color: #f8fafc; background: rgba(30, 41, 59, 0.8); border-color: rgba(255, 255, 255, 0.1); }
-    html.dark main select option { background: #0f172a; color: #f8fafc; }
-    html.dark main code { color: #fcd34d; background: rgba(255,255,255,.1) !important; }
+    main .bg-white {
+      background: rgba(255, 255, 255, .82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-color: rgba(226, 232, 240, .8);
+    }
+
+    main .shadow-card {
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, .05);
+    }
+
+    html.dark main .bg-white {
+      background: rgba(15, 23, 42, .65);
+      border-color: rgba(255, 255, 255, .08);
+    }
+
+    html.dark main .shadow-card {
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, .6);
+    }
+
+    html.dark .text-navy {
+      color: #f8fafc;
+    }
+
+    html.dark .text-ink {
+      color: #94a3b8;
+    }
+
+    html.dark main .bg-slate-50,
+    html.dark main .bg-slate-100 {
+      background: rgba(255, 255, 255, .06);
+    }
+
+    html.dark main .border-slate-100,
+    html.dark main .border-slate-200 {
+      border-color: rgba(255, 255, 255, .1);
+    }
+
+    html.dark main .bg-navy.text-white {
+      background: #f59e0b;
+      color: #0f172a;
+    }
+
+    html.dark main input,
+    html.dark main select,
+    html.dark main textarea {
+      color: #f8fafc;
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    html.dark main select option {
+      background: #0f172a;
+      color: #f8fafc;
+    }
+
+    html.dark main code {
+      color: #fcd34d;
+      background: rgba(255, 255, 255, .1) !important;
+    }
   </style>
 </head>
+
 <body class="font-sans text-navy antialiased min-h-screen flex flex-col selection:bg-amber-500/30 overflow-x-hidden">
   <a href="#main-content" class="skip-link">Lewati ke konten utama</a>
 
@@ -61,28 +116,38 @@
 
   <!-- Header Admin -->
   <header class="fixed inset-x-0 top-0 z-[1000] px-4 py-4">
-    <nav class="mx-auto flex max-w-7xl items-center justify-between rounded-2xl px-5 py-3.5 glass" aria-label="Navigasi admin">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between rounded-2xl px-5 py-3.5 glass"
+      aria-label="Navigasi admin">
       <div class="flex items-center gap-4">
         <a href="index.html" class="flex items-center gap-3 group">
-          <div class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 dark:bg-white/10 p-1 transition-transform group-hover:scale-105">
+          <div
+            class="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 dark:bg-white/10 p-1 transition-transform group-hover:scale-105">
             <img src="assets/img/logo-icon.png" alt="Logo JalanKitta" class="h-8 w-8 object-contain" />
           </div>
-          <span class="font-logo text-xl font-bold tracking-tight text-slate-900 dark:text-white">Jalan<span class="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Kitta</span></span>
+          <span class="font-logo text-xl font-bold tracking-tight text-slate-900 dark:text-white">Jalan<span
+              class="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Kitta</span></span>
         </a>
-        <span class="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-600 dark:text-amber-400 tracking-wide uppercase">Admin Portal</span>
+        <span
+          class="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-600 dark:text-amber-400 tracking-wide uppercase">Admin
+          Portal</span>
       </div>
 
       <div class="flex items-center gap-3">
-        <a href="app.html#peta" class="hidden sm:inline-flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-amber-500 transition">
+        <a href="app.html#peta"
+          class="hidden sm:inline-flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300 hover:text-amber-500 transition">
           <i data-lucide="map" class="h-4 w-4"></i> Peta Jalan
         </a>
-        <button id="dark-toggle" class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/80 dark:border-white/10 bg-white/60 dark:bg-slate-800/80 text-slate-700 dark:text-amber-400 shadow-sm transition hover:scale-105 active:scale-95" title="Ganti Tema" aria-label="Toggle Dark Mode">
+        <button id="dark-toggle"
+          class="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/80 dark:border-white/10 bg-white/60 dark:bg-slate-800/80 text-slate-700 dark:text-amber-400 shadow-sm transition hover:scale-105 active:scale-95"
+          title="Ganti Tema" aria-label="Toggle Dark Mode">
           <i data-lucide="sun" class="h-5 w-5 hidden dark:block"></i>
           <i data-lucide="moon" class="h-5 w-5 block dark:hidden"></i>
         </button>
         <div id="admin-user-pill" class="flex items-center gap-3 border-l border-slate-200 dark:border-white/10 pl-4">
-          <span id="admin-email" class="text-xs font-bold text-slate-600 dark:text-slate-300 hidden md:inline">Memuat...</span>
-          <button id="btn-admin-logout" class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-100 transition flex items-center gap-1.5">
+          <span id="admin-email"
+            class="text-xs font-bold text-slate-600 dark:text-slate-300 hidden md:inline">Memuat...</span>
+          <button id="btn-admin-logout"
+            class="rounded-xl border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-100 transition flex items-center gap-1.5">
             <i data-lucide="log-out" class="h-3.5 w-3.5"></i> Logout
           </button>
         </div>
@@ -106,153 +171,190 @@
       </div>
       <h2 id="access-denied-title" class="font-display text-2xl font-bold text-navy">Akses Terbatas</h2>
       <p id="access-denied-desc" class="mt-2 text-sm text-ink leading-relaxed">
-        Akun Anda belum terdaftar di tabel <code class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-navy font-mono">admins</code> Supabase.
+        Akun Anda belum terdaftar di tabel <code
+          class="bg-slate-200 px-1.5 py-0.5 rounded text-xs text-navy font-mono">admins</code> Supabase.
       </p>
       <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
-        <a href="app.html" class="rounded-xl bg-navy px-5 py-2.5 text-sm font-bold text-white shadow hover:bg-navy/90 transition">Ke Halaman Peta</a>
-        <button id="btn-recheck-admin" class="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-navy hover:bg-slate-50 transition">Cek Ulang Hak Akses</button>
+        <a href="app.html"
+          class="rounded-xl bg-navy px-5 py-2.5 text-sm font-bold text-white shadow hover:bg-navy/90 transition">Ke
+          Halaman Peta</a>
+        <button id="btn-recheck-admin"
+          class="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-navy hover:bg-slate-50 transition">Cek
+          Ulang Hak Akses</button>
       </div>
     </div>
 
     <!-- Dashboard Konten Admin -->
     <div id="admin-content" class="hidden space-y-6">
-      
+
       <!-- Navigasi Tab Utama Admin Portal -->
       <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-white/10 pb-4">
-        <button id="tab-nav-reports" type="button" class="admin-main-tab inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition bg-navy text-white shadow-sm">
+        <button id="tab-nav-reports" type="button"
+          class="admin-main-tab inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition bg-navy text-white shadow-sm">
           <i data-lucide="layout-dashboard" class="h-4 w-4 text-accent"></i> Verifikasi Laporan & Analitik
         </button>
-        <button id="tab-nav-db" type="button" class="admin-main-tab inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
+        <button id="tab-nav-db" type="button"
+          class="admin-main-tab inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
           <i data-lucide="database" class="h-4 w-4 text-accent"></i> Database Editor (Supabase)
         </button>
       </div>
 
       <!-- VIEW 1: Verifikasi Laporan & Analitik (View Utama) -->
       <div id="view-reports-analytics" class="space-y-8">
-        
+
         <!-- Ringkasan Statistik -->
         <section>
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 class="font-display text-2xl sm:text-3xl font-bold text-navy">Verifikasi & Pengelolaan Laporan</h1>
-            <p class="text-sm text-ink mt-1">Ubah status laporan warga agar langsung tersinkronisasi ke Peta Jalan publik.</p>
-          </div>
-          <button id="btn-refresh-data" class="self-start sm:self-auto rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-navy shadow-sm hover:bg-slate-50 transition flex items-center gap-2">
-            <i data-lucide="refresh-cw" class="h-4 w-4"></i> Segarkan Data
-          </button>
-        </div>
-
-        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
-          <div class="bg-white p-5 rounded-2xl shadow-card border border-slate-100">
-            <span class="text-xs font-bold text-ink uppercase tracking-wider">Total Laporan</span>
-            <p id="stat-total" class="font-display text-3xl font-bold text-navy mt-2">0</p>
-          </div>
-          <div class="bg-white p-5 rounded-2xl shadow-card border border-amber-100">
-            <span class="text-xs font-bold text-amber-600 uppercase tracking-wider flex items-center gap-1.5">
-              <span class="h-2 w-2 rounded-full bg-amber-500 animate-pulse"></span> Menunggu Verifikasi
-            </span>
-            <p id="stat-baru" class="font-display text-3xl font-bold text-amber-600 mt-2">0</p>
-          </div>
-          <div class="bg-white p-5 rounded-2xl shadow-card border border-blue-100">
-            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Terverifikasi</span>
-            <p id="stat-diverifikasi" class="font-display text-3xl font-bold text-blue-600 mt-2">0</p>
-          </div>
-          <div class="bg-white p-5 rounded-2xl shadow-card border border-purple-100">
-            <span class="text-xs font-bold text-purple-600 uppercase tracking-wider">Diproses</span>
-            <p id="stat-diproses" class="font-display text-3xl font-bold text-purple-600 mt-2">0</p>
-          </div>
-          <div class="bg-white p-5 rounded-2xl shadow-card border border-emerald-100 col-span-2 lg:col-span-1">
-            <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Selesai</span>
-            <p id="stat-selesai" class="font-display text-3xl font-bold text-emerald-600 mt-2">0</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Bagian Grafik & Analisis Data Riil (100% Live dari Database) -->
-      <section class="grid grid-cols-1 lg:grid-cols-2 gap-5" id="section-charts">
-        <!-- Grafik 1: Kondisi Fisik Ruas Jalan per Kabupaten (Live dari ruas_jalan) -->
-        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-card border border-slate-100 dark:border-white/10 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-              <span class="text-xs font-bold text-accent uppercase tracking-wider flex items-center gap-1.5">
-                <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> Kondisi Fisik Ruas Jalan (Live)
+              <h1 class="font-display text-2xl sm:text-3xl font-bold text-navy">Verifikasi & Pengelolaan Laporan</h1>
+              <p class="text-sm text-ink mt-1">Ubah status laporan warga agar langsung tersinkronisasi ke Peta Jalan
+                publik.</p>
+            </div>
+            <button id="btn-refresh-data"
+              class="self-start sm:self-auto rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-navy shadow-sm hover:bg-slate-50 transition flex items-center gap-2">
+              <i data-lucide="refresh-cw" class="h-4 w-4"></i> Segarkan Data
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            <div class="bg-white p-5 rounded-2xl shadow-card border border-slate-100">
+              <span class="text-xs font-bold text-ink uppercase tracking-wider">Total Laporan</span>
+              <p id="stat-total" class="font-display text-3xl font-bold text-navy mt-2">0</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-card border border-amber-100">
+              <span class="text-xs font-bold text-amber-600 uppercase tracking-wider flex items-center gap-1.5">
+                <span class="h-2 w-2 rounded-full bg-amber-500 animate-pulse"></span> Menunggu Verifikasi
               </span>
-              <h3 class="font-display text-base font-bold text-navy dark:text-white mt-0.5" id="chart1-title">Kondisi Jalan per Wilayah</h3>
+              <p id="stat-baru" class="font-display text-3xl font-bold text-amber-600 mt-2">0</p>
             </div>
-            <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
-              <button type="button" id="btn-chart1-bar" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 text-navy dark:text-white shadow-sm transition">Per Kabupaten (km)</button>
-              <button type="button" id="btn-chart1-donut" class="px-2.5 py-1 rounded-lg text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white transition">Rasio Total</button>
+            <div class="bg-white p-5 rounded-2xl shadow-card border border-blue-100">
+              <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Terverifikasi</span>
+              <p id="stat-diverifikasi" class="font-display text-3xl font-bold text-blue-600 mt-2">0</p>
             </div>
-          </div>
-          <div class="relative h-64 sm:h-72 w-full flex items-center justify-center">
-            <canvas id="chart-ruas"></canvas>
-          </div>
-          <div id="chart1-summary" class="mt-3 pt-3 border-t border-slate-100 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-ink dark:text-slate-400">
-            <!-- Summary angka riil terisi dinamis -->
-          </div>
-        </div>
-
-        <!-- Grafik 2: Status & Penanganan Laporan Warga (Live dari laporan_warga) -->
-        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-card border border-slate-100 dark:border-white/10 flex flex-col justify-between">
-          <div class="flex items-center justify-between mb-3">
-            <div>
-              <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
-                <span class="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span> Laporan Warga (Live)
-              </span>
-              <h3 class="font-display text-base font-bold text-navy dark:text-white mt-0.5" id="chart2-title">Status Penanganan Laporan</h3>
+            <div class="bg-white p-5 rounded-2xl shadow-card border border-purple-100">
+              <span class="text-xs font-bold text-purple-600 uppercase tracking-wider">Diproses</span>
+              <p id="stat-diproses" class="font-display text-3xl font-bold text-purple-600 mt-2">0</p>
             </div>
-            <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
-              <button type="button" id="btn-chart2-status" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 text-navy dark:text-white shadow-sm transition">Status</button>
-              <button type="button" id="btn-chart2-kategori" class="px-2.5 py-1 rounded-lg text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white transition">Tingkat Rusak</button>
+            <div class="bg-white p-5 rounded-2xl shadow-card border border-emerald-100 col-span-2 lg:col-span-1">
+              <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Selesai</span>
+              <p id="stat-selesai" class="font-display text-3xl font-bold text-emerald-600 mt-2">0</p>
             </div>
           </div>
-          <div class="relative h-64 sm:h-72 w-full flex items-center justify-center">
-            <canvas id="chart-laporan"></canvas>
+        </section>
+
+        <!-- Bagian Grafik & Analisis Data Riil (100% Live dari Database) -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-5" id="section-charts">
+          <!-- Grafik 1: Kondisi Fisik Ruas Jalan per Kabupaten (Live dari ruas_jalan) -->
+          <div
+            class="bg-white p-5 sm:p-6 rounded-2xl shadow-card border border-slate-100 dark:border-white/10 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <span class="text-xs font-bold text-accent uppercase tracking-wider flex items-center gap-1.5">
+                  <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> Kondisi Fisik Ruas Jalan
+                  (Live)
+                </span>
+                <h3 class="font-display text-base font-bold text-navy dark:text-white mt-0.5" id="chart1-title">Kondisi
+                  Jalan per Wilayah</h3>
+              </div>
+              <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
+                <button type="button" id="btn-chart1-bar"
+                  class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 text-navy dark:text-white shadow-sm transition">Per
+                  Kabupaten (km)</button>
+                <button type="button" id="btn-chart1-donut"
+                  class="px-2.5 py-1 rounded-lg text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white transition">Rasio
+                  Total</button>
+              </div>
+            </div>
+            <div class="relative h-64 sm:h-72 w-full flex items-center justify-center">
+              <canvas id="chart-ruas"></canvas>
+            </div>
+            <div id="chart1-summary"
+              class="mt-3 pt-3 border-t border-slate-100 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-ink dark:text-slate-400">
+              <!-- Summary angka riil terisi dinamis -->
+            </div>
           </div>
-          <div id="chart2-summary" class="mt-3 pt-3 border-t border-slate-100 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-ink dark:text-slate-400">
-            <!-- Summary angka riil terisi dinamis -->
+
+          <!-- Grafik 2: Status & Penanganan Laporan Warga (Live dari laporan_warga) -->
+          <div
+            class="bg-white p-5 sm:p-6 rounded-2xl shadow-card border border-slate-100 dark:border-white/10 flex flex-col justify-between">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <span
+                  class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span class="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span> Laporan Warga (Live)
+                </span>
+                <h3 class="font-display text-base font-bold text-navy dark:text-white mt-0.5" id="chart2-title">Status
+                  Penanganan Laporan</h3>
+              </div>
+              <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
+                <button type="button" id="btn-chart2-status"
+                  class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 text-navy dark:text-white shadow-sm transition">Status</button>
+                <button type="button" id="btn-chart2-kategori"
+                  class="px-2.5 py-1 rounded-lg text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white transition">Tingkat
+                  Rusak</button>
+              </div>
+            </div>
+            <div class="relative h-64 sm:h-72 w-full flex items-center justify-center">
+              <canvas id="chart-laporan"></canvas>
+            </div>
+            <div id="chart2-summary"
+              class="mt-3 pt-3 border-t border-slate-100 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-ink dark:text-slate-400">
+              <!-- Summary angka riil terisi dinamis -->
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- Filter dan Pencarian -->
-      <section class="bg-white p-5 rounded-2xl shadow-card border border-slate-100 flex flex-col md:flex-row gap-4 justify-between items-center">
-        <!-- Filter Tabs Status -->
-        <div class="flex flex-wrap items-center gap-1.5 w-full md:w-auto" id="filter-status-buttons">
-          <button data-status="all" class="filter-tab-btn rounded-xl px-3.5 py-2 text-xs font-bold transition bg-navy text-white">Semua</button>
-          <button data-status="baru" class="filter-tab-btn rounded-xl px-3.5 py-2 text-xs font-bold transition bg-slate-100 text-ink hover:bg-slate-200">Menunggu (Baru)</button>
-          <button data-status="diverifikasi" class="filter-tab-btn rounded-xl px-3.5 py-2 text-xs font-bold transition bg-slate-100 text-ink hover:bg-slate-200">Diverifikasi</button>
-          <button data-status="diproses" class="filter-tab-btn rounded-xl px-3.5 py-2 text-xs font-bold transition bg-slate-100 text-ink hover:bg-slate-200">Diproses</button>
-          <button data-status="selesai" class="filter-tab-btn rounded-xl px-3.5 py-2 text-xs font-bold transition bg-slate-100 text-ink hover:bg-slate-200">Selesai</button>
-        </div>
-
-        <!-- Search input & Action Sync -->
-        <div class="flex flex-col sm:flex-row items-center gap-2.5 w-full md:w-auto">
-          <div class="relative w-full sm:w-64">
-            <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"></i>
-            <input type="text" id="input-search" placeholder="Cari pelapor atau deskripsi..." class="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 py-2 text-xs text-navy outline-none focus:border-accent focus:bg-white focus:ring-2 focus:ring-accent/20 transition" />
+        <!-- Filter dan Pencarian -->
+        <section
+          class="bg-white p-5 rounded-2xl shadow-card border border-slate-100 flex flex-col md:flex-row gap-4 justify-between items-center">
+          <!-- Filter Tabs Status -->
+          <div class="flex flex-wrap items-center gap-1.5 w-full md:w-auto" id="filter-status-buttons">
+            <button data-status="all"
+              class="filter-tab-btn rounded-xl px-3.5 py-2 text-xs font-bold transition bg-navy text-white">Semua</button>
+            <button data-status="baru"
+              class="filter-tab-btn rounded-xl px-3.5 py-2 text-xs font-bold transition bg-slate-100 text-ink hover:bg-slate-200">Menunggu
+              (Baru)</button>
+            <button data-status="diverifikasi"
+              class="filter-tab-btn rounded-xl px-3.5 py-2 text-xs font-bold transition bg-slate-100 text-ink hover:bg-slate-200">Diverifikasi</button>
+            <button data-status="diproses"
+              class="filter-tab-btn rounded-xl px-3.5 py-2 text-xs font-bold transition bg-slate-100 text-ink hover:bg-slate-200">Diproses</button>
+            <button data-status="selesai"
+              class="filter-tab-btn rounded-xl px-3.5 py-2 text-xs font-bold transition bg-slate-100 text-ink hover:bg-slate-200">Selesai</button>
           </div>
-          <button id="btn-manage-ruas" class="w-full sm:w-auto rounded-xl px-3.5 py-2 text-xs font-bold transition bg-navy hover:bg-navy/90 text-white flex items-center justify-center gap-1.5 shrink-0" title="Kelola atau perbarui kondisi dasar ruas hasil survei/perbaikan">
-            <i data-lucide="clipboard-check" class="h-3.5 w-3.5 text-good"></i> Survei Kondisi Ruas
-          </button>
-          <button id="btn-sync-ruas" class="w-full sm:w-auto rounded-xl px-3.5 py-2 text-xs font-bold transition bg-amber-50 hover:bg-amber-100 text-amber-800 dark:bg-amber-500/10 dark:text-amber-300 dark:hover:bg-amber-500/20 border border-amber-300/60 dark:border-amber-500/30 flex items-center justify-center gap-1.5 shrink-0" title="Hitung ulang kondisi ruas jalan dari laporan terverifikasi">
-            <i data-lucide="refresh-cw" class="h-3.5 w-3.5"></i> Hitung Ulang Kondisi
-          </button>
-        </div>
-      </section>
 
-      <!-- Daftar Laporan -->
-      <section>
-        <div id="reports-container" class="space-y-4">
-          <!-- Item laporan di-render dinamis -->
-        </div>
+          <!-- Search input & Action Sync -->
+          <div class="flex flex-col sm:flex-row items-center gap-2.5 w-full md:w-auto">
+            <div class="relative w-full sm:w-64">
+              <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"></i>
+              <input type="text" id="input-search" placeholder="Cari pelapor atau deskripsi..."
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 py-2 text-xs text-navy outline-none focus:border-accent focus:bg-white focus:ring-2 focus:ring-accent/20 transition" />
+            </div>
+            <button id="btn-manage-ruas"
+              class="w-full sm:w-auto rounded-xl px-3.5 py-2 text-xs font-bold transition bg-navy hover:bg-navy/90 text-white flex items-center justify-center gap-1.5 shrink-0"
+              title="Kelola atau perbarui kondisi dasar ruas hasil survei/perbaikan">
+              <i data-lucide="clipboard-check" class="h-3.5 w-3.5 text-good"></i> Survei Kondisi Ruas
+            </button>
+            <button id="btn-sync-ruas"
+              class="w-full sm:w-auto rounded-xl px-3.5 py-2 text-xs font-bold transition bg-amber-50 hover:bg-amber-100 text-amber-800 dark:bg-amber-500/10 dark:text-amber-300 dark:hover:bg-amber-500/20 border border-amber-300/60 dark:border-amber-500/30 flex items-center justify-center gap-1.5 shrink-0"
+              title="Hitung ulang kondisi ruas jalan dari laporan terverifikasi">
+              <i data-lucide="refresh-cw" class="h-3.5 w-3.5"></i> Hitung Ulang Kondisi
+            </button>
+          </div>
+        </section>
 
-        <div id="reports-empty" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-card">
-          <i data-lucide="inbox" class="h-10 w-10 text-slate-300 mx-auto mb-3"></i>
-          <p class="font-bold text-navy text-base">Tidak ada laporan ditemukan</p>
-          <p class="text-xs text-ink mt-1">Coba sesuaikan filter status atau kata kunci pencarian Anda.</p>
-        </div>
-      </section>
+        <!-- Daftar Laporan -->
+        <section>
+          <div id="reports-container" class="space-y-4">
+            <!-- Item laporan di-render dinamis -->
+          </div>
+
+          <div id="reports-empty"
+            class="hidden text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-card">
+            <i data-lucide="inbox" class="h-10 w-10 text-slate-300 mx-auto mb-3"></i>
+            <p class="font-bold text-navy text-base">Tidak ada laporan ditemukan</p>
+            <p class="text-xs text-ink mt-1">Coba sesuaikan filter status atau kata kunci pencarian Anda.</p>
+          </div>
+        </section>
       </div> <!-- Akhir VIEW 1: view-reports-analytics -->
 
       <!-- VIEW 2: Database Editor (Supabase Data Manager) -->
@@ -261,32 +363,43 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div class="flex items-center gap-2">
-              <span class="rounded-lg bg-accent/20 px-2 py-0.5 text-[11px] font-bold text-accent uppercase tracking-wider">Direct DB Access</span>
-              <h1 class="font-display text-2xl sm:text-3xl font-bold text-navy dark:text-white">Supabase Database Editor</h1>
+              <span
+                class="rounded-lg bg-accent/20 px-2 py-0.5 text-[11px] font-bold text-accent uppercase tracking-wider">Direct
+                DB Access</span>
+              <h1 class="font-display text-2xl sm:text-3xl font-bold text-navy dark:text-white">Supabase Database Editor
+              </h1>
             </div>
-            <p class="text-sm text-ink dark:text-slate-400 mt-1">Kelola data tabel Supabase (Admins, Laporan, Ruas Jalan) langsung dari sini tanpa perlu membuka console web Supabase.</p>
+            <p class="text-sm text-ink dark:text-slate-400 mt-1">Kelola data tabel Supabase (Admins, Laporan, Ruas
+              Jalan) langsung dari sini tanpa perlu membuka console web Supabase.</p>
           </div>
-          <button id="btn-refresh-db" type="button" class="self-start sm:self-auto rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-bold text-navy dark:text-white shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition flex items-center gap-2">
+          <button id="btn-refresh-db" type="button"
+            class="self-start sm:self-auto rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-bold text-navy dark:text-white shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition flex items-center gap-2">
             <i data-lucide="refresh-cw" class="h-4 w-4"></i> Segarkan Data DB
           </button>
         </div>
 
         <!-- Sub-tab Navigasi Tabel -->
         <div class="flex flex-wrap items-center gap-2 bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-2xl w-fit">
-          <button id="subtab-btn-admins" type="button" class="db-subtab-btn rounded-xl px-4 py-2 text-xs font-bold transition bg-white text-navy dark:bg-slate-700 dark:text-white shadow-sm flex items-center gap-1.5">
+          <button id="subtab-btn-admins" type="button"
+            class="db-subtab-btn rounded-xl px-4 py-2 text-xs font-bold transition bg-white text-navy dark:bg-slate-700 dark:text-white shadow-sm flex items-center gap-1.5">
             <i data-lucide="shield-check" class="h-4 w-4 text-accent"></i>
             <span>Akun Admin (admins)</span>
-            <span id="badge-count-admins" class="ml-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-extrabold text-navy dark:text-white">...</span>
+            <span id="badge-count-admins"
+              class="ml-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[10px] font-extrabold text-navy dark:text-white">...</span>
           </button>
-          <button id="subtab-btn-laporan" type="button" class="db-subtab-btn rounded-xl px-4 py-2 text-xs font-bold transition text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white flex items-center gap-1.5">
+          <button id="subtab-btn-laporan" type="button"
+            class="db-subtab-btn rounded-xl px-4 py-2 text-xs font-bold transition text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white flex items-center gap-1.5">
             <i data-lucide="file-text" class="h-4 w-4 text-blue-500"></i>
             <span>Laporan Warga (laporan_warga)</span>
-            <span id="badge-count-laporan" class="ml-1 rounded-full bg-slate-200 dark:bg-slate-700 px-2 py-0.5 text-[10px] font-extrabold text-ink dark:text-slate-300">...</span>
+            <span id="badge-count-laporan"
+              class="ml-1 rounded-full bg-slate-200 dark:bg-slate-700 px-2 py-0.5 text-[10px] font-extrabold text-ink dark:text-slate-300">...</span>
           </button>
-          <button id="subtab-btn-ruas" type="button" class="db-subtab-btn rounded-xl px-4 py-2 text-xs font-bold transition text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white flex items-center gap-1.5">
+          <button id="subtab-btn-ruas" type="button"
+            class="db-subtab-btn rounded-xl px-4 py-2 text-xs font-bold transition text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white flex items-center gap-1.5">
             <i data-lucide="map-pin" class="h-4 w-4 text-emerald-500"></i>
             <span>Ruas Jalan (ruas_jalan)</span>
-            <span id="badge-count-ruas" class="ml-1 rounded-full bg-slate-200 dark:bg-slate-700 px-2 py-0.5 text-[10px] font-extrabold text-ink dark:text-slate-300">...</span>
+            <span id="badge-count-ruas"
+              class="ml-1 rounded-full bg-slate-200 dark:bg-slate-700 px-2 py-0.5 text-[10px] font-extrabold text-ink dark:text-slate-300">...</span>
           </button>
         </div>
 
@@ -299,15 +412,19 @@
               <h3 class="font-display text-base font-bold text-navy dark:text-white">Tambah Administrator Baru</h3>
             </div>
             <p class="text-xs text-ink dark:text-slate-400 mb-4 leading-relaxed">
-              Daftarkan email pengguna agar memiliki hak akses penuh ke portal admin. 
-              <span class="text-accent font-semibold">Catatan:</span> Pengguna harus sudah pernah mendaftar/login di JalanKitta agar akunnya ada di sistem autentikasi Supabase.
+              Daftarkan email pengguna agar memiliki hak akses penuh ke portal admin.
+              <span class="text-accent font-semibold">Catatan:</span> Pengguna harus sudah pernah mendaftar/login di
+              JalanKitta agar akunnya ada di sistem autentikasi Supabase.
             </p>
             <form id="form-add-admin" class="flex flex-col sm:flex-row gap-3">
               <div class="relative flex-1">
                 <i data-lucide="mail" class="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"></i>
-                <input type="email" id="input-new-admin-email" required placeholder="Masukkan email pengguna (contoh: rekan_admin@instansi.go.id)" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 pl-10 pr-4 py-2.5 text-xs text-navy dark:text-white outline-none focus:border-accent focus:bg-white dark:focus:bg-slate-900 transition" />
+                <input type="email" id="input-new-admin-email" required
+                  placeholder="Masukkan email pengguna (contoh: rekan_admin@instansi.go.id)"
+                  class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 pl-10 pr-4 py-2.5 text-xs text-navy dark:text-white outline-none focus:border-accent focus:bg-white dark:focus:bg-slate-900 transition" />
               </div>
-              <button type="submit" id="btn-submit-add-admin" class="rounded-xl bg-navy dark:bg-amber-500 hover:bg-navy/90 dark:hover:bg-amber-400 text-white dark:text-slate-900 font-bold px-5 py-2.5 text-xs transition flex items-center justify-center gap-2 shadow-sm shrink-0">
+              <button type="submit" id="btn-submit-add-admin"
+                class="rounded-xl bg-navy dark:bg-amber-500 hover:bg-navy/90 dark:hover:bg-amber-400 text-white dark:text-slate-900 font-bold px-5 py-2.5 text-xs transition flex items-center justify-center gap-2 shadow-sm shrink-0">
                 <i data-lucide="plus" class="h-4 w-4"></i> Tambah Hak Admin
               </button>
             </form>
@@ -318,13 +435,16 @@
           <div class="bg-white rounded-2xl shadow-card border border-slate-100 dark:border-white/10 overflow-hidden">
             <div class="p-5 border-b border-slate-100 dark:border-white/10 flex items-center justify-between">
               <div>
-                <h3 class="font-display text-base font-bold text-navy dark:text-white">Daftar Akun Administrator Aktif</h3>
-                <p class="text-xs text-ink dark:text-slate-400 mt-0.5">Akun-akun berikut memiliki izin penuh mengelola seluruh data sistem.</p>
+                <h3 class="font-display text-base font-bold text-navy dark:text-white">Daftar Akun Administrator Aktif
+                </h3>
+                <p class="text-xs text-ink dark:text-slate-400 mt-0.5">Akun-akun berikut memiliki izin penuh mengelola
+                  seluruh data sistem.</p>
               </div>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 dark:bg-slate-800/60 text-ink dark:text-slate-400 uppercase font-bold tracking-wider text-[10px]">
+                <thead
+                  class="bg-slate-50 dark:bg-slate-800/60 text-ink dark:text-slate-400 uppercase font-bold tracking-wider text-[10px]">
                   <tr>
                     <th class="py-3 px-5">Pengguna</th>
                     <th class="py-3 px-5">User ID (UUID)</th>
@@ -335,7 +455,9 @@
                 <tbody id="tbody-admins" class="divide-y divide-slate-100 dark:divide-white/5">
                   <tr>
                     <td colspan="4" class="py-8 text-center text-ink dark:text-slate-400">
-                      <div class="inline-block h-6 w-6 animate-spin rounded-full border-2 border-accent border-r-transparent mb-2"></div>
+                      <div
+                        class="inline-block h-6 w-6 animate-spin rounded-full border-2 border-accent border-r-transparent mb-2">
+                      </div>
                       <p>Memuat daftar admin...</p>
                     </td>
                   </tr>
@@ -347,20 +469,24 @@
 
         <!-- ================= SUB-PANEL 2: LAPORAN WARGA ================= -->
         <div id="panel-db-laporan" class="hidden space-y-4">
-          <div class="bg-white p-5 rounded-2xl shadow-card border border-slate-100 dark:border-white/10 flex flex-col md:flex-row gap-3 items-center justify-between">
+          <div
+            class="bg-white p-5 rounded-2xl shadow-card border border-slate-100 dark:border-white/10 flex flex-col md:flex-row gap-3 items-center justify-between">
             <div class="relative w-full md:w-80">
               <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400"></i>
-              <input type="text" id="input-search-db-laporan" placeholder="Cari nama, ID, deskripsi..." class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 pl-9 pr-3 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent transition" />
+              <input type="text" id="input-search-db-laporan" placeholder="Cari nama, ID, deskripsi..."
+                class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 pl-9 pr-3 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent transition" />
             </div>
             <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-              <select id="select-filter-db-status" class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-bold text-navy dark:text-white outline-none focus:border-accent">
+              <select id="select-filter-db-status"
+                class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-bold text-navy dark:text-white outline-none focus:border-accent">
                 <option value="all">Semua Status</option>
                 <option value="baru">Menunggu (Baru)</option>
                 <option value="diverifikasi">Diverifikasi</option>
                 <option value="diproses">Diproses</option>
                 <option value="selesai">Selesai</option>
               </select>
-              <select id="select-filter-db-kategori" class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-bold text-navy dark:text-white outline-none focus:border-accent">
+              <select id="select-filter-db-kategori"
+                class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-bold text-navy dark:text-white outline-none focus:border-accent">
                 <option value="all">Semua Kategori</option>
                 <option value="berat">Rusak Berat</option>
                 <option value="ringan">Rusak Ringan</option>
@@ -372,7 +498,8 @@
           <div class="bg-white rounded-2xl shadow-card border border-slate-100 dark:border-white/10 overflow-hidden">
             <div class="overflow-x-auto max-h-[650px] overflow-y-auto">
               <table class="w-full text-left text-xs">
-                <thead class="sticky top-0 z-10 bg-slate-50 dark:bg-slate-800 text-ink dark:text-slate-400 uppercase font-bold tracking-wider text-[10px] shadow-sm">
+                <thead
+                  class="sticky top-0 z-10 bg-slate-50 dark:bg-slate-800 text-ink dark:text-slate-400 uppercase font-bold tracking-wider text-[10px] shadow-sm">
                   <tr>
                     <th class="py-3 px-4">ID & Foto</th>
                     <th class="py-3 px-4">Pelapor & Tanggal</th>
@@ -392,12 +519,15 @@
 
         <!-- ================= SUB-PANEL 3: RUAS JALAN ================= -->
         <div id="panel-db-ruas" class="hidden space-y-4">
-          <div class="bg-white p-5 rounded-2xl shadow-card border border-slate-100 dark:border-white/10 flex flex-col md:flex-row gap-3 items-center justify-between">
+          <div
+            class="bg-white p-5 rounded-2xl shadow-card border border-slate-100 dark:border-white/10 flex flex-col md:flex-row gap-3 items-center justify-between">
             <div class="relative w-full md:w-80">
               <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400"></i>
-              <input type="text" id="input-search-db-ruas" placeholder="Cari nama ruas atau kabupaten..." class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 pl-9 pr-3 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent transition" />
+              <input type="text" id="input-search-db-ruas" placeholder="Cari nama ruas atau kabupaten..."
+                class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 pl-9 pr-3 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent transition" />
             </div>
-            <button type="button" id="btn-open-add-ruas" class="rounded-xl bg-accent hover:brightness-110 text-white font-bold px-4 py-2 text-xs transition flex items-center gap-1.5 shrink-0 shadow-sm">
+            <button type="button" id="btn-open-add-ruas"
+              class="rounded-xl bg-accent hover:brightness-110 text-white font-bold px-4 py-2 text-xs transition flex items-center gap-1.5 shrink-0 shadow-sm">
               <i data-lucide="plus-circle" class="h-4 w-4"></i> Tambah Ruas Jalan
             </button>
           </div>
@@ -405,7 +535,8 @@
           <div class="bg-white rounded-2xl shadow-card border border-slate-100 dark:border-white/10 overflow-hidden">
             <div class="overflow-x-auto max-h-[650px] overflow-y-auto">
               <table class="w-full text-left text-xs">
-                <thead class="sticky top-0 z-10 bg-slate-50 dark:bg-slate-800 text-ink dark:text-slate-400 uppercase font-bold tracking-wider text-[10px] shadow-sm">
+                <thead
+                  class="sticky top-0 z-10 bg-slate-50 dark:bg-slate-800 text-ink dark:text-slate-400 uppercase font-bold tracking-wider text-[10px] shadow-sm">
                   <tr>
                     <th class="py-3 px-4">ID Ruas</th>
                     <th class="py-3 px-4">Nama Ruas Jalan</th>
@@ -429,7 +560,8 @@
   </main>
 
   <!-- Modal Lightbox Foto & Detail Triase AI -->
-  <div id="modal-foto" role="dialog" aria-modal="true" aria-labelledby="modal-foto-title" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center">
+  <div id="modal-foto" role="dialog" aria-modal="true" aria-labelledby="modal-foto-title"
+    class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center">
     <div class="relative max-w-4xl w-full bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
       <!-- Header Modal -->
       <div class="p-4 flex items-center justify-between border-b border-slate-100 shrink-0">
@@ -437,7 +569,8 @@
           <h3 id="modal-foto-title" class="text-sm font-bold text-navy truncate">Dokumentasi Kerusakan</h3>
           <p id="modal-foto-subtitle" class="text-xs text-ink truncate"></p>
         </div>
-        <button id="modal-foto-close" aria-label="Tutup jendela foto" class="rounded-lg p-1 text-ink hover:bg-slate-100 transition"><i data-lucide="x" class="h-5 w-5"></i></button>
+        <button id="modal-foto-close" aria-label="Tutup jendela foto"
+          class="rounded-lg p-1 text-ink hover:bg-slate-100 transition"><i data-lucide="x" class="h-5 w-5"></i></button>
       </div>
 
       <!-- Body Modal: Grid Foto + Panel Saran AI -->
@@ -445,17 +578,21 @@
         <!-- Kolom Foto dengan Bounding Box Overlay -->
         <div class="lg:col-span-7 flex flex-col items-center justify-center bg-slate-900 rounded-xl p-3 min-h-[280px]">
           <div id="modal-foto-stage" class="relative inline-block max-w-full max-h-[60vh]">
-            <img id="modal-foto-img" src="" alt="Foto Bukti" class="max-h-[60vh] w-auto max-w-full block object-contain rounded" />
+            <img id="modal-foto-img" src="" alt="Foto Bukti"
+              class="max-h-[60vh] w-auto max-w-full block object-contain rounded" />
             <!-- Overlay Bounding Boxes -->
             <div id="modal-foto-overlay" class="absolute inset-0 pointer-events-none"></div>
             <!-- Label Badge Overlay -->
-            <div id="modal-foto-overlay-badge" class="hidden absolute top-2 left-2 px-2.5 py-1 rounded-md bg-black/75 text-[10px] font-bold text-white tracking-wide uppercase backdrop-blur-sm pointer-events-none border border-white/20 shadow">
+            <div id="modal-foto-overlay-badge"
+              class="hidden absolute top-2 left-2 px-2.5 py-1 rounded-md bg-black/75 text-[10px] font-bold text-white tracking-wide uppercase backdrop-blur-sm pointer-events-none border border-white/20 shadow">
               Perkiraan AI, bukan pengukuran
             </div>
           </div>
           <div class="mt-2 flex flex-wrap items-center gap-3 text-[11px] text-slate-300">
-            <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-sm bg-rose-500 border border-rose-300"></span> Kotak Lubang</span>
-            <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-sm bg-cyan-400 border border-cyan-200"></span> Kotak Kertas A4</span>
+            <span class="flex items-center gap-1.5"><span
+                class="h-2.5 w-2.5 rounded-sm bg-rose-500 border border-rose-300"></span> Kotak Lubang</span>
+            <span class="flex items-center gap-1.5"><span
+                class="h-2.5 w-2.5 rounded-sm bg-cyan-400 border border-cyan-200"></span> Kotak Kertas A4</span>
           </div>
         </div>
 
@@ -479,12 +616,15 @@
             <div id="modal-ai-content" class="hidden space-y-3">
               <div>
                 <span class="text-[10px] font-semibold text-ink uppercase tracking-wider block">Kategori Saran AI</span>
-                <span id="modal-ai-kategori" class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold"></span>
+                <span id="modal-ai-kategori"
+                  class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold"></span>
               </div>
 
               <div>
                 <span class="text-[10px] font-semibold text-ink uppercase tracking-wider block">Deskripsi AI</span>
-                <p id="modal-ai-deskripsi" class="text-xs text-navy mt-1 leading-relaxed bg-white p-2.5 rounded-lg border border-slate-200/60"></p>
+                <p id="modal-ai-deskripsi"
+                  class="text-xs text-navy mt-1 leading-relaxed bg-white p-2.5 rounded-lg border border-slate-200/60">
+                </p>
               </div>
 
               <div class="grid grid-cols-2 gap-2 text-xs bg-white p-2.5 rounded-lg border border-slate-200/60">
@@ -510,17 +650,21 @@
             <span class="text-xs font-bold uppercase tracking-wider text-navy block">Keputusan Kategori Admin</span>
             <div>
               <label for="modal-select-kategori" class="text-xs text-ink block mb-1">Tingkat Kerusakan Laporan:</label>
-              <select id="modal-select-kategori" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-navy outline-none focus:border-accent">
+              <select id="modal-select-kategori"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-navy outline-none focus:border-accent">
                 <option value="ringan">Rusak Ringan</option>
                 <option value="berat">Rusak Berat</option>
+                <option value="baik">Kondisi Baik / Normal</option>
               </select>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-2 pt-1">
-              <button type="button" id="btn-modal-apply-ai" class="flex-1 rounded-xl px-3 py-2 text-xs font-bold transition border border-accent/40 bg-accent/10 text-accent hover:bg-accent/20 flex items-center justify-center gap-1.5">
+              <button type="button" id="btn-modal-apply-ai"
+                class="flex-1 rounded-xl px-3 py-2 text-xs font-bold transition border border-accent/40 bg-accent/10 text-accent hover:bg-accent/20 flex items-center justify-center gap-1.5">
                 <i data-lucide="sparkles" class="h-3.5 w-3.5"></i> Terapkan kategori saran
               </button>
-              <button type="button" id="btn-modal-save-kategori" class="rounded-xl px-4 py-2 text-xs font-bold text-white bg-navy hover:bg-navy/90 transition flex items-center justify-center gap-1.5">
+              <button type="button" id="btn-modal-save-kategori"
+                class="rounded-xl px-4 py-2 text-xs font-bold text-white bg-navy hover:bg-navy/90 transition flex items-center justify-center gap-1.5">
                 <i data-lucide="save" class="h-3.5 w-3.5"></i> Simpan
               </button>
             </div>
@@ -531,27 +675,36 @@
     </div>
   </div>
   <!-- Modal Kelola & Survei Kondisi Ruas Jalan -->
-  <div id="modal-ruas" role="dialog" aria-modal="true" aria-labelledby="modal-ruas-title" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center">
-    <div class="relative max-w-4xl w-full bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] border border-slate-200 dark:border-slate-800">
+  <div id="modal-ruas" role="dialog" aria-modal="true" aria-labelledby="modal-ruas-title"
+    class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center">
+    <div
+      class="relative max-w-4xl w-full bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] border border-slate-200 dark:border-slate-800">
       <div class="p-5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
         <div>
           <h3 id="modal-ruas-title" class="text-base font-extrabold text-navy dark:text-white flex items-center gap-2">
             <i data-lucide="clipboard-check" class="h-5 w-5 text-accent"></i> Survei & Kondisi Dasar Ruas Jalan
           </h3>
-          <p class="text-xs text-ink dark:text-slate-400 mt-0.5">Perbarui kondisi dasar ruas hasil survei dinas atau setelah pekerjaan perbaikan tuntas.</p>
+          <p class="text-xs text-ink dark:text-slate-400 mt-0.5">Perbarui kondisi dasar ruas hasil survei dinas atau
+            setelah pekerjaan perbaikan tuntas.</p>
         </div>
-        <button id="modal-ruas-close" aria-label="Tutup jendela survei ruas" class="rounded-xl p-2 text-ink dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"><i data-lucide="x" class="h-5 w-5"></i></button>
+        <button id="modal-ruas-close" aria-label="Tutup jendela survei ruas"
+          class="rounded-xl p-2 text-ink dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"><i
+            data-lucide="x" class="h-5 w-5"></i></button>
       </div>
 
-      <div class="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex flex-col sm:flex-row gap-3 items-center justify-between">
+      <div
+        class="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex flex-col sm:flex-row gap-3 items-center justify-between">
         <div class="relative w-full sm:w-72">
           <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400"></i>
-          <input type="text" id="input-search-ruas" placeholder="Cari nama atau kabupaten..." class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 pl-9 pr-3 py-1.5 text-xs text-navy dark:text-white outline-none focus:border-accent transition" />
+          <input type="text" id="input-search-ruas" placeholder="Cari nama atau kabupaten..."
+            class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 pl-9 pr-3 py-1.5 text-xs text-navy dark:text-white outline-none focus:border-accent transition" />
         </div>
-        <span class="text-xs text-ink dark:text-slate-400 font-medium">Total: <strong id="ruas-count" class="text-navy dark:text-white font-bold">0</strong> ruas terdaftar</span>
+        <span class="text-xs text-ink dark:text-slate-400 font-medium">Total: <strong id="ruas-count"
+            class="text-navy dark:text-white font-bold">0</strong> ruas terdaftar</span>
       </div>
 
-      <div class="p-5 overflow-y-auto space-y-3 divide-y divide-slate-100 dark:divide-slate-800/60" id="ruas-list-container">
+      <div class="p-5 overflow-y-auto space-y-3 divide-y divide-slate-100 dark:divide-slate-800/60"
+        id="ruas-list-container">
         <!-- Item ruas di-render dinamis -->
         <div class="text-center py-10">
           <div class="inline-block h-6 w-6 animate-spin rounded-full border-2 border-accent border-r-transparent"></div>
@@ -562,45 +715,63 @@
   </div>
 
   <!-- Modal Tambah / Edit Ruas Jalan -->
-  <div id="modal-edit-ruas" role="dialog" aria-modal="true" aria-labelledby="modal-edit-ruas-title" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center">
-    <div class="relative max-w-lg w-full bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col border border-slate-200 dark:border-slate-800">
+  <div id="modal-edit-ruas" role="dialog" aria-modal="true" aria-labelledby="modal-edit-ruas-title"
+    class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center">
+    <div
+      class="relative max-w-lg w-full bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col border border-slate-200 dark:border-slate-800">
       <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-        <h3 id="modal-edit-ruas-title" class="text-base font-extrabold text-navy dark:text-white flex items-center gap-2">
+        <h3 id="modal-edit-ruas-title"
+          class="text-base font-extrabold text-navy dark:text-white flex items-center gap-2">
           <i data-lucide="edit-3" class="h-5 w-5 text-accent"></i> <span>Edit Data Ruas Jalan</span>
         </h3>
-        <button id="modal-edit-ruas-close" aria-label="Tutup jendela edit ruas" class="rounded-xl p-2 text-ink dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"><i data-lucide="x" class="h-5 w-5"></i></button>
+        <button id="modal-edit-ruas-close" aria-label="Tutup jendela edit ruas"
+          class="rounded-xl p-2 text-ink dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition"><i
+            data-lucide="x" class="h-5 w-5"></i></button>
       </div>
       <form id="form-ruas" class="p-5 space-y-4">
         <input type="hidden" id="input-ruas-mode" value="add" />
         <div>
-          <label for="input-ruas-id" class="block text-xs font-bold text-navy dark:text-white mb-1">ID Ruas (Kode)</label>
-          <input type="text" id="input-ruas-id" required placeholder="Contoh: 18.01.001" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent" />
+          <label for="input-ruas-id" class="block text-xs font-bold text-navy dark:text-white mb-1">ID Ruas
+            (Kode)</label>
+          <input type="text" id="input-ruas-id" required placeholder="Contoh: 18.01.001"
+            class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent" />
         </div>
         <div>
-          <label for="input-ruas-nama" class="block text-xs font-bold text-navy dark:text-white mb-1">Nama Ruas Jalan</label>
-          <input type="text" id="input-ruas-nama" required maxlength="150" placeholder="Contoh: Jl. Lintas Sumatra KM 45" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent" />
+          <label for="input-ruas-nama" class="block text-xs font-bold text-navy dark:text-white mb-1">Nama Ruas
+            Jalan</label>
+          <input type="text" id="input-ruas-nama" required maxlength="150"
+            placeholder="Contoh: Jl. Lintas Sumatra KM 45"
+            class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent" />
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label for="input-ruas-kabupaten" class="block text-xs font-bold text-navy dark:text-white mb-1">Kabupaten / Kota</label>
-            <input type="text" id="input-ruas-kabupaten" required placeholder="Contoh: Lampung Selatan" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent" />
+            <label for="input-ruas-kabupaten" class="block text-xs font-bold text-navy dark:text-white mb-1">Kabupaten /
+              Kota</label>
+            <input type="text" id="input-ruas-kabupaten" required placeholder="Contoh: Lampung Selatan"
+              class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent" />
           </div>
           <div>
-            <label for="input-ruas-panjang" class="block text-xs font-bold text-navy dark:text-white mb-1">Panjang (KM)</label>
-            <input type="number" id="input-ruas-panjang" step="0.01" min="0" placeholder="Contoh: 12.50" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent" />
+            <label for="input-ruas-panjang" class="block text-xs font-bold text-navy dark:text-white mb-1">Panjang
+              (KM)</label>
+            <input type="number" id="input-ruas-panjang" step="0.01" min="0" placeholder="Contoh: 12.50"
+              class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2 text-xs text-navy dark:text-white outline-none focus:border-accent" />
           </div>
         </div>
         <div>
-          <label for="input-ruas-kondisi" class="block text-xs font-bold text-navy dark:text-white mb-1">Kondisi Dasar Awal</label>
-          <select id="input-ruas-kondisi" class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-xs font-bold text-navy dark:text-white outline-none focus:border-accent">
+          <label for="input-ruas-kondisi" class="block text-xs font-bold text-navy dark:text-white mb-1">Kondisi Dasar
+            Awal</label>
+          <select id="input-ruas-kondisi"
+            class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-xs font-bold text-navy dark:text-white outline-none focus:border-accent">
             <option value="baik">Kondisi Baik</option>
             <option value="ringan">Rusak Ringan</option>
             <option value="berat">Rusak Berat</option>
           </select>
         </div>
         <div class="flex items-center justify-end gap-2 pt-2">
-          <button type="button" id="btn-cancel-ruas" class="rounded-xl px-4 py-2 text-xs font-bold text-ink dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
-          <button type="submit" id="btn-save-ruas-form" class="rounded-xl bg-accent hover:brightness-110 text-white font-bold px-5 py-2 text-xs transition flex items-center gap-1.5 shadow-sm">
+          <button type="button" id="btn-cancel-ruas"
+            class="rounded-xl px-4 py-2 text-xs font-bold text-ink dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
+          <button type="submit" id="btn-save-ruas-form"
+            class="rounded-xl bg-accent hover:brightness-110 text-white font-bold px-5 py-2 text-xs transition flex items-center gap-1.5 shadow-sm">
             <i data-lucide="save" class="h-3.5 w-3.5"></i> Simpan ke Supabase
           </button>
         </div>
@@ -608,30 +779,192 @@
     </div>
   </div>
 
+  <!-- Modal Verifikasi & Input Panjang Kerusakan Ruas Jalan -->
+  <div id="modal-verifikasi-ruas" role="dialog" aria-modal="true" aria-labelledby="modal-verify-title"
+    class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center">
+    <div
+      class="relative max-w-lg w-full bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div
+            class="h-10 w-10 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center font-bold shrink-0">
+            <i data-lucide="check-check" class="h-5 w-5"></i>
+          </div>
+          <div>
+            <h3 id="modal-verify-title" class="text-base font-extrabold text-navy dark:text-white">Verifikasi &amp;
+              Terbitkan Garis Ruas</h3>
+            <p id="modal-verify-subtitle" class="text-xs text-ink dark:text-slate-400">Laporan #...</p>
+          </div>
+        </div>
+        <button type="button" id="btn-close-verify-modal"
+          class="rounded-xl p-1.5 text-ink dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          <i data-lucide="x" class="h-5 w-5"></i>
+        </button>
+      </div>
+
+      <form id="form-verify-ruas" class="mt-4 space-y-4">
+        <input type="hidden" id="verify-report-id" />
+        <input type="hidden" id="verify-lat" />
+        <input type="hidden" id="verify-lng" />
+
+        <!-- Info Koordinat & Lokasi -->
+        <div
+          class="rounded-2xl bg-slate-50 dark:bg-slate-800/60 p-3.5 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs">
+          <div>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">Koordinat Titik
+              Kerusakan</span>
+            <span id="verify-coord-display" class="font-mono font-bold text-navy dark:text-white mt-0.5 block">-5.40,
+              105.26</span>
+          </div>
+          <span
+            class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+            Pelapor: <span id="verify-pelapor-name">Warga</span>
+          </span>
+        </div>
+
+        <!-- Nama Ruas / Gang -->
+        <div>
+          <label for="verify-nama-ruas" class="block text-xs font-bold text-navy dark:text-white mb-1">
+            Nama Jalan / Gang <span class="text-rose-500">*</span>
+          </label>
+          <input type="text" id="verify-nama-ruas" required maxlength="150"
+            placeholder="Contoh: Jl. Poros Dono Arum / Gang Mawar"
+            class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-xs text-navy dark:text-white outline-none focus:border-amber-500 transition" />
+          <p class="text-[10px] text-slate-400 mt-1">Nama ini akan menjadi label garis jalan di peta publik.</p>
+        </div>
+
+        <!-- Kabupaten / Kota & Kategori -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="verify-kabupaten" class="block text-xs font-bold text-navy dark:text-white mb-1">
+              Kabupaten / Wilayah <span class="text-rose-500">*</span>
+            </label>
+            <input type="text" id="verify-kabupaten" required placeholder="Contoh: Lampung Tengah"
+              class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-xs text-navy dark:text-white outline-none focus:border-amber-500 transition" />
+          </div>
+          <div>
+            <label for="verify-kategori" class="block text-xs font-bold text-navy dark:text-white mb-1">
+              Tingkat Kerusakan <span class="text-rose-500">*</span>
+            </label>
+            <select id="verify-kategori"
+              class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2.5 text-xs font-bold text-navy dark:text-white outline-none focus:border-amber-500 transition">
+              <option value="berat">Rusak Berat (Garis Merah)</option>
+              <option value="ringan">Rusak Ringan (Garis Oranye)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Banner Deteksi Jalur Ditandai Warga (Multi-titik) -->
+        <div id="verify-jalur-warga-badge"
+          class="hidden rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-800 dark:text-emerald-300 flex items-center gap-2.5">
+          <div
+            class="h-8 w-8 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <i data-lucide="route" class="h-4 w-4"></i>
+          </div>
+          <div class="flex-1">
+            <span class="font-bold block">Jalur Nyata Ditandai Warga</span>
+            <span id="verify-jalur-warga-text" class="text-[11px] text-emerald-700/80 dark:text-emerald-300/80">Warga
+              menandai titik awal &amp; akhir kerusakan jalan.</span>
+          </div>
+        </div>
+
+        <!-- Input Panjang Kerusakan -->
+        <div class="rounded-2xl border border-amber-500/20 bg-amber-500/5 dark:bg-amber-500/10 p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <label for="verify-panjang-val"
+              class="text-xs font-bold text-navy dark:text-white flex items-center gap-1.5">
+              <i data-lucide="ruler" class="h-4 w-4 text-amber-500"></i> Panjang Jalan Rusak
+            </label>
+            <span class="text-[11px] font-bold text-amber-600 dark:text-amber-400" id="verify-panjang-summary">Estimasi:
+              100 Meter (0.10 KM)</span>
+          </div>
+
+          <div class="flex gap-2">
+            <input type="number" id="verify-panjang-val" min="5" step="1" value="100" required
+              class="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-xs font-bold text-navy dark:text-white outline-none focus:border-amber-500 transition" />
+            <select id="verify-panjang-unit"
+              class="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-xs font-bold text-navy dark:text-white outline-none focus:border-amber-500 transition">
+              <option value="m">Meter (m)</option>
+              <option value="km">Kilometer (km)</option>
+            </select>
+          </div>
+
+          <!-- Quick Presets -->
+          <div class="flex flex-wrap items-center gap-1.5 pt-1">
+            <span class="text-[10px] text-slate-400 mr-1">Preset Cepat:</span>
+            <button type="button"
+              class="btn-preset-panjang px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-navy dark:text-white hover:border-amber-500 transition"
+              data-val="50" data-unit="m">50 m</button>
+            <button type="button"
+              class="btn-preset-panjang px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-navy dark:text-white hover:border-amber-500 transition"
+              data-val="100" data-unit="m">100 m</button>
+            <button type="button"
+              class="btn-preset-panjang px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-navy dark:text-white hover:border-amber-500 transition"
+              data-val="250" data-unit="m">250 m</button>
+            <button type="button"
+              class="btn-preset-panjang px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-navy dark:text-white hover:border-amber-500 transition"
+              data-val="500" data-unit="m">500 m</button>
+            <button type="button"
+              class="btn-preset-panjang px-2.5 py-1 rounded-lg text-[10px] font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-navy dark:text-white hover:border-amber-500 transition"
+              data-val="1" data-unit="km">1 km</button>
+          </div>
+        </div>
+
+        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+          ✨ <span class="font-bold text-navy dark:text-white">Otomatisasi Garis:</span> Sistem otomatis meng-generate
+          geometri garis jalan sepanjang jarak ini dan menyimpannya ke database <code
+            class="text-[10px] bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded">ruas_jalan</code> agar langsung
+          tampil sebagai garis di peta publik.
+        </p>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <button type="button" id="btn-cancel-verify"
+            class="rounded-xl px-4 py-2 text-xs font-bold text-ink dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Batal</button>
+          <button type="submit" id="btn-submit-verify-ruas"
+            class="rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold px-5 py-2 text-xs transition flex items-center gap-2 shadow-md">
+            <i data-lucide="sparkles" class="h-4 w-4"></i> Verifikasi &amp; Buat Garis Peta
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Modal Konfirmasi Universal (Aman untuk Hapus) -->
-  <div id="modal-confirm" role="dialog" aria-modal="true" aria-labelledby="modal-confirm-title" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center">
-    <div class="relative max-w-sm w-full bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800 text-center">
+  <div id="modal-confirm" role="dialog" aria-modal="true" aria-labelledby="modal-confirm-title"
+    class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center">
+    <div
+      class="relative max-w-sm w-full bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800 text-center">
       <div class="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-rose-500/10 text-rose-500 mb-4">
         <i data-lucide="alert-triangle" class="h-7 w-7"></i>
       </div>
-      <h3 id="modal-confirm-title" class="text-base font-extrabold text-navy dark:text-white">Konfirmasi Penghapusan</h3>
-      <p id="modal-confirm-desc" class="text-xs text-ink dark:text-slate-400 mt-2 leading-relaxed">Apakah Anda yakin ingin menghapus data ini dari Supabase?</p>
+      <h3 id="modal-confirm-title" class="text-base font-extrabold text-navy dark:text-white">Konfirmasi Penghapusan
+      </h3>
+      <p id="modal-confirm-desc" class="text-xs text-ink dark:text-slate-400 mt-2 leading-relaxed">Apakah Anda yakin
+        ingin menghapus data ini dari Supabase?</p>
       <div class="mt-6 flex items-center justify-center gap-2.5">
-        <button type="button" id="btn-confirm-cancel" class="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-xs font-bold text-navy dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition">Batal</button>
-        <button type="button" id="btn-confirm-ok" class="flex-1 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2.5 text-xs transition shadow-sm">Hapus Sekarang</button>
+        <button type="button" id="btn-confirm-cancel"
+          class="flex-1 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-xs font-bold text-navy dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition">Batal</button>
+        <button type="button" id="btn-confirm-ok"
+          class="flex-1 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2.5 text-xs transition shadow-sm">Hapus
+          Sekarang</button>
       </div>
     </div>
   </div>
 
   <!-- Toast Notifikasi -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 hidden rounded-xl bg-navy text-white px-5 py-3.5 shadow-2xl text-sm font-bold flex items-center gap-3 transition-all duration-300">
+  <div id="toast"
+    class="fixed bottom-6 right-6 z-50 hidden rounded-xl bg-navy text-white px-5 py-3.5 shadow-2xl text-sm font-bold flex items-center gap-3 transition-all duration-300">
     <i data-lucide="check-circle" class="h-5 w-5 text-good"></i>
     <span id="toast-message">Status berhasil diperbarui!</span>
   </div>
 
   <!-- Script Supabase, Auth & Sanitizer -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js" integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js" integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"
+    integrity="sha384-Rj26LVGvoeRVR6+mwQmFfcR3QOBEwT+ZmuCWpuiqeTzJpCs0ER4ITAWGb4Hiy3Ok"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"
+    integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu"
+    crossorigin="anonymous"></script>
   <script src="assets/js/auth.js"></script>
   <script>
     (() => {
@@ -1081,14 +1414,14 @@
 
       window.addEventListener('jk-theme-change', renderCharts);
 
-      // Sanitasi XSS & URL Aman
-      const esc = (s = '') => {
-        const raw = String(s);
-        if (typeof window.DOMPurify !== 'undefined' && typeof window.DOMPurify.sanitize === 'function') {
-          return window.DOMPurify.sanitize(raw, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
-        }
-        return raw.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-      };
+      // Sanitasi XSS & URL Aman (Wajib meng-escape tanda kutip untuk atribut HTML)
+      const esc = (s = '') => String(s ?? '').replace(/[&<>"']/g, c => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[c]));
       const safeUrl = (u) => {
         try {
           const x = new URL(u);
@@ -1097,6 +1430,45 @@
           return null;
         }
       };
+
+      // Modal Konfirmasi Universal
+      const modalConfirm = $('#modal-confirm');
+      const btnConfirmCancel = $('#btn-confirm-cancel');
+      const btnConfirmOk = $('#btn-confirm-ok');
+      const modalConfirmTitle = $('#modal-confirm-title');
+      const modalConfirmDesc = $('#modal-confirm-desc');
+      let currentConfirmCallback = null;
+
+      function openConfirmModal(title, desc, onConfirm, btnText = 'Hapus Sekarang') {
+        if (!modalConfirm) return;
+        if (modalConfirmTitle) modalConfirmTitle.textContent = title;
+        if (modalConfirmDesc) modalConfirmDesc.textContent = desc;
+        if (btnConfirmOk) btnConfirmOk.textContent = btnText;
+        currentConfirmCallback = onConfirm;
+        modalConfirm.classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      btnConfirmCancel?.addEventListener('click', () => {
+        modalConfirm?.classList.add('hidden');
+        currentConfirmCallback = null;
+      });
+
+      modalConfirm?.addEventListener('click', (e) => {
+        if (e.target === modalConfirm) {
+          modalConfirm.classList.add('hidden');
+          currentConfirmCallback = null;
+        }
+      });
+
+      btnConfirmOk?.addEventListener('click', async () => {
+        if (typeof currentConfirmCallback === 'function') {
+          const cb = currentConfirmCallback;
+          currentConfirmCallback = null;
+          modalConfirm?.classList.add('hidden');
+          await cb();
+        }
+      });
 
       // Render Laporan
       function renderReports() {
@@ -1125,7 +1497,8 @@
           const lat = Number(r.koordinat_lat);
           const lng = Number(r.koordinat_lng);
           const namaSafe = esc(r.nama || 'Anonim');
-          const deskripsiSafe = esc(r.deskripsi || '-');
+          const cleanDesc = (r.deskripsi || '-').replace(/<!--jalur:.*?-->/g, '').trim();
+          const descSafe = esc(cleanDesc || '-');
           const idSafe = esc(r.id);
 
           return `
@@ -1152,7 +1525,7 @@
                   </div>
 
                   <h3 class="font-bold text-navy text-base truncate">${namaSafe}</h3>
-                  <p class="text-sm text-ink mt-1 leading-relaxed">${deskripsiSafe}</p>
+                  <p class="text-sm text-ink mt-1 leading-relaxed">${descSafe}</p>
 
                   <div class="mt-3 flex flex-wrap items-center gap-3 text-xs text-ink font-semibold">
                     <span class="flex items-center gap-1"><i data-lucide="map-pin" class="h-3.5 w-3.5 text-accent"></i> ${lat}, ${lng}</span>
@@ -1214,6 +1587,7 @@
 
           updateStats();
           renderReports();
+          renderDbLaporan();
           showToast(`Status laporan berhasil diubah menjadi "${STATUS_CONFIG[newStatus]?.label || newStatus}"`);
         } catch (err) {
           console.error('Update status error:', err);
@@ -1222,10 +1596,9 @@
       }
 
       // Handler Hapus / Arsipkan Laporan (soft-delete aman dengan pembebasan kuota foto & audit log)
-      async function deleteReport(reportId) {
+      async function executeDeleteReport(reportId) {
         const item = allReports.find(r => String(r.id) === String(reportId));
         if (!item) return;
-        if (!confirm(`Arsipkan/hapus laporan #${item.id}? Data tidak akan lagi ditampilkan di peta publik atau daftar aktif, dan file foto di storage akan dibersihkan untuk membebaskan kuota akun pelapor.`)) return;
         try {
           // 1. Soft-delete di database terlebih dahulu dengan mengisi deleted_at dan mengosongkan foto_url
           // Trigger trg_sinkron_kondisi_ruas otomatis menyinkronkan kondisi ruas terkait di server.
@@ -1249,6 +1622,7 @@
           allReports = allReports.filter(r => String(r.id) !== String(reportId));
           updateStats();
           renderReports();
+          renderDbLaporan();
           showToast(`Laporan #${item.id} berhasil diarsipkan dan kuota foto telah dibebaskan.`);
         } catch (err) {
           console.error('Delete report error:', err);
@@ -1256,13 +1630,335 @@
         }
       }
 
+      function deleteReport(reportId) {
+        const item = allReports.find(r => String(r.id) === String(reportId));
+        if (!item) return;
+        openConfirmModal(
+          'Arsipkan Laporan Warga',
+          `Arsipkan/hapus laporan #${item.id}? Data tidak akan lagi ditampilkan di peta publik atau daftar aktif, dan file foto di storage akan dibersihkan untuk membebaskan kuota akun pelapor.`,
+          () => executeDeleteReport(reportId),
+          'Ya, Arsipkan'
+        );
+      }
+
+      // =====================================================================
+      // FITUR VERIFIKASI & GENERATOR SEGMEN JALAN RUSAK (EQUITY UNTUK GANG/DESA)
+      // =====================================================================
+      const modalVerifyRuas = $('#modal-verifikasi-ruas');
+      const formVerifyRuas = $('#form-verify-ruas');
+      const inputVerifyPanjangVal = $('#verify-panjang-val');
+      const selectVerifyPanjangUnit = $('#verify-panjang-unit');
+      const summaryVerifyPanjang = $('#verify-panjang-summary');
+
+      let currentCitizenGeometry = null;
+
+      function haversineDistKm(lat1, lon1, lat2, lon2) {
+        const R = 6371; // km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) ** 2 +
+          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+          Math.sin(dLon / 2) ** 2;
+        return 2 * R * Math.asin(Math.sqrt(a));
+      }
+
+      function updatePanjangSummary() {
+        const rawVal = parseFloat(inputVerifyPanjangVal?.value || '');
+        const val = Number.isFinite(rawVal) && rawVal > 0 ? rawVal : 0;
+        const unit = selectVerifyPanjangUnit?.value || 'm';
+
+        if (inputVerifyPanjangVal) {
+          inputVerifyPanjangVal.min = unit === 'm' ? '5' : '0.005';
+          inputVerifyPanjangVal.step = unit === 'm' ? '1' : 'any';
+        }
+
+        let meter = 0, km = 0;
+        if (unit === 'm') {
+          meter = val;
+          km = val / 1000;
+        } else {
+          km = val;
+          meter = val * 1000;
+        }
+        if (summaryVerifyPanjang) {
+          summaryVerifyPanjang.textContent = val <= 0
+            ? 'Masukkan panjang jalan rusak yang valid'
+            : `Estimasi: ${meter.toLocaleString('id-ID')} Meter (${km.toFixed(2)} KM)`;
+        }
+      }
+
+      inputVerifyPanjangVal?.addEventListener('input', updatePanjangSummary);
+      selectVerifyPanjangUnit?.addEventListener('change', updatePanjangSummary);
+
+      $$('.btn-preset-panjang')?.forEach(btn => {
+        btn.addEventListener('click', () => {
+          if (selectVerifyPanjangUnit) selectVerifyPanjangUnit.value = btn.dataset.unit;
+          if (inputVerifyPanjangVal) inputVerifyPanjangVal.value = btn.dataset.val;
+          updatePanjangSummary();
+        });
+      });
+
+      const closeVerifyModal = () => {
+        modalVerifyRuas?.classList.add('hidden');
+        if (window._pendingVerifySelectReset) {
+          window._pendingVerifySelectReset();
+          window._pendingVerifySelectReset = null;
+        }
+      };
+      $('#btn-close-verify-modal')?.addEventListener('click', closeVerifyModal);
+      $('#btn-cancel-verify')?.addEventListener('click', closeVerifyModal);
+      modalVerifyRuas?.addEventListener('click', (e) => {
+        if (e.target === modalVerifyRuas) closeVerifyModal();
+      });
+
+      function openVerifyRuasModal(reportId) {
+        const r = allReports.find(item => String(item.id) === String(reportId));
+        if (!r) return;
+
+        $('#verify-report-id').value = r.id;
+        $('#verify-lat').value = r.koordinat_lat;
+        $('#verify-lng').value = r.koordinat_lng;
+        $('#modal-verify-subtitle').textContent = `Laporan #${r.id} • Dibuat oleh ${r.nama || 'Warga'}`;
+        $('#verify-coord-display').textContent = `${Number(r.koordinat_lat).toFixed(6)}, ${Number(r.koordinat_lng).toFixed(6)}`;
+        $('#verify-pelapor-name').textContent = r.nama || 'Warga';
+
+        // Deteksi atau tebak nama jalan / gang dari deskripsi atau ruas master
+        const existingRuas = allRuas.find(ru => String(ru.id) === String(r.ruas_id));
+        let defaultNama = '';
+        if (existingRuas && existingRuas.nama) {
+          defaultNama = existingRuas.nama;
+        } else {
+          // Cari pola nama jalan spesifik dengan kata depan Jl./Gang diikuti nama (bukan kata sifat kerusakan)
+          const namaMatch = (r.deskripsi || '').match(/(?:jl\.|jalan|gang|gg\.)\s+([A-Z0-9][a-zA-Z0-9\s.]{2,30})/i);
+          if (namaMatch && !/rusak|parah|lubang|hancur|amblas|banjir|aspal|becek/i.test(namaMatch[0])) {
+            defaultNama = namaMatch[0].trim();
+          } else {
+            defaultNama = `Jl. Lingkungan (Laporan #${r.id})`;
+          }
+        }
+        $('#verify-nama-ruas').value = defaultNama;
+
+        // Kabupaten
+        let defaultKab = 'Provinsi Lampung';
+        const desc = (r.deskripsi || '').toLowerCase();
+        if (existingRuas && existingRuas.kabupaten) {
+          defaultKab = existingRuas.kabupaten;
+        } else if (desc.includes('lampung tengah') || desc.includes('seputih') || desc.includes('dono arum')) {
+          defaultKab = 'Lampung Tengah';
+        } else if (desc.includes('pesawaran')) {
+          defaultKab = 'Pesawaran';
+        } else if (desc.includes('pringsewu')) {
+          defaultKab = 'Pringsewu';
+        } else if (desc.includes('lampung timur')) {
+          defaultKab = 'Lampung Timur';
+        } else if (desc.includes('bandar lampung')) {
+          defaultKab = 'Bandar Lampung';
+        }
+        $('#verify-kabupaten').value = defaultKab;
+
+        // Kategori tingkat kerusakan
+        $('#verify-kategori').value = (r.kategori_rusak === 'berat') ? 'berat' : 'ringan';
+
+        // Cek apakah warga menandai multi-titik jalur (<!--jalur:[[lng,lat],...]-->)
+        currentCitizenGeometry = null;
+        const jalurBadge = $('#verify-jalur-warga-badge');
+        const jalurText = $('#verify-jalur-warga-text');
+
+        const jalurMatch = (r.deskripsi || '').match(/<!--jalur:(.*?)-->/);
+        if (jalurMatch && jalurMatch[1]) {
+          try {
+            const rawCoords = JSON.parse(jalurMatch[1]);
+            const isValidCoordinates = Array.isArray(rawCoords) &&
+              rawCoords.length >= 2 &&
+              rawCoords.length <= 50 &&
+              rawCoords.every(pt =>
+                Array.isArray(pt) &&
+                pt.length >= 2 &&
+                typeof pt[0] === 'number' && Number.isFinite(pt[0]) && pt[0] >= -180 && pt[0] <= 180 &&
+                typeof pt[1] === 'number' && Number.isFinite(pt[1]) && pt[1] >= -90 && pt[1] <= 90
+              );
+
+            if (isValidCoordinates) {
+              const coords = rawCoords.map(pt => [Number(pt[0].toFixed(6)), Number(pt[1].toFixed(6))]);
+              currentCitizenGeometry = {
+                type: 'LineString',
+                coordinates: coords
+              };
+
+              let totalDistKm = 0;
+              for (let i = 0; i < coords.length - 1; i++) {
+                totalDistKm += haversineDistKm(coords[i][1], coords[i][0], coords[i + 1][1], coords[i + 1][0]);
+              }
+              const totalDistM = Math.round(totalDistKm * 1000);
+
+              if (selectVerifyPanjangUnit) selectVerifyPanjangUnit.value = totalDistM >= 1000 ? 'km' : 'm';
+              if (inputVerifyPanjangVal) inputVerifyPanjangVal.value = totalDistM >= 1000 ? (totalDistM / 1000).toFixed(2) : totalDistM;
+              updatePanjangSummary();
+
+              if (jalurBadge && jalurText) {
+                jalurBadge.classList.remove('hidden');
+                jalurText.textContent = `Warga menandai ${coords.length} titik (${totalDistM.toLocaleString('id-ID')} m). Garis nyata ini langsung digunakan ke peta!`;
+              }
+            } else {
+              jalurBadge?.classList.add('hidden');
+            }
+          } catch (err) {
+            console.warn('Gagal parse jalur warga:', err);
+            jalurBadge?.classList.add('hidden');
+          }
+        } else {
+          jalurBadge?.classList.add('hidden');
+          // Reset default panjang: 100 Meter
+          if (selectVerifyPanjangUnit) selectVerifyPanjangUnit.value = 'm';
+          if (inputVerifyPanjangVal) inputVerifyPanjangVal.value = '100';
+          updatePanjangSummary();
+        }
+
+        modalVerifyRuas?.classList.remove('hidden');
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      // Algoritma Generator Geometri Garis Jalan Spasial (OSRM & Smooth Linear Fallback)
+      async function generateRoadSegmentGeometry(lat, lng, lengthKm) {
+        const halfKm = Math.max(0.015, (lengthKm || 0.1) / 2);
+        const dLat = halfKm / 110.574;
+        const dLng = halfKm / (111.320 * Math.cos(lat * Math.PI / 180));
+
+        // 1. Coba routing OSRM agar garis mengikuti lekukan aspal jalan / gang nyata
+        try {
+          const pt1Lng = Number((lng - dLng).toFixed(6));
+          const pt1Lat = Number((lat - dLat * 0.35).toFixed(6));
+          const pt2Lng = Number((lng + dLng).toFixed(6));
+          const pt2Lat = Number((lat + dLat * 0.35).toFixed(6));
+
+          const url = `https://router.project-osrm.org/route/v1/driving/${pt1Lng},${pt1Lat};${Number(lng.toFixed(6))},${Number(lat.toFixed(6))};${pt2Lng},${pt2Lat}?overview=full&geometries=geojson`;
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 3500);
+          const res = await fetch(url, { signal: ctrl.signal });
+          clearTimeout(timer);
+
+          if (res.ok) {
+            const data = await res.json();
+            if (data.code === 'Ok' && data.routes?.[0]?.geometry?.coordinates?.length >= 2) {
+              return data.routes[0].geometry;
+            }
+          }
+        } catch (e) {
+          console.warn('OSRM routing fetch dilewati, menggunakan fallback garis segmen:', e);
+        }
+
+        // 2. Fallback Deterministik: Menghasilkan LineString 3-titik presisi sepanjang jarak
+        return {
+          type: 'LineString',
+          coordinates: [
+            [Number((lng - dLng).toFixed(6)), Number((lat - dLat * 0.25).toFixed(6))],
+            [Number(lng.toFixed(6)), Number(lat.toFixed(6))],
+            [Number((lng + dLng).toFixed(6)), Number((lat + dLat * 0.25).toFixed(6))]
+          ]
+        };
+      }
+
+      // Handler Submit Form Verifikasi & Pembuatan Garis Ruas
+      formVerifyRuas?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const reportId = $('#verify-report-id').value;
+        const lat = parseFloat($('#verify-lat').value);
+        const lng = parseFloat($('#verify-lng').value);
+        const namaRuas = ($('#verify-nama-ruas').value || '').trim();
+        const kabupaten = ($('#verify-kabupaten').value || '').trim() || 'Provinsi Lampung';
+        const kategori = $('#verify-kategori').value || 'berat';
+        const val = parseFloat($('#verify-panjang-val').value) || 100;
+        const unit = $('#verify-panjang-unit').value || 'm';
+        const lengthKm = unit === 'm' ? Number((val / 1000).toFixed(3)) : Number(val.toFixed(2));
+
+        const btn = $('#btn-submit-verify-ruas');
+        const origHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i data-lucide="loader-2" class="h-4 w-4 animate-spin"></i> Menghasilkan Garis Ruas...';
+
+        try {
+          // 1. Dapatkan geometri garis jalan: gunakan jalur nyata yang ditandai warga jika ada, atau generate OSRM/linear
+          let geom = null;
+          if (currentCitizenGeometry && Array.isArray(currentCitizenGeometry.coordinates) && currentCitizenGeometry.coordinates.length >= 2) {
+            geom = currentCitizenGeometry;
+          } else {
+            geom = await generateRoadSegmentGeometry(lat, lng, lengthKm);
+          }
+
+          // 2. Tentukan ID Ruas yang rapi (pertahankan jika laporan sudah terhubung ke ruas resmi)
+          const rep = allReports.find(r => String(r.id) === String(reportId));
+          const existingRuas = rep?.ruas_id ? allRuas.find(ru => String(ru.id) === String(rep.ruas_id)) : null;
+          const ruasId = existingRuas ? existingRuas.id : (rep?.ruas_id || `R-LAP-${reportId}`);
+
+          // 3. Simpan/Upsert ke tabel ruas_jalan di Supabase
+          const ruasPayload = {
+            id: ruasId,
+            nama: namaRuas,
+            kabupaten: kabupaten,
+            kondisi_dasar: existingRuas?.kondisi_dasar || 'baik',
+            kondisi: kategori,
+            panjang_km: (existingRuas && !currentCitizenGeometry) ? (existingRuas.panjang_km || lengthKm) : lengthKm,
+            geometry: (existingRuas && !currentCitizenGeometry && existingRuas.geometry) ? existingRuas.geometry : geom,
+            updated_at: new Date().toISOString()
+          };
+
+          const { error: ruasErr } = await db.from('ruas_jalan').upsert(ruasPayload);
+          if (ruasErr) throw ruasErr;
+
+          // 4. Update status dan kaitkan ruas_id di laporan_warga
+          const { error: lapErr } = await db.from('laporan_warga').update({
+            status: 'diverifikasi',
+            kategori_rusak: kategori,
+            ruas_id: ruasId,
+            status_changed_at: new Date().toISOString()
+          }).eq('id', reportId);
+          if (lapErr) throw lapErr;
+
+          // 5. Update data lokal di admin.html
+          if (rep) {
+            rep.status = 'diverifikasi';
+            rep.kategori_rusak = kategori;
+            rep.ruas_id = ruasId;
+          }
+
+          // Perbarui allRuas di memori
+          const existingIdx = allRuas.findIndex(r => String(r.id) === String(ruasId));
+          if (existingIdx >= 0) allRuas[existingIdx] = ruasPayload;
+          else allRuas.unshift(ruasPayload);
+
+          // 6. Tutup modal & perbarui seluruh tampilan UI
+          modalVerifyRuas?.classList.add('hidden');
+          window._pendingVerifySelectReset = null;
+          updateStats();
+          renderReports();
+          renderDbLaporan();
+          renderDbRuas();
+          renderRuasList();
+          renderCharts();
+
+          const panjangDisplay = unit === 'm' ? `${val} Meter` : `${val} KM`;
+          showToast(`Laporan #${reportId} diverifikasi! Garis jalan rusak (${panjangDisplay}) berhasil dibuat & terbit di peta.`);
+        } catch (err) {
+          console.error('Gagal verifikasi ruas:', err);
+          alert('Gagal memverifikasi dan membuat garis jalan: ' + (err.message || err));
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
+          if (window.lucide) window.lucide.createIcons();
+        }
+      });
+
       // Event Delegation untuk tombol status dan modal foto
       $('#reports-container').addEventListener('click', (e) => {
         const btnStatus = e.target.closest('.btn-update-status');
         if (btnStatus) {
           const id = btnStatus.dataset.id;
           const newStatus = btnStatus.dataset.newStatus;
-          updateReportStatus(id, newStatus);
+          if (newStatus === 'diverifikasi') {
+            openVerifyRuasModal(id);
+          } else {
+            updateReportStatus(id, newStatus);
+          }
           return;
         }
 
@@ -1462,8 +2158,8 @@
         currentFilterStatus = btn.dataset.status;
         $$('.filter-tab-btn').forEach(b => {
           const active = b === btn;
-          b.className = active 
-            ? 'filter-tab-btn rounded-xl px-3.5 py-2 text-xs font-bold transition bg-navy text-white' 
+          b.className = active
+            ? 'filter-tab-btn rounded-xl px-3.5 py-2 text-xs font-bold transition bg-navy text-white'
             : 'filter-tab-btn rounded-xl px-3.5 py-2 text-xs font-bold transition bg-slate-100 text-ink hover:bg-slate-200';
         });
         renderReports();
@@ -1504,7 +2200,7 @@
           container.innerHTML = `
             <div class="text-center py-8 text-major">
               <p class="font-bold text-sm">Gagal memuat daftar ruas jalan</p>
-              <p class="text-xs text-slate-500 mt-1">${err.message || err}</p>
+              <p class="text-xs text-slate-500 mt-1">${esc(err.message || err)}</p>
             </div>
           `;
         }
@@ -1513,8 +2209,8 @@
       function renderRuasList() {
         const container = $('#ruas-list-container');
         const q = searchRuasQuery.toLowerCase();
-        const filtered = allRuas.filter(r => 
-          (r.nama || '').toLowerCase().includes(q) || 
+        const filtered = allRuas.filter(r =>
+          (r.nama || '').toLowerCase().includes(q) ||
           (r.kabupaten || '').toLowerCase().includes(q) ||
           (r.id || '').toLowerCase().includes(q)
         );
@@ -1617,12 +2313,12 @@
         });
       }
 
-      // Event delegation simpan kondisi ruas
+      // Event delegation simpan kondisi ruas (Gunakan getElementById agar ID ber-titik seperti 18.01.001 valid)
       $('#ruas-list-container')?.addEventListener('click', async (e) => {
         const btnSave = e.target.closest('.btn-save-ruas-kondisi');
         if (!btnSave) return;
         const id = btnSave.dataset.id;
-        const select = $(`#select-ruas-${id}`);
+        const select = document.getElementById('select-ruas-' + id);
         if (!select) return;
         const newKondisi = select.value;
         const origHtml = btnSave.innerHTML;
@@ -1644,6 +2340,11 @@
           try {
             const { error } = await db.rpc('sinkron_kondisi_ruas', { p_ruas_id: null });
             if (error) throw error;
+            await Promise.all([loadRuasJalan(), fetchReports()]);
+            renderRuasList();
+            renderCharts();
+            renderDbRuas();
+            renderDbLaporan();
             showToast('Kondisi seluruh ruas jalan berhasil disinkronkan dari laporan terverifikasi!');
           } catch (err) {
             console.error('Sync ruas error:', err);
@@ -1664,7 +2365,6 @@
       let dbLaporanFilterStatus = 'all';
       let dbLaporanFilterKategori = 'all';
       let dbRuasSearch = '';
-      let currentConfirmCallback = null;
 
       // 1. Tab Navigasi Utama
       const tabNavReports = $('#tab-nav-reports');
@@ -1679,6 +2379,7 @@
           viewReports?.classList.remove('hidden');
           viewDb?.classList.add('hidden');
         } else {
+          tuh
           tabNavDb.className = 'admin-main-tab inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition bg-navy text-white shadow-sm';
           tabNavReports.className = 'admin-main-tab inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700';
           viewDb?.classList.remove('hidden');
@@ -1728,44 +2429,6 @@
         renderDbLaporan();
         renderDbRuas();
         showToast('Seluruh data database terbaru berhasil dimuat!');
-      });
-
-      // 3. Modal Konfirmasi Universal
-      const modalConfirm = $('#modal-confirm');
-      const btnConfirmCancel = $('#btn-confirm-cancel');
-      const btnConfirmOk = $('#btn-confirm-ok');
-      const modalConfirmTitle = $('#modal-confirm-title');
-      const modalConfirmDesc = $('#modal-confirm-desc');
-
-      function openConfirmModal(title, desc, onConfirm, btnText = 'Hapus Sekarang') {
-        if (!modalConfirm) return;
-        if (modalConfirmTitle) modalConfirmTitle.textContent = title;
-        if (modalConfirmDesc) modalConfirmDesc.textContent = desc;
-        if (btnConfirmOk) btnConfirmOk.textContent = btnText;
-        currentConfirmCallback = onConfirm;
-        modalConfirm.classList.remove('hidden');
-        if (window.lucide) window.lucide.createIcons();
-      }
-
-      btnConfirmCancel?.addEventListener('click', () => {
-        modalConfirm?.classList.add('hidden');
-        currentConfirmCallback = null;
-      });
-
-      modalConfirm?.addEventListener('click', (e) => {
-        if (e.target === modalConfirm) {
-          modalConfirm.classList.add('hidden');
-          currentConfirmCallback = null;
-        }
-      });
-
-      btnConfirmOk?.addEventListener('click', async () => {
-        if (typeof currentConfirmCallback === 'function') {
-          const cb = currentConfirmCallback;
-          currentConfirmCallback = null;
-          modalConfirm?.classList.add('hidden');
-          await cb();
-        }
       });
 
       // 4. Panel Admins Engine
@@ -1924,13 +2587,19 @@
               await fetchAdmins();
             } catch (err) {
               console.error('Remove admin error:', err);
-              try {
-                const { error: delErr } = await db.from('admins').delete().eq('user_id', id);
-                if (delErr) throw delErr;
-                showToast(`Akses admin untuk "${email}" telah dicabut.`);
-                await fetchAdmins();
-              } catch (del2Err) {
-                showToast('Gagal mencabut akses admin: ' + (del2Err.message || del2Err), true);
+              // Hanya fallback jika RPC tidak ditemukan di Supabase
+              const isRpcMissing = err.code === '42883' || (err.message && err.message.includes('function') && err.message.includes('does not exist'));
+              if (isRpcMissing) {
+                try {
+                  const { error: delErr } = await db.from('admins').delete().eq('user_id', id);
+                  if (delErr) throw delErr;
+                  showToast(`Akses admin untuk "${email}" telah dicabut.`);
+                  await fetchAdmins();
+                } catch (del2Err) {
+                  showToast('Gagal mencabut akses admin: ' + (del2Err.message || del2Err), true);
+                }
+              } else {
+                showToast('Gagal mencabut akses admin: ' + (err.message || err), true);
               }
             }
           },
@@ -1977,7 +2646,7 @@
           const tglSafe = r.created_at ? new Date(r.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
           const katSafe = KATEGORI_CONFIG[r.kategori_rusak] || { label: esc(r.kategori_rusak), color: '#94a3b8' };
           const fotoHtml = r.foto_url ? `
-            <img src="${esc(r.foto_url)}" alt="Foto" class="h-9 w-9 rounded-lg object-cover cursor-pointer hover:opacity-80 transition shrink-0" onclick="window.adminOpenFotoModal && window.adminOpenFotoModal(${id})" />
+            <img src="${esc(r.foto_url)}" alt="Foto" class="h-9 w-9 rounded-lg object-cover cursor-pointer hover:opacity-80 transition shrink-0" onclick="window.adminOpenFotoModal && window.adminOpenFotoModal('${idSafe}')" />
           ` : `
             <div class="h-9 w-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 shrink-0"><i data-lucide="image-off" class="h-4 w-4"></i></div>
           `;
@@ -2050,6 +2719,15 @@
         if (e.target.classList.contains('select-db-laporan-status')) {
           const id = e.target.dataset.id;
           const newStatus = e.target.value;
+          if (newStatus === 'diverifikasi') {
+            const currentRep = allReports.find(r => String(r.id) === String(id));
+            const prevStatus = currentRep?.status || 'baru';
+            window._pendingVerifySelectReset = () => {
+              e.target.value = prevStatus;
+            };
+            openVerifyRuasModal(id);
+            return;
+          }
           try {
             const { error } = await db.from('laporan_warga').update({ status: newStatus }).eq('id', id);
             if (error) throw error;
@@ -2085,25 +2763,7 @@
         const btn = e.target.closest('.btn-delete-laporan');
         if (!btn) return;
         const id = btn.dataset.id;
-
-        openConfirmModal(
-          'Hapus Laporan Warga',
-          `Apakah Anda yakin ingin menghapus laporan #${id} secara permanen dari Supabase? Tindakan ini tidak dapat dibatalkan.`,
-          async () => {
-            try {
-              const { error } = await db.from('laporan_warga').delete().eq('id', id);
-              if (error) throw error;
-              showToast(`Laporan #${id} berhasil dihapus dari database.`);
-              allReports = allReports.filter(r => String(r.id) !== String(id));
-              updateStats();
-              renderReports();
-              renderDbLaporan();
-            } catch (err) {
-              console.error('Delete laporan error:', err);
-              showToast('Gagal menghapus laporan: ' + (err.message || err), true);
-            }
-          }
-        );
+        deleteReport(id);
       });
 
       // 6. Panel Ruas Jalan Database Table Engine
@@ -2115,8 +2775,8 @@
         if (badgeCount) badgeCount.textContent = allRuas.length;
 
         const q = dbRuasSearch.toLowerCase();
-        const filtered = allRuas.filter(r => 
-          (r.nama || '').toLowerCase().includes(q) || 
+        const filtered = allRuas.filter(r =>
+          (r.nama || '').toLowerCase().includes(q) ||
           (r.kabupaten || '').toLowerCase().includes(q) ||
           String(r.id || '').toLowerCase().includes(q)
         );
@@ -2304,7 +2964,7 @@
               panjang_km: pjg,
               kondisi_dasar: kondisi,
               kondisi: kondisi,
-              geometry: { type: 'LineString', coordinates: [] }
+              geometry: null
             });
             if (error) throw error;
             showToast(`Ruas jalan "${nama}" berhasil ditambahkan ke Supabase!`);
@@ -2347,9 +3007,27 @@
 
       // Ekspos helper buka modal foto untuk thumbnail tabel DB
       window.adminOpenFotoModal = (id) => {
-        const rep = allReports.find(r => r.id === id);
-        if (rep && typeof openModalFoto === 'function') openModalFoto(rep);
+        const rep = allReports.find(r => String(r.id) === String(id));
+        if (rep && typeof openPhotoAiModal === 'function') {
+          openPhotoAiModal(rep.id, rep.foto_url, rep.nama || 'Laporan', rep.kategori_rusak || 'ringan');
+        }
       };
+
+      // Keyboard Accessibility: Tutup modal aktif dengan tombol Escape
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          modalVerifyRuas?.classList.add('hidden');
+          modalRuas?.classList.add('hidden');
+          modalEditRuas?.classList.add('hidden');
+          modalConfirm?.classList.add('hidden');
+          $('#modal-foto')?.classList.add('hidden');
+          currentConfirmCallback = null;
+          if (window._pendingVerifySelectReset) {
+            window._pendingVerifySelectReset();
+            window._pendingVerifySelectReset = null;
+          }
+        }
+      });
 
       // Logout Admin
       $('#btn-admin-logout').addEventListener('click', async () => {
@@ -2366,11 +3044,12 @@
       const isDark = document.documentElement.classList.toggle('dark');
       const safeStore = window.safeStore || {
         get(k) { try { return localStorage.getItem(k); } catch { return null; } },
-        set(k, v) { try { localStorage.setItem(k, v); } catch {} }
+        set(k, v) { try { localStorage.setItem(k, v); } catch { } }
       };
       safeStore.set('theme', isDark ? 'dark' : 'light');
       window.dispatchEvent(new CustomEvent('jk-theme-change'));
     });
   </script>
 </body>
+
 </html>

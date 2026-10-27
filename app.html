@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://server.arcgisonline.com https://*.basemaps.cartocdn.com https://basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://router.project-osrm.org; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://server.arcgisonline.com https://*.google.com https://*.googleapis.com https://*.basemaps.cartocdn.com https://basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://router.project-osrm.org; object-src 'none'; base-uri 'self'; form-action 'self'" />
   <title>JalanKitta — Peta &amp; Laporan Infrastruktur Jalan Provinsi Lampung</title>
   <meta name="description"
     content="JalanKitta: platform pemantauan kondisi jalan Provinsi Lampung berbasis peta interaktif dan laporan warga." />
@@ -256,12 +256,15 @@
                 </div>
               </div>
 
-              <!-- Lokasi: peta mini + GPS -->
+              <!-- Lokasi: peta mini multi-titik jalur kerusakan + GPS -->
               <div>
                 <div class="mb-2 flex items-center justify-between gap-3">
-                  <label for="input-lokasi" class="block text-sm font-bold text-navy">Lokasi Kerusakan</label>
+                  <div>
+                    <label for="input-lokasi" class="block text-sm font-bold text-navy">Tandai Jalur Kerusakan Jalan</label>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400">Klik titik awal dan titik akhir (atau klik belokan gang untuk menandai jalur).</p>
+                  </div>
                   <button type="button" id="btn-geolocate"
-                    class="inline-flex items-center gap-2 rounded-full bg-accent/10 px-3.5 py-1.5 text-xs font-bold text-accent transition hover:bg-accent/20 disabled:cursor-wait disabled:opacity-60">
+                    class="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-3 py-1.5 text-xs font-bold text-accent transition hover:bg-accent/20 disabled:cursor-wait disabled:opacity-60 shrink-0">
                     <i data-lucide="crosshair" class="h-3.5 w-3.5"></i><span>Lokasi Saya</span>
                   </button>
                 </div>
@@ -271,15 +274,33 @@
                   <div class="absolute right-3 top-3 z-[500] flex items-center gap-1.5 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-2.5 py-1 text-xs font-bold text-slate-700 dark:text-slate-300 shadow-md border border-slate-200/80 dark:border-white/10">
                     <i data-lucide="satellite" class="h-3.5 w-3.5 text-amber-500"></i> Satelit HD
                   </div>
+                  <!-- Petunjuk Interaktif -->
                   <p id="picker-hint"
                     class="pointer-events-none absolute left-3 bottom-3 z-[500] whitespace-nowrap rounded-full bg-white/95 dark:bg-slate-900/95 px-3 py-1.5 text-[11px] font-bold text-navy dark:text-slate-200 shadow-sm transition-opacity border border-slate-200/60 dark:border-white/10">
-                    <i data-lucide="mouse-pointer-click" class="mr-1 inline h-3.5 w-3.5 text-accent"></i>Klik peta untuk menandai lokasi
+                    <i data-lucide="mouse-pointer-click" class="mr-1 inline h-3.5 w-3.5 text-accent"></i>Klik titik awal jalan rusak
                   </p>
                 </div>
-                <div class="relative mt-3">
+
+                <!-- Kontrol Jalur Multi-Titik -->
+                <div id="picker-path-controls" class="mt-2.5 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 p-2.5 border border-slate-200/60 dark:border-white/10 text-xs">
+                  <div class="flex items-center gap-2">
+                    <span id="picker-path-badge" class="px-2 py-0.5 rounded-md font-bold text-[10px] bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">0 Titik</span>
+                    <span id="picker-path-dist" class="font-bold text-navy dark:text-white text-xs">Panjang: 0 m</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <button type="button" id="btn-picker-undo" class="rounded-lg px-2.5 py-1 text-[11px] font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 hover:bg-slate-100 dark:hover:bg-slate-600 transition border border-slate-200/80 dark:border-white/10 flex items-center gap-1 disabled:opacity-50 disabled:pointer-events-none" disabled>
+                      <i data-lucide="undo-2" class="h-3 w-3"></i> Undo Titik
+                    </button>
+                    <button type="button" id="btn-picker-clear" class="rounded-lg px-2.5 py-1 text-[11px] font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition border border-rose-200 dark:border-rose-900/40 flex items-center gap-1 disabled:opacity-50 disabled:pointer-events-none" disabled>
+                      <i data-lucide="trash-2" class="h-3 w-3"></i> Reset Jalur
+                    </button>
+                  </div>
+                </div>
+
+                <div class="relative mt-2">
                   <i data-lucide="map-pin" class="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
                   <input type="text" id="input-lokasi" readonly required
-                    placeholder="Belum ada lokasi — klik peta atau gunakan GPS"
+                    placeholder="Belum ada lokasi — klik titik awal di peta atau gunakan GPS"
                     class="w-full cursor-default rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 font-mono text-sm text-navy outline-none placeholder:font-sans placeholder:text-slate-400" />
                 </div>
                 <div id="detected-road-box" class="hidden mt-2 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-3.5 py-2 text-xs flex items-center justify-between">
@@ -743,17 +764,14 @@
         scrollWheelZoom: false,
       });
 
-      // Tile HD dari Esri (gratis, tanpa API key) — Satelit HD dengan batas wilayah & jaringan jalan
-      const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services';
-      const TILE_ATTR_SATELIT = 'Tiles &copy; Esri &mdash; Esri, Maxar, Earthstar Geographics, HERE, Garmin, OpenStreetMap contributors';
-
+      // Tile Satelit HD Hybrid: Citra satelit beresolusi tinggi lengkap dengan garis ruas jalan & gang di setiap pelosok desa
       const makeBaseTiles = () => {
-        const opts = { attribution: TILE_ATTR_SATELIT, detectRetina: true, maxZoom: 20 };
-        return L.layerGroup([
-          L.tileLayer(`${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 19, zIndex: 1 }),
-          L.tileLayer(`${ESRI}/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 19, zIndex: 2 }),
-          L.tileLayer(`${ESRI}/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}`, { ...opts, maxNativeZoom: 19, zIndex: 3 }),
-        ]);
+        return L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+          subdomains: ['0', '1', '2', '3'],
+          attribution: 'Citra Satelit &copy; Google, Maxar, CNES/Airbus &mdash; JalanKitta',
+          detectRetina: true,
+          maxZoom: 20
+        });
       };
 
       const safeStore = window.safeStore || {
@@ -970,23 +988,25 @@
                 try {
                   const conditionKey = r.kondisi || 'ringan';
                   const color = CONDITION[conditionKey]?.color || CONDITION.ringan.color;
-                  const lengthKm = Number(r.panjang_km || 0).toFixed(1);
+                  const kmNum = Number(r.panjang_km || 0);
+                  const lengthText = kmNum < 1 && kmNum > 0 ? `${Math.round(kmNum * 1000)} Meter (${kmNum.toFixed(2)} km)` : `${kmNum.toFixed(1)} km`;
+                  const lengthShort = kmNum < 1 && kmNum > 0 ? `${Math.round(kmNum * 1000)} m` : `${kmNum.toFixed(1)} km`;
 
                   const layer = L.geoJSON(r.geometry, {
-                    style: { color: color, weight: 6, opacity: 0.9, lineCap: 'round' }
+                    style: { color: color, weight: 7, opacity: 0.95, lineCap: 'round', lineJoin: 'round' }
                   }).bindPopup(`
                     <div class="min-w-[180px]">
                       <p class="text-[11px] font-bold uppercase tracking-wider text-ink">${escapeHtml(r.kabupaten)}</p>
                       <p class="mt-0.5 font-display text-base font-bold text-navy">${escapeHtml(r.nama)}</p>
                       <span class="mt-2 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold" style="background:${color}25;color:${color}">${CONDITION[conditionKey]?.label || conditionKey}</span>
-                      <p class="mt-2 text-xs font-semibold text-ink">Panjang Ruas: ${lengthKm} km</p>
+                      <p class="mt-2 text-xs font-semibold text-ink">Panjang Kerusakan: ${lengthText}</p>
                     </div>
                   `);
 
-                  layer.on('mouseover', () => layer.setStyle({ weight: 9, opacity: 1 }));
-                  layer.on('mouseout', () => layer.setStyle({ weight: 6, opacity: 0.9 }));
+                  layer.on('mouseover', () => layer.setStyle({ weight: 10, opacity: 1 }));
+                  layer.on('mouseout', () => layer.setStyle({ weight: 7, opacity: 0.95 }));
 
-                  roadLayers[r.id] = { layer, props: { id: r.id, name: r.nama, condition: conditionKey, kab: r.kabupaten, lengthKm, color } };
+                  roadLayers[r.id] = { layer, props: { id: r.id, name: r.nama, condition: conditionKey, kab: r.kabupaten, lengthKm: lengthShort, color } };
                   layer.addTo(map);
                 } catch (renderErr) {
                   console.warn(`Gagal me-render geometri ruas ${r.id}:`, renderErr);
@@ -1018,7 +1038,7 @@
         const fotoSrc = foto_url ? safeImageUrl(foto_url) : null;
         const fotoHtml = fotoSrc ? `<a href="${escapeHtml(fotoSrc)}" target="_blank" rel="noopener" class="mb-2 mt-1.5 block overflow-hidden rounded-xl border border-slate-100"><img src="${escapeHtml(fotoSrc)}" alt="Foto dokumentasi kerusakan jalan" loading="lazy" class="h-28 w-full object-cover transition hover:scale-105" /></a>` : '';
 
-        const cleanDeskripsi = sanitizeHtml(deskripsi);
+        const cleanDeskripsi = sanitizeHtml((deskripsi || '').replace(/<!--jalur:.*?-->/g, '').trim());
         const cleanNama = escapeHtml(formatNamaPublik(nama));
 
         const marker = L.marker([koordinat_lat, koordinat_lng], { icon: makePulseIcon(color) }).bindPopup(`
@@ -1224,28 +1244,106 @@
 
       let pickerBaseTiles = makeBaseTiles().addTo(pickerMap);
 
-      let pickerMarker = null, accuracyCircle = null;
+      let pickedPoints = []; // [{ lat, lng, marker }, ...]
+      let pickerPolyline = null;
+      let accuracyCircle = null;
       const selectedColor = () => CONDITION[$('input[name="kategori"]:checked')?.value || 'ringan'].color;
 
-      function setPickedLocation(lat, lng, source = 'peta') {
-        const latF = Number(lat.toFixed(6)), lngF = Number(lng.toFixed(6));
-        $('#input-lat').value = latF; $('#input-lng').value = lngF;
-        $('#input-lokasi').value = `${latF}, ${lngF}  ·  via ${source}`;
-        if (pickerMarker) pickerMarker.setLatLng([latF, lngF]);
-        else {
-          pickerMarker = L.marker([latF, lngF], { icon: makePulseIcon(selectedColor()), draggable: true }).addTo(pickerMap);
-          pickerMarker.on('dragend', () => {
-            const p = pickerMarker.getLatLng();
-            if (accuracyCircle) { pickerMap.removeLayer(accuracyCircle); accuracyCircle = null; }
-            setPickedLocation(p.lat, p.lng, 'peta');
-          });
+      function calculatePathDistanceMeters(pts) {
+        if (!pts || pts.length < 2) return 0;
+        let totalKm = 0;
+        for (let i = 0; i < pts.length - 1; i++) {
+          totalKm += haversineDistKm(pts[i].lat, pts[i].lng, pts[i+1].lat, pts[i+1].lng);
         }
-        $('#picker-hint').classList.add('opacity-0');
-        if (!LAMPUNG_BOUNDS.contains([latF, lngF])) showStatus('warn', 'Titik di luar Provinsi Lampung.');
+        return Math.round(totalKm * 1000);
+      }
+
+      function updatePickerPathDisplay(source = 'peta') {
+        const count = pickedPoints.length;
+        const badgeEl = $('#picker-path-badge');
+        const distEl = $('#picker-path-dist');
+        const btnUndo = $('#btn-picker-undo');
+        const btnClear = $('#btn-picker-clear');
+        const hintEl = $('#picker-hint');
+        const locInput = $('#input-lokasi');
+
+        if (count === 0) {
+          if (badgeEl) badgeEl.textContent = '0 Titik';
+          if (distEl) distEl.textContent = 'Panjang: 0 m';
+          if (btnUndo) btnUndo.disabled = true;
+          if (btnClear) btnClear.disabled = true;
+          if (locInput) locInput.value = '';
+          $('#input-lat').value = '';
+          $('#input-lng').value = '';
+          if (hintEl) {
+            hintEl.innerHTML = '<i data-lucide="mouse-pointer-click" class="mr-1 inline h-3.5 w-3.5 text-accent"></i>Klik titik awal jalan rusak';
+            hintEl.classList.remove('opacity-0');
+          }
+          if (pickerPolyline) {
+            pickerMap.removeLayer(pickerPolyline);
+            pickerPolyline = null;
+          }
+          $('#detected-road-box')?.classList.add('hidden');
+          $('#duplicate-warning-box')?.classList.add('hidden');
+          if (window.lucide) window.lucide.createIcons();
+          return;
+        }
+
+        if (btnUndo) btnUndo.disabled = false;
+        if (btnClear) btnClear.disabled = false;
+
+        const firstPt = pickedPoints[0];
+        $('#input-lat').value = firstPt.lat;
+        $('#input-lng').value = firstPt.lng;
+
+        const distM = calculatePathDistanceMeters(pickedPoints);
+        const distText = distM >= 1000 ? `${(distM / 1000).toFixed(2)} km` : `${distM} m`;
+
+        if (badgeEl) badgeEl.textContent = `${count} Titik`;
+        if (distEl) distEl.textContent = `Panjang: ±${distText}`;
+
+        // Perbarui garis Polyline di antara titik-titik
+        const latLngs = pickedPoints.map(p => [p.lat, p.lng]);
+        const curColor = selectedColor();
+        if (count >= 2) {
+          if (pickerPolyline) {
+            pickerPolyline.setLatLngs(latLngs);
+            pickerPolyline.setStyle({ color: curColor });
+          } else {
+            pickerPolyline = L.polyline(latLngs, {
+              color: curColor,
+              weight: 5,
+              opacity: 0.95,
+              dashArray: '6, 6',
+              lineCap: 'round',
+              lineJoin: 'round'
+            }).addTo(pickerMap);
+          }
+        } else if (pickerPolyline) {
+          pickerMap.removeLayer(pickerPolyline);
+          pickerPolyline = null;
+        }
+
+        // Teks lokasi input & petunjuk hint
+        if (count === 1) {
+          if (locInput) locInput.value = `${firstPt.lat}, ${firstPt.lng} (Titik 1/Awal) · via ${source}`;
+          if (hintEl) {
+            hintEl.innerHTML = '<i data-lucide="corner-down-right" class="mr-1 inline h-3.5 w-3.5 text-amber-500"></i>Klik titik kedua (sampai mana jalan rusak)';
+            hintEl.classList.remove('opacity-0');
+          }
+        } else {
+          if (locInput) locInput.value = `Jalur: ±${distText} (${count} titik) · Titik awal: ${firstPt.lat}, ${firstPt.lng}`;
+          if (hintEl) {
+            hintEl.innerHTML = `<i data-lucide="check-circle-2" class="mr-1 inline h-3.5 w-3.5 text-good"></i>Jalur ${distText} terbentuk. Klik lagi jika berbelok.`;
+            hintEl.classList.remove('opacity-0');
+          }
+        }
+
+        if (!LAMPUNG_BOUNDS.contains([firstPt.lat, firstPt.lng])) showStatus('warn', 'Titik di luar Provinsi Lampung.');
         else hideStatus();
 
         // Deteksi ruas jalan terdekat
-        const nearestRoadInfo = findNearestRoad(latF, lngF);
+        const nearestRoadInfo = findNearestRoad(firstPt.lat, firstPt.lng);
         const roadBox = $('#detected-road-box');
         if (roadBox) {
           if (nearestRoadInfo) {
@@ -1258,7 +1356,7 @@
         }
 
         // Deteksi laporan duplikat dalam radius 30 meter
-        const dupInfo = findNearbyDuplicateReport(latF, lngF, 30);
+        const dupInfo = findNearbyDuplicateReport(firstPt.lat, firstPt.lng, 30);
         const dupBox = $('#duplicate-warning-box');
         if (dupBox) {
           if (dupInfo) {
@@ -1268,26 +1366,72 @@
             dupBox.classList.add('hidden');
           }
         }
+
+        if (window.lucide) window.lucide.createIcons();
       }
 
-      function clearPickedLocation() {
-        $('#input-lat').value = ''; $('#input-lng').value = ''; $('#input-lokasi').value = '';
-        if (pickerMarker) { pickerMap.removeLayer(pickerMarker); pickerMarker = null; }
-        if (accuracyCircle) { pickerMap.removeLayer(accuracyCircle); accuracyCircle = null; }
-        $('#picker-hint').classList.remove('opacity-0');
-        const roadBox = $('#detected-road-box');
-        if (roadBox) roadBox.classList.add('hidden');
-        const dupBox = $('#duplicate-warning-box');
-        if (dupBox) dupBox.classList.add('hidden');
+      function addPickerPoint(lat, lng, source = 'peta') {
+        const latF = Number(lat.toFixed(6)), lngF = Number(lng.toFixed(6));
+        const idx = pickedPoints.length + 1;
+        const color = selectedColor();
+        const label = idx === 1 ? 'Awal' : String(idx);
+
+        const marker = L.marker([latF, lngF], {
+          icon: L.divIcon({
+            className: 'picker-point-div',
+            html: `<div class="flex items-center justify-center rounded-full font-black text-[10px] text-white shadow-lg border-2 border-white px-1.5 py-0.5" style="background:${color};min-width:24px;height:24px">${label}</div>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
+          })
+        }).addTo(pickerMap);
+
+        pickedPoints.push({ lat: latF, lng: lngF, marker });
+        updatePickerPathDisplay(source);
       }
+
+      function undoPickerPoint() {
+        if (pickedPoints.length === 0) return;
+        const last = pickedPoints.pop();
+        if (last && last.marker) pickerMap.removeLayer(last.marker);
+        updatePickerPathDisplay('undo');
+      }
+
+      function clearPickedPath() {
+        pickedPoints.forEach(p => {
+          if (p.marker) pickerMap.removeLayer(p.marker);
+        });
+        pickedPoints = [];
+        if (pickerPolyline) {
+          pickerMap.removeLayer(pickerPolyline);
+          pickerPolyline = null;
+        }
+        if (accuracyCircle) {
+          pickerMap.removeLayer(accuracyCircle);
+          accuracyCircle = null;
+        }
+        updatePickerPathDisplay('reset');
+      }
+
+      $('#btn-picker-undo')?.addEventListener('click', undoPickerPoint);
+      $('#btn-picker-clear')?.addEventListener('click', clearPickedPath);
 
       pickerMap.on('click', (e) => {
         if (accuracyCircle) { pickerMap.removeLayer(accuracyCircle); accuracyCircle = null; }
-        setPickedLocation(e.latlng.lat, e.latlng.lng, 'peta');
+        addPickerPoint(e.latlng.lat, e.latlng.lng, 'peta');
       });
 
       $$('input[name="kategori"]').forEach((r) => r.addEventListener('change', () => {
-        if (pickerMarker) pickerMarker.setIcon(makePulseIcon(selectedColor()));
+        pickedPoints.forEach((p, i) => {
+          const color = selectedColor();
+          const label = i === 0 ? 'Awal' : String(i + 1);
+          p.marker.setIcon(L.divIcon({
+            className: 'picker-point-div',
+            html: `<div class="flex items-center justify-center rounded-full font-black text-[10px] text-white shadow-lg border-2 border-white px-1.5 py-0.5" style="background:${color};min-width:24px;height:24px">${label}</div>`,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
+          }));
+        });
+        if (pickerPolyline) pickerPolyline.setStyle({ color: selectedColor() });
       }));
 
       new IntersectionObserver((entries, obs) => {
@@ -1302,7 +1446,7 @@
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             const { latitude, longitude, accuracy } = pos.coords;
-            setPickedLocation(latitude, longitude, `GPS ±${Math.round(accuracy)} m`);
+            addPickerPoint(latitude, longitude, `GPS ±${Math.round(accuracy)} m`);
             if (accuracyCircle) pickerMap.removeLayer(accuracyCircle);
             accuracyCircle = L.circle([latitude, longitude], { radius: accuracy, color: '#34d399', weight: 1, fillOpacity: 0.12 }).addTo(pickerMap);
             pickerMap.flyTo([latitude, longitude], 17, { duration: 1.2 });
@@ -1679,13 +1823,21 @@
         form.dataset.submitting = 'true';
         btn.disabled = true;
         const nearestRoadInfo = findNearestRoad(lat, lng);
+
+        let finalDeskripsi = deskripsi;
+        if (pickedPoints.length >= 2) {
+          const distM = calculatePathDistanceMeters(pickedPoints);
+          const coordsArr = pickedPoints.map(p => [Number(p.lng.toFixed(6)), Number(p.lat.toFixed(6))]);
+          finalDeskripsi = `[Jalur: ${distM}m • ${pickedPoints.length} titik] ${deskripsi} <!--jalur:${JSON.stringify(coordsArr)}-->`;
+        }
+
         const payload = {
           user_id: user.id,
           nama,
           kategori_rusak: kategori,
           koordinat_lat: lat,
           koordinat_lng: lng,
-          deskripsi,
+          deskripsi: finalDeskripsi,
           foto_url: null,
           ruas_id: nearestRoadInfo ? nearestRoadInfo.road.id : null,
           status: 'baru'
@@ -1731,7 +1883,7 @@
 
           showStatus('success', 'Laporan berhasil dikirim dan sedang menunggu verifikasi oleh tim. Terima kasih atas kontribusi Anda!');
           openReportSuccessModal({ ...payload, id: data?.[0]?.id });
-          form.reset(); clearPickedLocation(); clearFoto();
+          form.reset(); clearPickedPath(); clearFoto();
 
           // Isi ulang nama pengguna setelah form di-reset agar laporan berikutnya tidak kosong/terkunci
           const { data: { user: currentUser } } = await db.auth.getUser();
@@ -1921,7 +2073,7 @@
                   `}
 
                   <div class="min-w-0 flex-1">
-                    <p class="text-xs font-medium text-ink leading-relaxed bg-white p-2.5 rounded-xl border border-slate-100 italic">"${escapeHtml(r.deskripsi || '-')}"</p>
+                    <p class="text-xs font-medium text-ink leading-relaxed bg-white p-2.5 rounded-xl border border-slate-100 italic">"${escapeHtml((r.deskripsi || '-').replace(/<!--jalur:.*?-->/g, '').trim())}"</p>
                     <p class="text-[11px] text-slate-500 mt-2 font-medium">${st.desc}</p>
                   </div>
                 </div>
