@@ -6,6 +6,7 @@ const EXPECTED_SRI = {
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js': 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=',
   'https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js': 'sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr',
   'https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js': 'sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu',
+  'https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js': 'sha384-vsrfeLOOY6KuIYKDlmVH5UiBmgIdB1oEf7p01YgWHuqmOHfZr374+odEv96n9tNC',
 };
 
 const HTML_FILES = ['index.html', 'app.html', 'admin.html', 'login.html'];
@@ -34,13 +35,28 @@ for (const file of HTML_FILES) {
     hasError = true;
   }
 
-  // 4. Cek SRI pada skrip yang digunakan
-  for (const [url, expectedHash] of Object.entries(EXPECTED_SRI)) {
-    if (content.includes(url)) {
-      if (!content.includes(`integrity="${expectedHash}"`)) {
-        console.error(`❌ [${file}] SRI hash untuk ${url} tidak cocok dengan hash resmi!`);
+  // 4. Cek SRI ditegakkan untuk SEMUA skrip CDN eksternal
+  const scriptTagRegex = /<script\b[^>]*\bsrc=["'](https?:\/\/[^"']+)["'][^>]*>/gi;
+  let match;
+  while ((match = scriptTagRegex.exec(content)) !== null) {
+    const fullTag = match[0];
+    const srcUrl = match[1];
+
+    if (!/\bintegrity=["'][^"']+["']/i.test(fullTag)) {
+      console.error(`❌ [${file}] Skrip CDN eksternal "${srcUrl}" tidak memiliki atribut integrity (SRI)!`);
+      hasError = true;
+    } else {
+      const integrityMatch = fullTag.match(/\bintegrity=["']([^"']+)["']/i);
+      const hashInFile = integrityMatch ? integrityMatch[1] : '';
+      if (EXPECTED_SRI[srcUrl] && hashInFile !== EXPECTED_SRI[srcUrl]) {
+        console.error(`❌ [${file}] SRI hash untuk ${srcUrl} tidak cocok dengan hash resmi!`);
         hasError = true;
       }
+    }
+
+    if (!/\bcrossorigin=["']anonymous["']/i.test(fullTag)) {
+      console.error(`❌ [${file}] Skrip CDN eksternal "${srcUrl}" wajib memiliki crossorigin="anonymous"!`);
+      hasError = true;
     }
   }
 
@@ -56,7 +72,9 @@ for (const file of HTML_FILES) {
     }
   });
 
-  console.log(`✓ [${file}] Lolos verifikasi keamanan, aksesibilitas, dan sintaks.`);
+  if (!hasError) {
+    console.log(`✓ [${file}] Lolos verifikasi keamanan, aksesibilitas, dan sintaks.`);
+  }
 }
 
 if (hasError) {

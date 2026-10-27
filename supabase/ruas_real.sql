@@ -1,5 +1,5 @@
--- Ruas Jalan Nyata Provinsi Lampung (Survei Lapangan 2026)
--- Sumber Data: Pemilik Proyek JalanKitta / Hasil Survei Wilayah Lampung Timur, Pesawaran, Pringsewu
+-- Ruas Jalan Nyata Provinsi Lampung (Data Teknis Ruas Jalan)
+-- Sumber Data: Pemilik Proyek JalanKitta / Wilayah Lampung Timur, Pesawaran, Pringsewu
 -- Dihasilkan oleh scripts/import_ruas.mjs. Aman dijalankan berulang (upsert idempoten).
 
 insert into public.ruas_jalan (id, nama, kabupaten, kondisi_dasar, kondisi, geometry, panjang_km) values
@@ -23,3 +23,5 @@ on conflict (id) do update set
   geometry = excluded.geometry,
   panjang_km = excluded.panjang_km,
   updated_at = now();
+
+delete from public.ruas_jalan where id not in ('R-01', 'R-02', 'R-03', 'R-04', 'R-05', 'R-06');

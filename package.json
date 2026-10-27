@@ -8,7 +8,9 @@
     "watch:css": "tailwindcss -c tailwind.config.js -i src/tailwind.input.css -o assets/css/tailwind.css --watch",
     "seed:ruas": "node scripts/import_ruas.mjs",
     "import:ruas": "node scripts/import_ruas.mjs",
-    "test": "node scripts/check_codebase.mjs",
+    "test": "node scripts/check_codebase.mjs && node scripts/test_bersihkan_yatim.mjs",
+    "test:gemini": "node scripts/test_triase_gemini.mjs",
+    "deploy:functions": "bash scripts/deploy_edge_functions.sh",
     "package": "bash scripts/package.sh"
   },
   "devDependencies": {

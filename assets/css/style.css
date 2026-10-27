@@ -387,15 +387,54 @@ html.dark .kategori-card {
 
 /* Tombol filter kondisi */
 .filter-btn.is-active {
-  background: rgba(245, 158, 11, 0.12) !important;
-  border-color: #f59e0b !important;
-  color: #b45309 !important;
+  font-weight: 700 !important;
 }
-html.dark .filter-btn.is-active { color: #fbbf24 !important; }
-.filter-btn[data-filter="all"].is-active {
-  background: #f59e0b !important;
+
+/* 1. Filter 'Semua' saat aktif (Teks putih tegas berlatar gradien amber-orange di mode terang & gelap) */
+.filter-btn[data-filter="all"].is-active,
+html.dark .filter-btn[data-filter="all"].is-active {
+  background: linear-gradient(135deg, #f59e0b, #ea580c) !important;
+  border-color: #ea580c !important;
   color: #ffffff !important;
-  box-shadow: 0 6px 16px -4px rgba(245, 158, 11, 0.4);
+  font-weight: 800 !important;
+  box-shadow: 0 6px 18px -3px rgba(245, 158, 11, 0.45);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* 2. Filter 'Mantap' saat aktif (Hijau) */
+.filter-btn[data-filter="baik"].is-active {
+  background: rgba(16, 185, 129, 0.15) !important;
+  border-color: #10b981 !important;
+  color: #065f46 !important;
+}
+html.dark .filter-btn[data-filter="baik"].is-active {
+  background: rgba(16, 185, 129, 0.25) !important;
+  border-color: #10b981 !important;
+  color: #34d399 !important;
+}
+
+/* 3. Filter 'Rusak Ringan' saat aktif (Kuning/Amber) */
+.filter-btn[data-filter="ringan"].is-active {
+  background: rgba(245, 158, 11, 0.15) !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+}
+html.dark .filter-btn[data-filter="ringan"].is-active {
+  background: rgba(245, 158, 11, 0.25) !important;
+  border-color: #f59e0b !important;
+  color: #fcd34d !important;
+}
+
+/* 4. Filter 'Rusak Berat' saat aktif (Merah) */
+.filter-btn[data-filter="berat"].is-active {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: #ef4444 !important;
+  color: #991b1b !important;
+}
+html.dark .filter-btn[data-filter="berat"].is-active {
+  background: rgba(239, 68, 68, 0.25) !important;
+  border-color: #ef4444 !important;
+  color: #f87171 !important;
 }
 
 /* Scrollbar tipis untuk daftar */

@@ -99,6 +99,96 @@ const SUPABASE_ANON_KEY = 'sb_publishable_...';
 
 ---
 
+## 🤖 Fitur Triase Foto dengan AI (Google Gemini Free Tier)
+
+Platform menyediakan fitur opsional **Triase Foto Kerusakan Jalan dengan AI** berbasis Edge Function untuk memberikan rekomendasi awal kategori kerusakan dan perkiraan diameter lubang.
+
+### Prinsip Utama & Etika Pengukuran
+- **Hanya Saran (Bukan Keputusan Otomatis):** Rekomendasi AI bersifat asistif. Pelapor dapat memilih untuk menggunakan atau mengabaikan saran, dan petugas admin tetap memverifikasi secara independen sebelum menyetujui laporan.
+- **Biaya Rp0 & Aman:** Memanfaatkan paket gratis (*Free Tier*) Google Gemini API. Kunci API hanya tersimpan di *secrets* Edge Function (tidak pernah bocor ke sisi peramban/frontend).
+- **Gagal dengan Anggun (*Graceful Degradation*):** Jika fungsi dinonaktifkan, batas kuota gratis habis (HTTP 429), atau terjadi *timeout* (>12 detik), formulir pelaporan tetap berfungsi normal 100% secara manual tanpa hambatan.
+- **Metode Pengukuran Deterministik (Tanpa Halusinasi cm):** Model AI **dilarang menebak angka sentimeter**. Model hanya mendeteksi kotak pembatas (*bounding box*) lubang dan objek pembanding kertas A4. Diameter dihitung oleh algoritma kode berdasarkan rasio fisik kertas A4 standar (29,7 × 21,0 cm) dan disajikan dalam rentang target toleransi (belum terverifikasi; lihat tabel uji akurasi) (misal "25–35 cm"). Kedalaman disajikan murni dalam kelas kualitatif (*dangkal, sedang, dalam, tidak yakin*) tanpa angka sentimeter rekaan.
+- **Kepatuhan CSP & Keamanan CORS:** Aturan *Content Security Policy* (`connect-src`) pada seluruh halaman mengizinkan `https://*.supabase.co`, dan Edge Function hanya merespons origin yang terdaftar di secret `ALLOWED_ORIGINS`.
+
+### Panduan Setup & Deploy Edge Function
+1. Dapatkan API Key gratis di [Google AI Studio](https://aistudio.google.com).
+2. Pasang Supabase CLI di komputer Anda (bila belum terpasang):
+   ```bash
+   npm install -g supabase
+   ```
+3. Login dan tautkan (*link*) ke proyek Supabase Anda:
+   ```bash
+   supabase login
+   supabase link --project-ref <PROJECT_REF_ANDA>
+   ```
+4. Setel secrets kunci API, nama model, origin yang diizinkan, dan token cron pada Supabase:
+   ```bash
+   supabase secrets set GEMINI_API_KEY="<KUNCI_API_GEMINI_ANDA>" \
+     GEMINI_MODEL="<NAMA_MODEL_DARI_AI_STUDIO>" \
+     ALLOWED_ORIGINS="http://localhost:8080,https://<DOMAIN-ANDA>" \
+     CRON_SECRET="kunci-rahasia-cron-anda"
+   ```
+   > **Catatan Konfigurasi:**  
+   > - **`GEMINI_MODEL`:** Wajib diisi dengan nama model aktif dari dokumentasi Google AI Studio (misal: `gemini-3.5-flash-lite`).  
+   > - **`ALLOWED_ORIGINS`:** Wajib diisi dan harus memuat origin domain tempat situs JalanKitta dihosting (bukan domain `*.supabase.co`) dan tanpa garis miring (*slash*) di akhir (contoh yang benar: `http://localhost:8080,https://jalankitta.web.app`, bukan `https://jalankitta.web.app/`). Jangan menambahkan domain `*.supabase.co` karena `ALLOWED_ORIGINS` digunakan untuk memverifikasi asal peramban klien yang memanggil Edge Function.
+
+5. Deploy Edge Function:
+   ```bash
+   supabase functions deploy triase-foto
+   supabase functions deploy bersihkan-yatim --no-verify-jwt
+   ```
+   > **Catatan Autentikasi Function:**  
+   > - `triase-foto` mewajibkan token JWT pengguna (`verify_jwt = true`).  
+   > - `bersihkan-yatim` dideploy dengan opsi `--no-verify-jwt` (didefinisikan di `supabase/config.toml`) karena function ini tidak dipanggil oleh pengguna aplikasi, melainkan oleh scheduler/cron dan dilindungi menggunakan secret `CRON_SECRET` (bukan JWT pengguna).
+
+### Pembersihan Berkas Storage Yatim
+Pembersihan foto pra-unggah di bucket `foto_laporan` yang berumur > 24 jam dan tidak terhubung ke laporan warga mana pun ditangani secara aman oleh Edge Function `supabase/functions/bersihkan-yatim/index.ts` menggunakan Supabase Storage API dan hak akses *Service Role*. Fungsi SQL pendamping `public.bersihkan_foto_yatim()` di [`supabase/schema.sql`](supabase/schema.sql) bertindak mengidentifikasi daftar path berkas yatim (*SELECT-only*) dan hak eksekusinya dibatasi khusus untuk `service_role`.
+
+Fungsi dilindungi oleh secret `CRON_SECRET` melalui header `Authorization: Bearer <CRON_SECRET>`.
+
+> Bagi pengguna lama yang sebelumnya telah memasang jadwal cron SQL lama, batalkan jadwal lama tersebut terlebih dahulu:  
+> `select cron.unschedule('bersihkan_foto_yatim_daily');`
+
+#### 1. Penjadwalan Otomatis (pg_cron + pg_net)
+Jika ekstensi `pg_cron` dan `pg_net` aktif di proyek Supabase Anda (menu **Database > Extensions**), jadwalkan pembersihan otomatis (misal setiap hari pukul 03.00 WIB) via SQL Editor:
+```sql
+select cron.schedule(
+  'bersihkan-foto-yatim-harian',
+  '0 3 * * *',
+  $$
+  select net.http_post(
+    url := 'https://<PROJECT-REF>.supabase.co/functions/v1/bersihkan-yatim',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer <CRON_SECRET_ANDA>'
+    ),
+    body := '{}'::jsonb
+  );
+  $$
+);
+```
+
+#### 2. Menjalankan Pembersihan Manual
+Pembersihan dapat dipicu kapan saja melalui terminal / cURL:
+```bash
+curl -i -X POST "https://<PROJECT-REF>.supabase.co/functions/v1/bersihkan-yatim" \
+  -H "Authorization: Bearer <CRON_SECRET_ANDA>"
+```
+
+#### 3. Cara Menguji Pembersihan
+1. **Unggah Foto Uji:** Unggah satu berkas foto uji ke bucket `foto_laporan` di bawah folder `laporan/<uid>/test-yatim.jpg` (bisa lewat formulir lapor tanpa menekan submit laporan, atau melalui menu *Storage* di Supabase Dashboard).
+2. **Ubah Umur Berkas (> 24 Jam):** Jalankan perintah SQL berikut di SQL Editor Supabase untuk memundurkan waktu pembuatan objek:
+   ```sql
+   update storage.objects
+   set created_at = now() - interval '25 hours'
+   where bucket_id = 'foto_laporan' and name like '%test-yatim.jpg';
+   ```
+3. **Jalankan Fungsi Pembersih:** Eksekusi function via cURL (seperti pada langkah manual di atas).
+4. **Verifikasi:** Pastikan respons JSON mengembalikan status `ok: true` dan memuat path `laporan/<uid>/test-yatim.jpg` pada daftar `terhapus`. Periksa juga di menu Storage Supabase bahwa berkas tersebut telah hilang dari bucket.
+
+---
+
+
 ## 🚀 Menjalankan Aplikasi Secara Lokal
 
 Aplikasi tidak membutuhkan build bundler (seperti Webpack/Vite) dan dapat dijalankan langsung dengan server statis lokal apa pun:

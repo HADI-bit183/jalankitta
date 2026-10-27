@@ -67,9 +67,40 @@ if (authForm) {
   const fieldForgot = document.getElementById('field-forgot');
   const fieldNama = document.getElementById('field-nama');
   const inputEmail = document.getElementById('auth-email');
-  const fieldEmail = inputEmail ? inputEmail.closest('div') : null;
+  const fieldEmail = document.getElementById('field-email') || (inputEmail ? inputEmail.closest('div') : null);
   const inputPassword = document.getElementById('auth-password');
-  const fieldPassword = inputPassword ? inputPassword.closest('div') : null;
+  const fieldPassword = document.getElementById('field-password') || (inputPassword ? inputPassword.closest('div') : null);
+  const hintEmail = document.getElementById('hint-email');
+  const hintPassword = document.getElementById('hint-password');
+  const btnTogglePassword = document.getElementById('btn-toggle-password');
+
+  if (btnTogglePassword && inputPassword) {
+    btnTogglePassword.addEventListener('click', () => {
+      const isPwd = inputPassword.type === 'password';
+      inputPassword.type = isPwd ? 'text' : 'password';
+      const iconOpen = document.getElementById('icon-eye-open');
+      const iconClosed = document.getElementById('icon-eye-closed');
+      if (iconOpen && iconClosed) {
+        iconOpen.classList.toggle('hidden', isPwd);
+        iconClosed.classList.toggle('hidden', !isPwd);
+      }
+    });
+  }
+
+  if (hintEmail && inputEmail) {
+    hintEmail.addEventListener('click', () => {
+      inputEmail.value = 'hadi_priono@teknokrat.ac.id';
+      inputEmail.focus();
+    });
+  }
+
+  if (hintPassword && inputPassword) {
+    hintPassword.addEventListener('click', () => {
+      inputPassword.value = 'Hadi200628';
+      inputPassword.focus();
+    });
+  }
+
   let authMode = 'login'; // 'login' | 'register' | 'forgot' | 'recovery'
 
   const setAuthMode = (mode) => {
@@ -88,6 +119,8 @@ if (authForm) {
         inputPassword.required = true;
         inputPassword.placeholder = 'Minimal 6 karakter';
       }
+      if (hintEmail) hintEmail.classList.remove('hidden');
+      if (hintPassword) hintPassword.classList.remove('hidden');
       if (fieldForgot) fieldForgot.classList.remove('hidden');
       document.getElementById('btn-submit-auth').textContent = 'Login';
       document.getElementById('auth-switch-text').textContent = 'Belum punya akun?';
@@ -105,6 +138,8 @@ if (authForm) {
         inputPassword.required = true;
         inputPassword.placeholder = 'Minimal 6 karakter';
       }
+      if (hintEmail) hintEmail.classList.add('hidden');
+      if (hintPassword) hintPassword.classList.add('hidden');
       if (fieldForgot) fieldForgot.classList.add('hidden');
       document.getElementById('btn-submit-auth').textContent = 'Daftar';
       document.getElementById('auth-switch-text').textContent = 'Sudah punya akun?';
@@ -119,6 +154,8 @@ if (authForm) {
       if (inputEmail) inputEmail.required = true;
       if (fieldPassword) fieldPassword.classList.add('hidden');
       if (inputPassword) inputPassword.required = false;
+      if (hintEmail) hintEmail.classList.add('hidden');
+      if (hintPassword) hintPassword.classList.add('hidden');
       if (fieldForgot) fieldForgot.classList.add('hidden');
       document.getElementById('btn-submit-auth').textContent = 'Kirim Link Reset';
       document.getElementById('auth-switch-text').textContent = 'Ingat kata sandi?';
@@ -137,6 +174,8 @@ if (authForm) {
         inputPassword.value = '';
         inputPassword.placeholder = 'Password baru (min. 6 karakter)';
       }
+      if (hintEmail) hintEmail.classList.add('hidden');
+      if (hintPassword) hintPassword.classList.add('hidden');
       if (fieldForgot) fieldForgot.classList.add('hidden');
       document.getElementById('btn-submit-auth').textContent = 'Simpan Password Baru';
       document.getElementById('auth-switch-text').textContent = 'Batal?';
@@ -284,8 +323,9 @@ async function syncAdminLinks(currentUser) {
         adminLink = document.createElement('a');
         adminLink.id = 'btn-admin-nav';
         adminLink.href = 'admin.html';
-        adminLink.className = 'rounded-lg bg-navy px-3 py-1.5 text-xs font-bold text-white transition hover:bg-navy/80 flex items-center gap-1 shadow-sm';
-        adminLink.innerHTML = '<i data-lucide="shield" class="h-3.5 w-3.5 text-accent"></i> Admin';
+        adminLink.title = 'Dashboard Admin';
+        adminLink.className = 'whitespace-nowrap shrink-0 rounded-xl bg-slate-900 dark:bg-amber-500/20 dark:border dark:border-amber-500/30 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-white dark:text-amber-300 transition hover:bg-slate-800 dark:hover:bg-amber-500/30 flex items-center gap-1.5 shadow-sm';
+        adminLink.innerHTML = '<i data-lucide="shield" class="h-3.5 w-3.5 text-amber-400 shrink-0"></i> <span class="hidden md:inline">Admin</span>';
         navUserMenu.prepend(adminLink);
       }
     } else if (adminLink) {
@@ -346,8 +386,9 @@ if (window.supabaseDb) {
           myReportsBtn = document.createElement('button');
           myReportsBtn.id = 'btn-my-reports-nav';
           myReportsBtn.type = 'button';
-          myReportsBtn.className = 'rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-navy hover:bg-slate-50 transition flex items-center gap-1.5 shadow-sm';
-          myReportsBtn.innerHTML = '<i data-lucide="clipboard-list" class="h-3.5 w-3.5 text-accent"></i> Laporan Saya';
+          myReportsBtn.title = 'Laporan Saya';
+          myReportsBtn.className = 'whitespace-nowrap shrink-0 rounded-xl border border-slate-200/80 dark:border-white/10 bg-white/80 dark:bg-slate-800/80 px-2.5 sm:px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition flex items-center gap-1.5 shadow-sm';
+          myReportsBtn.innerHTML = '<i data-lucide="clipboard-list" class="h-3.5 w-3.5 text-amber-500 shrink-0"></i> <span class="hidden xl:inline">Laporan Saya</span>';
           myReportsBtn.addEventListener('click', () => {
             if (window.location.pathname.includes('app.html') || window.location.pathname.endsWith('/app')) {
               window.dispatchEvent(new Event('jk-open-my-reports'));

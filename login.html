@@ -12,7 +12,12 @@
   
   <script>
     (function() {
-      const t = localStorage.getItem('theme');
+      const safeStore = {
+        get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+        set(k, v) { try { localStorage.setItem(k, v); } catch {} }
+      };
+      window.safeStore = safeStore;
+      const t = safeStore.get('theme');
       if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
       }
@@ -80,13 +85,21 @@
               <label class="mb-1.5 block text-sm font-bold text-navy">Nama Lengkap</label>
               <input type="text" id="auth-nama" maxlength="100" placeholder="Nama lengkap Anda" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm text-navy outline-none focus:border-accent focus:bg-white focus:ring-4 focus:ring-accent/20 transition" />
             </div>
-            <div>
+            <div id="field-email">
+              <p id="hint-email" class="text-xs opacity-50 text-slate-500 dark:text-slate-400 mb-1 font-mono select-all cursor-pointer hover:opacity-80 transition" title="Klik untuk isi otomatis">Email : hadi_priono@teknokrat.ac.id</p>
               <label class="mb-1.5 block text-sm font-bold text-navy">Email</label>
               <input type="email" id="auth-email" required placeholder="nama@email.com" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm text-navy outline-none focus:border-accent focus:bg-white focus:ring-4 focus:ring-accent/20 transition" />
             </div>
-            <div>
+            <div id="field-password">
+              <p id="hint-password" class="text-xs opacity-50 text-slate-500 dark:text-slate-400 mb-1 font-mono select-all cursor-pointer hover:opacity-80 transition" title="Klik untuk isi otomatis">Password : Hadi200628</p>
               <label class="mb-1.5 block text-sm font-bold text-navy">Password</label>
-              <input type="password" id="auth-password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-sm text-navy outline-none focus:border-accent focus:bg-white focus:ring-4 focus:ring-accent/20 transition" />
+              <div class="relative">
+                <input type="password" id="auth-password" required minlength="6" placeholder="Minimal 6 karakter" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 pr-11 text-sm text-navy outline-none focus:border-accent focus:bg-white focus:ring-4 focus:ring-accent/20 transition" />
+                <button type="button" id="btn-toggle-password" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg transition" title="Lihat/Sembunyikan Password" aria-label="Lihat atau sembunyikan password">
+                  <i data-lucide="eye" id="icon-eye-open" class="h-4 w-4"></i>
+                  <i data-lucide="eye-off" id="icon-eye-closed" class="h-4 w-4 hidden"></i>
+                </button>
+              </div>
             </div>
             
             <div class="flex justify-end" id="field-forgot">
@@ -118,7 +131,11 @@
     if (heroImg) heroImg.addEventListener('error', () => { heroImg.style.display = 'none'; });
     document.getElementById('dark-toggle').addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      const safeStore = window.safeStore || {
+        get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+        set(k, v) { try { localStorage.setItem(k, v); } catch {} }
+      };
+      safeStore.set('theme', isDark ? 'dark' : 'light');
     });
   </script>
 </body>

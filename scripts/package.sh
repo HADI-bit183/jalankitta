@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Membuat paket pengumpulan (juknis C.7) yang bersih dari sampah macOS dan node_modules.
+# Membuat paket pengumpulan (juknis C.7) yang bersih dari sampah macOS, node_modules, dan berkas rahasia.
 # Pakai:  npm run build:css && bash scripts/package.sh
 # Hasil:  ../JalanKitta_Pengumpulan.zip berisi:
 #   1_Folder_Karya/      (kode situs)
@@ -14,7 +14,9 @@ OUT="$ROOT/../JalanKitta_Pengumpulan.zip"
 mkdir -p "$STAGE/1_Folder_Karya" "$STAGE/2_Surat_Orisinalitas" "$STAGE/3_Proposal_Proyek"
 rsync -a \
   --exclude 'node_modules' --exclude '.git' --exclude '.DS_Store' --exclude '__MACOSX' \
-  --exclude '._*' --exclude 'pengumpulan' --exclude '.env*' \
+  --exclude '._*' --exclude 'pengumpulan' --exclude '.env*' --exclude '*.env*' \
+  --exclude 'supabase/.temp' --exclude 'supabase/.temp/*' \
+  --exclude 'supabase/.env.local' --exclude 'test_fotos' \
   "$ROOT/" "$STAGE/1_Folder_Karya/"
 
 # Salin draf/berkas dari folder pengumpulan/ bila sudah ada PDF final
@@ -25,6 +27,7 @@ cp "$ROOT/pengumpulan/Proposal_Proyek_DRAFT.md" "$STAGE/3_Proposal_Proyek/" 2>/d
 cp "$ROOT/pengumpulan/Surat_Orisinalitas_DRAFT.md" "$STAGE/2_Surat_Orisinalitas/" 2>/dev/null || true
 
 rm -f "$OUT"
-( cd "$(dirname "$STAGE")" && zip -rq "$OUT" "JalanKitta_Pengumpulan" -x '*.DS_Store' '*__MACOSX*' )
+( cd "$(dirname "$STAGE")" && zip -rq "$OUT" "JalanKitta_Pengumpulan" \
+  -x '*.DS_Store' '*__MACOSX*' '*.env*' '*supabase/.temp*' '*supabase/.env.local*' '*test_fotos*' )
 echo "Paket dibuat: $OUT"
 unzip -l "$OUT" | tail -3

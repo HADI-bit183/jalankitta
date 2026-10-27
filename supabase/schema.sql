@@ -125,8 +125,7 @@ alter table public.laporan_warga add column if not exists deleted_at timestamptz
 -- Ini diletakkan di sini agar tabel laporan_warga dan kolom ruas_id sudah dipastikan ada.
 update public.ruas_jalan r
 set kondisi_dasar = r.kondisi
-where r.id not in ('R-01','R-02','R-03','R-04','R-05','R-06','R-07','R-08','R-09','R-10','R-11','R-12','R-13','R-14')
-  and r.kondisi_dasar = 'baik'
+where r.kondisi_dasar = 'baik'
   and r.kondisi <> 'baik'
   and not exists (
     select 1 from public.laporan_warga l
@@ -588,12 +587,28 @@ end $$;
 -- 8f. Audit Log Admin untuk tindakan penting (hapus laporan, soft-delete, ubah status)
 create table if not exists public.laporan_audit_log (
   id          bigint generated always as identity primary key,
-  laporan_id  bigint,
+  laporan_id  text,
   action      text not null, -- 'DELETE', 'SOFT_DELETE', 'STATUS_CHANGE'
   admin_id    uuid default auth.uid() references auth.users(id) on delete set null,
   data        jsonb not null,
   created_at  timestamptz not null default now()
 );
+
+-- Migrasi idempoten: pastikan kolom laporan_id bertipe text agar kompatibel dengan UUID laporan
+do $$
+begin
+  if exists (
+    select 1
+    from information_schema.columns
+    where table_schema = 'public'
+      and table_name = 'laporan_audit_log'
+      and column_name = 'laporan_id'
+      and data_type in ('bigint', 'integer', 'smallint')
+  ) then
+    alter table public.laporan_audit_log alter column laporan_id type text using laporan_id::text;
+  end if;
+end $$;
+
 alter table public.laporan_audit_log enable row level security;
 drop policy if exists "admin baca audit log" on public.laporan_audit_log;
 create policy "admin baca audit log" on public.laporan_audit_log
@@ -903,6 +918,78 @@ $$;
 grant execute on function public.get_laporan_viewport(double precision, double precision, double precision, double precision, text, integer) to anon, authenticated;
 
 -- ==============================================================================
+-- 9. TABEL: AI TRIASE (Saran AI Foto Kerusakan - Free Tier)
+-- ==============================================================================
+create table if not exists public.ai_triase (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  foto_path text not null,
+  hasil jsonb not null,
+  model text,
+  created_at timestamptz default now()
+);
+
+alter table public.ai_triase enable row level security;
+
+-- Policy: SELECT untuk pemilik (user_id = auth.uid()) dan admin (public.is_admin())
+drop policy if exists "ai_triase_select_owner" on public.ai_triase;
+create policy "ai_triase_select_owner" on public.ai_triase
+  for select to authenticated
+  using (user_id = auth.uid());
+
+drop policy if exists "ai_triase_select_admin" on public.ai_triase;
+create policy "ai_triase_select_admin" on public.ai_triase
+  for select to authenticated
+  using (public.is_admin());
+
+-- INSERT/UPDATE/DELETE tidak diberi policy untuk anon/authenticated (hanya service_role)
+
+-- Index (user_id, created_at) dan (foto_path)
+create index if not exists idx_ai_triase_user_created on public.ai_triase(user_id, created_at desc);
+create index if not exists idx_ai_triase_foto_path on public.ai_triase(foto_path);
+
+-- ==============================================================================
+-- 10. PEMBERSIH FOTO YATIM STORAGE (Orphaned Storage Objects Helper)
+-- ==============================================================================
+-- Mengembalikan daftar path berkas di bucket 'foto_laporan' dengan pola 'laporan/*'
+-- yang berumur > 24 jam dan tidak memiliki referensi aktif di public.laporan_warga.foto_url.
+-- Penghapusan fisik berkas dilakukan oleh Edge Function bersihkan-yatim via Storage API.
+create or replace function public.bersihkan_foto_yatim()
+returns table(name text)
+language plpgsql
+security definer
+set search_path = public, storage
+as $$
+begin
+  return query
+  select o.name::text
+  from storage.objects o
+  where o.bucket_id = 'foto_laporan'
+    and o.name like 'laporan/%'
+    and o.created_at < (now() - interval '24 hours')
+    and not exists (
+      select 1 from public.laporan_warga lw
+      where lw.foto_url is not null
+        and lw.deleted_at is null
+        and lw.foto_url like '%' || o.name
+    );
+exception
+  when insufficient_privilege then
+    raise warning 'Akses ditolak pada storage.objects (insufficient privilege)';
+    return;
+  when others then
+    raise warning 'Gagal mengambil daftar foto yatim: %', sqlerrm;
+    return;
+end;
+$$;
+
+-- Cabut akses eksekusi dari publik dan user terotentikasi; hanya service_role yang diizinkan
+revoke execute on function public.bersihkan_foto_yatim() from public, anon, authenticated;
+grant execute on function public.bersihkan_foto_yatim() to service_role;
+
+-- ==============================================================================
 -- ADMIN PERTAMA: daftar akun lewat login.html, salin UID di Authentication > Users:
 --   insert into public.admins (user_id) values ('<UUID_ANDA>') on conflict do nothing;
 -- ==============================================================================
+
+

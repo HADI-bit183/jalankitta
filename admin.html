@@ -12,7 +12,12 @@
 
   <script>
     (function() {
-      const savedTheme = localStorage.getItem('theme');
+      const safeStore = {
+        get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+        set(k, v) { try { localStorage.setItem(k, v); } catch {} }
+      };
+      window.safeStore = safeStore;
+      const savedTheme = safeStore.get('theme');
       if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
       }
@@ -26,6 +31,7 @@
     rel="stylesheet" />
 
   <script src="https://unpkg.com/lucide@0.453.0/dist/umd/lucide.min.js" integrity="sha384-0v3Wh0ZtiQBYCYywQoeMDA5mAw5Z01p0lhorqy0BlwFrcN6u3lmN7K0U/e1uezmr" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" integrity="sha384-vsrfeLOOY6KuIYKDlmVH5UiBmgIdB1oEf7p01YgWHuqmOHfZr374+odEv96n9tNC" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="assets/css/style.css" />
   <link rel="stylesheet" href="assets/css/tailwind.css" />
   <style>
@@ -148,6 +154,53 @@
         </div>
       </section>
 
+      <!-- Bagian Grafik & Analisis Data Riil (100% Live dari Database) -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-5" id="section-charts">
+        <!-- Grafik 1: Kondisi Fisik Ruas Jalan per Kabupaten (Live dari ruas_jalan) -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-card border border-slate-100 dark:border-white/10 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <span class="text-xs font-bold text-accent uppercase tracking-wider flex items-center gap-1.5">
+                <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> Kondisi Fisik Ruas Jalan (Live)
+              </span>
+              <h3 class="font-display text-base font-bold text-navy dark:text-white mt-0.5" id="chart1-title">Kondisi Jalan per Wilayah</h3>
+            </div>
+            <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
+              <button type="button" id="btn-chart1-bar" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 text-navy dark:text-white shadow-sm transition">Per Kabupaten (km)</button>
+              <button type="button" id="btn-chart1-donut" class="px-2.5 py-1 rounded-lg text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white transition">Rasio Total</button>
+            </div>
+          </div>
+          <div class="relative h-64 sm:h-72 w-full flex items-center justify-center">
+            <canvas id="chart-ruas"></canvas>
+          </div>
+          <div id="chart1-summary" class="mt-3 pt-3 border-t border-slate-100 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-ink dark:text-slate-400">
+            <!-- Summary angka riil terisi dinamis -->
+          </div>
+        </div>
+
+        <!-- Grafik 2: Status & Penanganan Laporan Warga (Live dari laporan_warga) -->
+        <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-card border border-slate-100 dark:border-white/10 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <span class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                <span class="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span> Laporan Warga (Live)
+              </span>
+              <h3 class="font-display text-base font-bold text-navy dark:text-white mt-0.5" id="chart2-title">Status Penanganan Laporan</h3>
+            </div>
+            <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-bold">
+              <button type="button" id="btn-chart2-status" class="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 text-navy dark:text-white shadow-sm transition">Status</button>
+              <button type="button" id="btn-chart2-kategori" class="px-2.5 py-1 rounded-lg text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white transition">Tingkat Rusak</button>
+            </div>
+          </div>
+          <div class="relative h-64 sm:h-72 w-full flex items-center justify-center">
+            <canvas id="chart-laporan"></canvas>
+          </div>
+          <div id="chart2-summary" class="mt-3 pt-3 border-t border-slate-100 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-ink dark:text-slate-400">
+            <!-- Summary angka riil terisi dinamis -->
+          </div>
+        </div>
+      </section>
+
       <!-- Filter dan Pencarian -->
       <section class="bg-white p-5 rounded-2xl shadow-card border border-slate-100 flex flex-col md:flex-row gap-4 justify-between items-center">
         <!-- Filter Tabs Status -->
@@ -190,17 +243,108 @@
     </div>
   </main>
 
-  <!-- Modal Lightbox Foto -->
+  <!-- Modal Lightbox Foto & Detail Triase AI -->
   <div id="modal-foto" role="dialog" aria-modal="true" aria-labelledby="modal-foto-title" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center">
-    <div class="relative max-w-3xl w-full bg-white rounded-2xl overflow-hidden shadow-2xl">
-      <div class="p-4 flex items-center justify-between border-b border-slate-100">
-        <h3 id="modal-foto-title" class="text-sm font-bold text-navy truncate">Dokumentasi Kerusakan</h3>
+    <div class="relative max-w-4xl w-full bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      <!-- Header Modal -->
+      <div class="p-4 flex items-center justify-between border-b border-slate-100 shrink-0">
+        <div class="min-w-0 pr-3">
+          <h3 id="modal-foto-title" class="text-sm font-bold text-navy truncate">Dokumentasi Kerusakan</h3>
+          <p id="modal-foto-subtitle" class="text-xs text-ink truncate"></p>
+        </div>
         <button id="modal-foto-close" aria-label="Tutup jendela foto" class="rounded-lg p-1 text-ink hover:bg-slate-100 transition"><i data-lucide="x" class="h-5 w-5"></i></button>
       </div>
-      <div class="p-4 bg-slate-900 flex items-center justify-center min-h-[300px] max-h-[75vh]">
-        <img id="modal-foto-img" src="" alt="Foto Bukti" class="max-h-[70vh] w-auto max-w-full object-contain rounded-lg" />
+
+      <!-- Body Modal: Grid Foto + Panel Saran AI -->
+      <div class="overflow-y-auto flex-1 p-4 grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <!-- Kolom Foto dengan Bounding Box Overlay -->
+        <div class="lg:col-span-7 flex flex-col items-center justify-center bg-slate-900 rounded-xl p-3 min-h-[280px]">
+          <div id="modal-foto-stage" class="relative inline-block max-w-full max-h-[60vh]">
+            <img id="modal-foto-img" src="" alt="Foto Bukti" class="max-h-[60vh] w-auto max-w-full block object-contain rounded" />
+            <!-- Overlay Bounding Boxes -->
+            <div id="modal-foto-overlay" class="absolute inset-0 pointer-events-none"></div>
+            <!-- Label Badge Overlay -->
+            <div id="modal-foto-overlay-badge" class="hidden absolute top-2 left-2 px-2.5 py-1 rounded-md bg-black/75 text-[10px] font-bold text-white tracking-wide uppercase backdrop-blur-sm pointer-events-none border border-white/20 shadow">
+              Perkiraan AI, bukan pengukuran
+            </div>
+          </div>
+          <div class="mt-2 flex flex-wrap items-center gap-3 text-[11px] text-slate-300">
+            <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-sm bg-rose-500 border border-rose-300"></span> Kotak Lubang</span>
+            <span class="flex items-center gap-1.5"><span class="h-2.5 w-2.5 rounded-sm bg-cyan-400 border border-cyan-200"></span> Kotak Kertas A4</span>
+          </div>
+        </div>
+
+        <!-- Kolom Panel Saran AI & Verifikasi Kategori -->
+        <div class="lg:col-span-5 flex flex-col gap-4">
+          <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+            <div class="flex items-center gap-2 mb-3">
+              <i data-lucide="sparkles" class="h-4 w-4 text-accent"></i>
+              <h4 class="text-xs font-bold uppercase tracking-wider text-navy">Saran AI</h4>
+            </div>
+
+            <div id="modal-ai-loading" class="hidden py-4 text-center text-xs text-ink">
+              <i data-lucide="loader-2" class="h-5 w-5 animate-spin mx-auto mb-1 text-accent"></i>
+              Memuat data triase AI...
+            </div>
+
+            <div id="modal-ai-empty" class="hidden py-4 text-center text-xs text-ink italic">
+              Tidak ada data triase AI untuk foto ini.
+            </div>
+
+            <div id="modal-ai-content" class="hidden space-y-3">
+              <div>
+                <span class="text-[10px] font-semibold text-ink uppercase tracking-wider block">Kategori Saran AI</span>
+                <span id="modal-ai-kategori" class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold"></span>
+              </div>
+
+              <div>
+                <span class="text-[10px] font-semibold text-ink uppercase tracking-wider block">Deskripsi AI</span>
+                <p id="modal-ai-deskripsi" class="text-xs text-navy mt-1 leading-relaxed bg-white p-2.5 rounded-lg border border-slate-200/60"></p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 text-xs bg-white p-2.5 rounded-lg border border-slate-200/60">
+                <div>
+                  <span class="text-[10px] text-ink block">Perkiraan Diameter</span>
+                  <span id="modal-ai-diameter" class="font-bold text-navy block mt-0.5"></span>
+                </div>
+                <div>
+                  <span class="text-[10px] text-ink block">Kelas Kedalaman</span>
+                  <span id="modal-ai-kedalaman" class="font-bold text-navy block mt-0.5 capitalize"></span>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between text-xs text-ink pt-1">
+                <span>Tingkat Kepercayaan AI:</span>
+                <span id="modal-ai-kepercayaan" class="font-bold text-navy"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bagian Verifikasi / Pengaturan Kategori oleh Admin -->
+          <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-navy block">Keputusan Kategori Admin</span>
+            <div>
+              <label for="modal-select-kategori" class="text-xs text-ink block mb-1">Tingkat Kerusakan Laporan:</label>
+              <select id="modal-select-kategori" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-bold text-navy outline-none focus:border-accent">
+                <option value="ringan">Rusak Ringan</option>
+                <option value="berat">Rusak Berat</option>
+              </select>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2 pt-1">
+              <button type="button" id="btn-modal-apply-ai" class="flex-1 rounded-xl px-3 py-2 text-xs font-bold transition border border-accent/40 bg-accent/10 text-accent hover:bg-accent/20 flex items-center justify-center gap-1.5">
+                <i data-lucide="sparkles" class="h-3.5 w-3.5"></i> Terapkan kategori saran
+              </button>
+              <button type="button" id="btn-modal-save-kategori" class="rounded-xl px-4 py-2 text-xs font-bold text-white bg-navy hover:bg-navy/90 transition flex items-center justify-center gap-1.5">
+                <i data-lucide="save" class="h-3.5 w-3.5"></i> Simpan
+              </button>
+            </div>
+            <p id="modal-kategori-status" class="hidden text-[11px] font-semibold text-center"></p>
+          </div>
+        </div>
       </div>
     </div>
+  </div>
   <!-- Modal Kelola & Survei Kondisi Ruas Jalan -->
   <div id="modal-ruas" role="dialog" aria-modal="true" aria-labelledby="modal-ruas-title" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm p-4 flex items-center justify-center">
     <div class="relative max-w-4xl w-full bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh] border border-slate-200 dark:border-slate-800">
@@ -327,6 +471,7 @@
             deniedEl.classList.add('hidden');
             contentEl.classList.remove('hidden');
             fetchReports();
+            loadRuasJalan();
           }
         } catch (err) {
           console.error('Fatal admin access error:', err);
@@ -386,7 +531,306 @@
         $('#stat-diverifikasi').textContent = allReports.filter(r => r.status === 'diverifikasi').length;
         $('#stat-diproses').textContent = allReports.filter(r => r.status === 'diproses').length;
         $('#stat-selesai').textContent = allReports.filter(r => r.status === 'selesai').length;
+        renderCharts();
       }
+
+      // =====================================================================
+      // FITUR GRAFIK & VISUALISASI ANALITIK ADMIN (100% DATA RIIL & LIVE)
+      // =====================================================================
+      let chartRuasInstance = null;
+      let chartLaporanInstance = null;
+      let chart1View = 'bar'; // 'bar' | 'donut'
+      let chart2View = 'status'; // 'status' | 'kategori'
+
+      function renderCharts() {
+        if (typeof Chart === 'undefined') return;
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const textColor = isDark ? '#94A3B8' : '#64748B';
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.07)' : 'rgba(226, 232, 240, 0.7)';
+        const fontConfig = { family: "'Plus Jakarta Sans', sans-serif" };
+
+        // -------------------------------------------------------------
+        // 1. DATA RIIL RUAS JALAN DARI SUPABASE (allRuas)
+        // -------------------------------------------------------------
+        const kabMap = {};
+        let totalKm = 0;
+        let totalKmBerat = 0;
+        let totalKmRingan = 0;
+        let totalKmBaik = 0;
+
+        (allRuas || []).forEach(r => {
+          const kab = r.kabupaten || 'Lampung';
+          if (!kabMap[kab]) {
+            kabMap[kab] = { berat: 0, ringan: 0, baik: 0, total: 0 };
+          }
+          const km = parseFloat(r.panjang_km) || 0;
+          kabMap[kab].total += km;
+          totalKm += km;
+          if (r.kondisi === 'berat') {
+            kabMap[kab].berat += km;
+            totalKmBerat += km;
+          } else if (r.kondisi === 'ringan') {
+            kabMap[kab].ringan += km;
+            totalKmRingan += km;
+          } else {
+            kabMap[kab].baik += km;
+            totalKmBaik += km;
+          }
+        });
+
+        const kabLabels = Object.keys(kabMap);
+        const dataKmBeratPerKab = kabLabels.map(k => Number(kabMap[k].berat.toFixed(1)));
+        const dataKmRinganPerKab = kabLabels.map(k => Number(kabMap[k].ringan.toFixed(1)));
+        const dataKmBaikPerKab = kabLabels.map(k => Number(kabMap[k].baik.toFixed(1)));
+
+        // Summary angka riil untuk Grafik 1
+        const summary1El = $('#chart1-summary');
+        if (summary1El) {
+          summary1El.innerHTML = `
+            <span class="font-bold text-navy dark:text-white">Total: ${totalKm.toFixed(1)} km (${allRuas.length} Ruas)</span>
+            <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+              <span class="text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span>Berat: ${totalKmBerat.toFixed(1)} km</span>
+              <span class="text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span>Ringan: ${totalKmRingan.toFixed(1)} km</span>
+              <span class="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>Baik: ${totalKmBaik.toFixed(1)} km</span>
+            </div>
+          `;
+        }
+
+        // Render Grafik 1: Ruas Jalan
+        const ctxRuas = document.getElementById('chart-ruas')?.getContext('2d');
+        if (ctxRuas) {
+          if (chartRuasInstance) chartRuasInstance.destroy();
+
+          if (chart1View === 'donut') {
+            // Tampilan Donut (Rasio Total Kondisi Fisik Seluruh Ruas)
+            chartRuasInstance = new Chart(ctxRuas, {
+              type: 'doughnut',
+              data: {
+                labels: ['Rusak Berat (km)', 'Rusak Ringan (km)', 'Kondisi Mantap/Baik (km)'],
+                datasets: [{
+                  data: [Number(totalKmBerat.toFixed(1)), Number(totalKmRingan.toFixed(1)), Number(totalKmBaik.toFixed(1))],
+                  backgroundColor: ['#EF4444', '#F59E0B', '#10B981'],
+                  borderWidth: isDark ? 2 : 1,
+                  borderColor: isDark ? '#0F172A' : '#FFFFFF',
+                  hoverOffset: 6
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: 'bottom',
+                    labels: { color: textColor, font: { ...fontConfig, size: 11, weight: '600' }, padding: 12 }
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: (ctx) => ` ${ctx.label}: ${ctx.raw} km (${totalKm > 0 ? ((ctx.raw / totalKm) * 100).toFixed(1) : 0}%)`
+                    }
+                  }
+                }
+              }
+            });
+          } else {
+            // Tampilan Bar per Wilayah / Kabupaten
+            chartRuasInstance = new Chart(ctxRuas, {
+              type: 'bar',
+              data: {
+                labels: kabLabels.length > 0 ? kabLabels : ['Belum Ada Ruas'],
+                datasets: [
+                  {
+                    label: 'Rusak Berat (km)',
+                    data: dataKmBeratPerKab,
+                    backgroundColor: '#EF4444',
+                    borderRadius: 6
+                  },
+                  {
+                    label: 'Rusak Ringan (km)',
+                    data: dataKmRinganPerKab,
+                    backgroundColor: '#F59E0B',
+                    borderRadius: 6
+                  },
+                  {
+                    label: 'Kondisi Mantap (km)',
+                    data: dataKmBaikPerKab,
+                    backgroundColor: '#10B981',
+                    borderRadius: 6
+                  }
+                ]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: 'bottom',
+                    labels: { color: textColor, font: { ...fontConfig, size: 11, weight: '600' }, padding: 12 }
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: (ctx) => ` ${ctx.dataset.label}: ${ctx.raw} km`
+                    }
+                  }
+                },
+                scales: {
+                  x: {
+                    grid: { display: false },
+                    ticks: { color: textColor, font: { ...fontConfig, size: 11 } }
+                  },
+                  y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Panjang Jalan (km)', color: textColor, font: { ...fontConfig, size: 11, weight: 'bold' } },
+                    grid: { color: gridColor },
+                    ticks: { color: textColor, font: { ...fontConfig, size: 10 } }
+                  }
+                }
+              }
+            });
+          }
+        }
+
+        // -------------------------------------------------------------
+        // 2. DATA RIIL LAPORAN WARGA DARI SUPABASE (allReports)
+        // -------------------------------------------------------------
+        const countBaru = (allReports || []).filter(r => r.status === 'baru').length;
+        const countDiverifikasi = (allReports || []).filter(r => r.status === 'diverifikasi').length;
+        const countDiproses = (allReports || []).filter(r => r.status === 'diproses').length;
+        const countSelesai = (allReports || []).filter(r => r.status === 'selesai').length;
+
+        const countBerat = (allReports || []).filter(r => r.kategori_rusak === 'berat').length;
+        const countRingan = (allReports || []).filter(r => r.kategori_rusak === 'ringan').length;
+        const countBaik = (allReports || []).filter(r => r.kategori_rusak === 'baik').length;
+
+        // Summary angka riil untuk Grafik 2
+        const summary2El = $('#chart2-summary');
+        if (summary2El) {
+          summary2El.innerHTML = `
+            <span class="font-bold text-navy dark:text-white">Total Laporan Aktif: ${(allReports || []).length}</span>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold">${countBaru} Baru</span>
+              <span class="px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 font-bold">${countDiverifikasi} Verifikasi</span>
+              <span class="px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 font-bold">${countDiproses} Proses</span>
+              <span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-bold">${countSelesai} Selesai</span>
+            </div>
+          `;
+        }
+
+        // Render Grafik 2: Laporan Warga
+        const ctxLaporan = document.getElementById('chart-laporan')?.getContext('2d');
+        if (ctxLaporan) {
+          if (chartLaporanInstance) chartLaporanInstance.destroy();
+
+          if (chart2View === 'kategori') {
+            // Tampilan Donut Kategori Kerusakan Laporan
+            const hasData = (countBerat + countRingan + countBaik) > 0;
+            chartLaporanInstance = new Chart(ctxLaporan, {
+              type: 'doughnut',
+              data: {
+                labels: ['Rusak Berat', 'Rusak Ringan', 'Kondisi Baik'],
+                datasets: [{
+                  data: hasData ? [countBerat, countRingan, countBaik] : [0, 0, 0],
+                  backgroundColor: ['#EF4444', '#F59E0B', '#10B981'],
+                  borderWidth: isDark ? 2 : 1,
+                  borderColor: isDark ? '#0F172A' : '#FFFFFF',
+                  hoverOffset: 6
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: 'bottom',
+                    labels: { color: textColor, font: { ...fontConfig, size: 11, weight: '600' }, padding: 12 }
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: (ctx) => ` ${ctx.label}: ${ctx.raw} laporan`
+                    }
+                  }
+                }
+              }
+            });
+          } else {
+            // Tampilan Bar Status Penanganan Laporan Masuk
+            chartLaporanInstance = new Chart(ctxLaporan, {
+              type: 'bar',
+              data: {
+                labels: ['Menunggu (Baru)', 'Diverifikasi', 'Diproses', 'Selesai'],
+                datasets: [{
+                  label: 'Jumlah Laporan',
+                  data: [countBaru, countDiverifikasi, countDiproses, countSelesai],
+                  backgroundColor: ['#F59E0B', '#3B82F6', '#A855F7', '#10B981'],
+                  borderRadius: 8,
+                  maxBarThickness: 45
+                }]
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { display: false },
+                  tooltip: {
+                    callbacks: {
+                      label: (ctx) => ` ${ctx.raw} laporan`
+                    }
+                  }
+                },
+                scales: {
+                  x: {
+                    grid: { display: false },
+                    ticks: { color: textColor, font: { ...fontConfig, size: 11, weight: '600' } }
+                  },
+                  y: {
+                    beginAtZero: true,
+                    ticks: {
+                      precision: 0,
+                      color: textColor,
+                      font: { ...fontConfig, size: 10 }
+                    },
+                    title: { display: true, text: 'Jumlah Laporan', color: textColor, font: { ...fontConfig, size: 11, weight: 'bold' } },
+                    grid: { color: gridColor }
+                  }
+                }
+              }
+            });
+          }
+        }
+      }
+
+      // Handler Tombol Toggle Grafik 1 & 2
+      $('#btn-chart1-bar')?.addEventListener('click', () => {
+        chart1View = 'bar';
+        $('#btn-chart1-bar').className = 'px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 text-navy dark:text-white shadow-sm transition';
+        $('#btn-chart1-donut').className = 'px-2.5 py-1 rounded-lg text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white transition';
+        $('#chart1-title').textContent = 'Kondisi Jalan per Wilayah';
+        renderCharts();
+      });
+      $('#btn-chart1-donut')?.addEventListener('click', () => {
+        chart1View = 'donut';
+        $('#btn-chart1-donut').className = 'px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 text-navy dark:text-white shadow-sm transition';
+        $('#btn-chart1-bar').className = 'px-2.5 py-1 rounded-lg text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white transition';
+        $('#chart1-title').textContent = 'Rasio Total Kondisi Seluruh Ruas';
+        renderCharts();
+      });
+
+      $('#btn-chart2-status')?.addEventListener('click', () => {
+        chart2View = 'status';
+        $('#btn-chart2-status').className = 'px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 text-navy dark:text-white shadow-sm transition';
+        $('#btn-chart2-kategori').className = 'px-2.5 py-1 rounded-lg text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white transition';
+        $('#chart2-title').textContent = 'Status Penanganan Laporan';
+        renderCharts();
+      });
+      $('#btn-chart2-kategori')?.addEventListener('click', () => {
+        chart2View = 'kategori';
+        $('#btn-chart2-kategori').className = 'px-2.5 py-1 rounded-lg bg-white dark:bg-slate-700 text-navy dark:text-white shadow-sm transition';
+        $('#btn-chart2-status').className = 'px-2.5 py-1 rounded-lg text-ink dark:text-slate-400 hover:text-navy dark:hover:text-white transition';
+        $('#chart2-title').textContent = 'Komposisi Tingkat Kerusakan';
+        renderCharts();
+      });
+
+      window.addEventListener('jk-theme-change', renderCharts);
 
       // Sanitasi XSS & URL Aman
       const esc = (s = '') => {
@@ -440,7 +884,7 @@
               <!-- Info Utama -->
               <div class="flex gap-4 items-start w-full lg:max-w-3xl">
                 ${foto ? `
-                  <button type="button" aria-label="Perbesar foto bukti laporan" class="btn-open-photo shrink-0 rounded-xl overflow-hidden border border-slate-200 h-24 w-24 group relative" data-url="${esc(foto)}" data-title="${namaSafe}">
+                  <button type="button" aria-label="Perbesar foto bukti laporan" class="btn-open-photo shrink-0 rounded-xl overflow-hidden border border-slate-200 h-24 w-24 group relative" data-id="${idSafe}" data-kategori="${esc(r.kategori_rusak || 'ringan')}" data-url="${esc(foto)}" data-title="${namaSafe}">
                     <img src="${esc(foto)}" alt="Foto Bukti" class="h-full w-full object-cover transition group-hover:scale-105" />
                     <span class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition grid place-items-center text-white"><i data-lucide="zoom-in" class="h-5 w-5"></i></span>
                   </button>
@@ -583,9 +1027,176 @@
         if (btnPhoto) {
           const url = btnPhoto.dataset.url;
           const title = btnPhoto.dataset.title;
-          $('#modal-foto-img').src = url;
-          $('#modal-foto-title').textContent = `Dokumentasi: ${title}`;
-          $('#modal-foto').classList.remove('hidden');
+          const reportId = btnPhoto.dataset.id;
+          const currentKategori = btnPhoto.dataset.kategori || 'ringan';
+          openPhotoAiModal(reportId, url, title, currentKategori);
+        }
+      });
+
+      let currentModalReportId = null;
+      let currentModalAiSuggestion = null;
+
+      async function openPhotoAiModal(reportId, url, title, currentKategori) {
+        currentModalReportId = reportId;
+        currentModalAiSuggestion = null;
+
+        $('#modal-foto-img').src = url;
+        $('#modal-foto-title').textContent = `Dokumentasi: ${title}`;
+        $('#modal-foto-subtitle').textContent = `Laporan #${reportId} • Kategori saat ini: ${KATEGORI_CONFIG[currentKategori]?.label || currentKategori}`;
+        $('#modal-select-kategori').value = currentKategori;
+        $('#modal-kategori-status').className = 'hidden text-[11px] font-semibold text-center';
+
+        const overlayEl = $('#modal-foto-overlay');
+        overlayEl.innerHTML = '';
+        $('#modal-foto-overlay-badge').classList.add('hidden');
+
+        $('#modal-ai-loading').classList.remove('hidden');
+        $('#modal-ai-content').classList.add('hidden');
+        $('#modal-ai-empty').classList.add('hidden');
+        $('#modal-foto').classList.remove('hidden');
+
+        const storagePath = extractStoragePath(url);
+        if (storagePath) {
+          try {
+            const { data, error } = await db.from('ai_triase')
+              .select('*')
+              .eq('foto_path', storagePath)
+              .order('created_at', { ascending: false })
+              .limit(5);
+
+            const validRow = data?.find(row => row.hasil && !row.hasil.gagal);
+            if (!error && validRow) {
+              const h = validRow.hasil;
+              currentModalAiSuggestion = h;
+              $('#modal-ai-loading').classList.add('hidden');
+              $('#modal-ai-empty').classList.add('hidden');
+              $('#modal-ai-content').classList.remove('hidden');
+
+              // Badge Kategori AI
+              const katEl = $('#modal-ai-kategori');
+              if (h.kategori === 'berat') {
+                katEl.className = 'inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-major/15 text-major border border-major/30';
+                katEl.textContent = 'Rusak Berat';
+              } else if (h.kategori === 'ringan') {
+                katEl.className = 'inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-minor/15 text-minor border border-minor/30';
+                katEl.textContent = 'Rusak Ringan';
+              } else {
+                katEl.className = 'inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200';
+                katEl.textContent = 'Tidak Spesifik';
+              }
+
+              // Deskripsi
+              $('#modal-ai-deskripsi').textContent = h.deskripsi || '-';
+
+              // Diameter
+              if (h.diameter_cm_min != null && h.diameter_cm_maks != null) {
+                $('#modal-ai-diameter').textContent = `${h.diameter_cm_min}–${h.diameter_cm_maks} cm`;
+              } else {
+                $('#modal-ai-diameter').textContent = 'Tidak dapat diperkirakan (tanpa pembanding)';
+              }
+
+              // Kedalaman
+              const KELAS_MAP = { dangkal: 'Dangkal', sedang: 'Sedang', dalam: 'Dalam', tidak_yakin: 'Tidak yakin' };
+              $('#modal-ai-kedalaman').textContent = KELAS_MAP[h.kedalaman_kelas] || h.kedalaman_kelas || 'Tidak yakin';
+
+              // Kepercayaan
+              $('#modal-ai-kepercayaan').textContent = `${Math.round((Number(h.kepercayaan) || 0) * 100)}%`;
+
+              // Gambar Bounding Box Overlay dengan persentase
+              overlayEl.innerHTML = '';
+              let hasBox = false;
+
+              if (h.kotak_lubang && Array.isArray(h.kotak_lubang)) {
+                hasBox = true;
+                const [ymin, xmin, ymax, xmax] = h.kotak_lubang;
+                const lubBox = document.createElement('div');
+                lubBox.className = 'absolute border-2 border-rose-500 bg-rose-500/20 rounded pointer-events-none transition';
+                lubBox.style.top = `${ymin / 10}%`;
+                lubBox.style.left = `${xmin / 10}%`;
+                lubBox.style.width = `${(xmax - xmin) / 10}%`;
+                lubBox.style.height = `${(ymax - ymin) / 10}%`;
+                lubBox.innerHTML = '<span class="absolute -top-4 left-0 text-[9px] font-black uppercase tracking-wider bg-rose-600 text-white px-1.5 py-0.5 rounded shadow">Lubang</span>';
+                overlayEl.appendChild(lubBox);
+              }
+
+              if (h.kotak_a4 && Array.isArray(h.kotak_a4)) {
+                hasBox = true;
+                const [ymin, xmin, ymax, xmax] = h.kotak_a4;
+                const a4Box = document.createElement('div');
+                a4Box.className = 'absolute border-2 border-cyan-400 bg-cyan-400/20 rounded pointer-events-none transition';
+                a4Box.style.top = `${ymin / 10}%`;
+                a4Box.style.left = `${xmin / 10}%`;
+                a4Box.style.width = `${(xmax - xmin) / 10}%`;
+                a4Box.style.height = `${(ymax - ymin) / 10}%`;
+                a4Box.innerHTML = '<span class="absolute -top-4 left-0 text-[9px] font-black uppercase tracking-wider bg-cyan-600 text-white px-1.5 py-0.5 rounded shadow">Kertas A4</span>';
+                overlayEl.appendChild(a4Box);
+              }
+
+              if (hasBox) {
+                $('#modal-foto-overlay-badge').classList.remove('hidden');
+              }
+            } else {
+              $('#modal-ai-loading').classList.add('hidden');
+              $('#modal-ai-empty').classList.remove('hidden');
+            }
+          } catch (err) {
+            console.warn('Gagal memuat triase AI:', err);
+            $('#modal-ai-loading').classList.add('hidden');
+            $('#modal-ai-empty').classList.remove('hidden');
+          }
+        } else {
+          $('#modal-ai-loading').classList.add('hidden');
+          $('#modal-ai-empty').classList.remove('hidden');
+        }
+        if (window.lucide) window.lucide.createIcons();
+      }
+
+      // Handler Terapkan Kategori Saran AI
+      $('#btn-modal-apply-ai')?.addEventListener('click', () => {
+        if (currentModalAiSuggestion && currentModalAiSuggestion.kategori) {
+          $('#modal-select-kategori').value = currentModalAiSuggestion.kategori;
+          const statusEl = $('#modal-kategori-status');
+          statusEl.className = 'text-[11px] font-semibold text-accent';
+          statusEl.textContent = 'Kategori saran AI telah diterapkan pada pilihan. Tekan "Simpan" untuk menyimpan perubahan ke database.';
+          statusEl.classList.remove('hidden');
+        } else {
+          alert('Tidak ada saran kategori dari AI untuk foto ini.');
+        }
+      });
+
+      // Handler Simpan Kategori oleh Admin
+      $('#btn-modal-save-kategori')?.addEventListener('click', async () => {
+        if (!currentModalReportId) return;
+        const newKat = $('#modal-select-kategori').value;
+        const btn = $('#btn-modal-save-kategori');
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.textContent = 'Menyimpan...';
+
+        try {
+          const { error } = await db.from('laporan_warga')
+            .update({ kategori_rusak: newKat })
+            .eq('id', currentModalReportId);
+          if (error) throw error;
+
+          const report = allReports.find(r => String(r.id) === String(currentModalReportId));
+          if (report) report.kategori_rusak = newKat;
+
+          updateStats();
+          renderReports();
+
+          const statusEl = $('#modal-kategori-status');
+          statusEl.className = 'text-[11px] font-bold text-good';
+          statusEl.textContent = 'Kategori laporan berhasil diperbarui!';
+          statusEl.classList.remove('hidden');
+          showToast(`Kategori laporan #${currentModalReportId} berhasil diubah menjadi "${KATEGORI_CONFIG[newKat]?.label || newKat}"`);
+        } catch (err) {
+          console.error('Simpan kategori error:', err);
+          alert('Gagal menyimpan kategori: ' + (err.message || err));
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+          if (window.lucide) window.lucide.createIcons();
         }
       });
 
@@ -616,7 +1227,10 @@
       });
 
       // Refresh data
-      $('#btn-refresh-data').addEventListener('click', fetchReports);
+      $('#btn-refresh-data').addEventListener('click', () => {
+        fetchReports();
+        loadRuasJalan();
+      });
       $('#btn-recheck-admin').addEventListener('click', checkAdminAccess);
 
       // =====================================================================
@@ -635,6 +1249,7 @@
           allRuas = data || [];
           $('#ruas-count').textContent = allRuas.length;
           renderRuasList();
+          renderCharts();
         } catch (err) {
           console.error('Error load ruas:', err);
           container.innerHTML = `
@@ -805,7 +1420,12 @@
   <script>
     document.getElementById('dark-toggle').addEventListener('click', () => {
       const isDark = document.documentElement.classList.toggle('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      const safeStore = window.safeStore || {
+        get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+        set(k, v) { try { localStorage.setItem(k, v); } catch {} }
+      };
+      safeStore.set('theme', isDark ? 'dark' : 'light');
+      window.dispatchEvent(new CustomEvent('jk-theme-change'));
     });
   </script>
 </body>

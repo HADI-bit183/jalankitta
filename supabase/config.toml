@@ -1,0 +1,5 @@
+[functions.triase-foto]
+verify_jwt = true
+
+[functions.bersihkan-yatim]
+verify_jwt = false
