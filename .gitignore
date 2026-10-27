@@ -12,3 +12,4 @@ node_modules/
 supabase/.temp/
 supabase/.env.local
 test_fotos/
+test_fotos*/

@@ -16,7 +16,7 @@ rsync -a \
   --exclude 'node_modules' --exclude '.git' --exclude '.DS_Store' --exclude '__MACOSX' \
   --exclude '._*' --exclude 'pengumpulan' --exclude '.env*' --exclude '*.env*' \
   --exclude 'supabase/.temp' --exclude 'supabase/.temp/*' \
-  --exclude 'supabase/.env.local' --exclude 'test_fotos' \
+  --exclude 'supabase/.env.local' --exclude 'test_fotos*' \
   "$ROOT/" "$STAGE/1_Folder_Karya/"
 
 # Salin draf/berkas dari folder pengumpulan/ bila sudah ada PDF final
