@@ -2,11 +2,15 @@
 <html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.supabase.co https://server.arcgisonline.com https://*.google.com https://*.googleapis.com https://*.basemaps.cartocdn.com https://basemaps.cartocdn.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://router.project-osrm.org; object-src 'none'; base-uri 'self'; form-action 'self'" />
   <title>JalanKitta — Peta &amp; Laporan Infrastruktur Jalan Provinsi Lampung</title>
   <meta name="description"
     content="JalanKitta: platform pemantauan kondisi jalan Provinsi Lampung berbasis peta interaktif dan laporan warga." />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="JalanKitta — Peta &amp; Laporan Infrastruktur Jalan Provinsi Lampung" />
+  <meta property="og:description" content="Pantau kondisi jalan Provinsi Lampung berbasis peta interaktif dan laporan warga." />
+  <meta property="og:image" content="assets/img/og-image.jpg" />
   <meta name="theme-color" content="#0F172A" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/logo-192.png" />
@@ -519,13 +523,13 @@
     <!-- Modal Laporan Terkirim -->
     <div id="modal-success-result" role="dialog" aria-modal="true" aria-labelledby="modal-success-title" class="fixed inset-0 z-[2100] hidden bg-black/60 backdrop-blur-sm p-4 flex items-center justify-center">
       <div class="relative max-w-2xl w-full bg-white rounded-3xl shadow-2xl p-6">
-        <button id="modal-success-close" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700" aria-label="Tutup"><i data-lucide="x" class="h-5 w-5"></i></button>
+        <button id="modal-success-close" class="absolute top-4 right-4 rounded-xl p-1.5 text-ink hover:bg-slate-200/60 transition" aria-label="Tutup"><i data-lucide="x" class="h-5 w-5"></i></button>
         <div class="flex flex-col items-center space-y-4">
-          <div class="flex items-center justify-center bg-green-100 rounded-full p-2">
-            <i data-lucide="check-circle" class="h-8 w-8 text-green-600"></i>
+          <div class="flex items-center justify-center bg-emerald-500/15 rounded-full p-2.5">
+            <i data-lucide="check-circle" class="h-8 w-8 text-emerald-500"></i>
           </div>
           <h3 id="modal-success-title" class="text-2xl font-bold text-navy">Laporan terkirim!</h3>
-          <p id="modal-success-code" class="text-sm text-ink">Kode laporan <span class="font-mono text-navy"></span></p>
+          <p id="modal-success-code" class="text-sm text-ink">Kode laporan <span class="font-mono font-bold text-navy"></span></p>
           <!-- Photo preview -->
           <img id="modal-success-photo" src="" alt="Foto laporan" class="hidden rounded-xl max-h-80 object-cover" />
           <p class="text-center text-sm text-ink">Laporan Anda sedang menunggu verifikasi tim. Simpan kode di atas untuk merujuk laporan ini.</p>
@@ -534,6 +538,7 @@
             <button id="modal-success-track" class="ml-2 inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-bold text-white shadow-md transition hover:brightness-110"><i data-lucide="clipboard-list" class="h-4 w-4"></i>Lacak status</button>
           </div>
         </div>
+      </div>
     </div>
 
     <!-- Mobile Bottom Navigation Bar (Ergonomis Layar Sentuh HP) -->
@@ -2065,6 +2070,9 @@
         modalSuccessClose.addEventListener('click', () => {
           modalSuccessReport.classList.add('hidden');
         });
+        modalSuccessReport.addEventListener('click', (e) => {
+          if (e.target === modalSuccessReport) modalSuccessReport.classList.add('hidden');
+        });
         modalSuccessShare.addEventListener('click', async () => {
           const shareData = {
             title: 'Laporan JalanKitta',
@@ -2278,13 +2286,13 @@
               } else {
                 showStatus('success', 'Laporan berhasil dibatalkan dan kuota penyimpanan foto telah dibebaskan.');
               }
-              fetchMyReports();
+              openMyReports();
             } catch (err) {
               console.error('Batal laporan error:', err);
               showStatus('error', 'Gagal membatalkan laporan: ' + err.message);
               btnCancel.disabled = false;
               btnCancel.innerHTML = origHtml;
-              fetchMyReports();
+              openMyReports();
             }
           })();
           return;

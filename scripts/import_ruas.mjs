@@ -202,7 +202,7 @@ on conflict (id) do update set
   panjang_km = excluded.panjang_km,
   updated_at = now();
 
-delete from public.ruas_jalan where id not in (${idListSql});
+delete from public.ruas_jalan where id not in (${idListSql}) and id not like 'R-LAP-%';
 `;
 
   writeFileSync(OUTPUT_SQL_PATH, sql, 'utf8');

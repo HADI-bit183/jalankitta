@@ -60,7 +60,7 @@ Untuk mereplikasi backend database secara mandiri:
    - View publik `laporan_publik` dan agregat `statistik_publik`.
    - Kebijakan *Row Level Security* (RLS) lengkap.
    - Bucket Storage `foto_laporan` berstatus publik beserta aturan keamanannya.
-   - Trigger keamanan: nama pelapor diambil dari token login, batas 10 laporan/24 jam per pengguna, batas 200 subscriber/jam.
+   - Trigger keamanan: nama pelapor diambil dari token login, *advisory lock* transaksi anti-*race condition*, dan batas 200 subscriber/jam.
    - Data ruas jalan nyata: Jalankan [`supabase/ruas_real.sql`](supabase/ruas_real.sql) yang dihasilkan oleh `npm run import:ruas` (data survei lapangan Lampung Timur, Pesawaran, Pringsewu 2026).
 > **Catatan:** Skema ini aman dijalankan berulang kali (*idempotent*), dan host pada constraint `foto_url_valid` perlu disesuaikan jika memakai proyek Supabase lain.
 
@@ -73,10 +73,10 @@ Untuk mereplikasi backend database secara mandiri:
    - `https://<URL-DEPLOY-ANDA>/app.html`
    Atur juga **Site URL** ke URL deploy. Membuka lewat `file://` tidak didukung (redirect auth gagal) — gunakan deploy (Netlify/Vercel/GitHub Pages) atau server lokal.
 
-### 2b. Siapkan Akun Demo untuk Juri
-Pendaftaran butuh verifikasi email dan SMTP bawaan Supabase sangat terbatas, jadi juri bisa gagal mendaftar. Buat dua akun lewat **Authentication > Users > Add user** (centang *Auto Confirm User*), lalu jadikan salah satunya admin (langkah 3), dan tulis kredensialnya di proposal/`pengumpulan/Link_Demo.txt`:
-- Pelapor demo: `ISI_EMAIL` / `ISI_PASSWORD`
-- Admin demo: `ISI_EMAIL` / `ISI_PASSWORD`
+### 2b. Akun Demo untuk Dewan Juri
+Pendaftaran butuh verifikasi email dan SMTP bawaan Supabase terbatas, sehingga akun demo yang sudah terverifikasi (dan memiliki akses pelapor sekaligus administrator) telah disediakan langsung di halaman `login.html` (fitur klik-isi-otomatis):
+- **Email Demo Juri (Pelapor & Admin):** `hadi_priono@teknokrat.ac.id`
+- **Password Demo Juri:** `Hadi200628`
 
 ### 2c. Cegah Project Di-pause
 Project Supabase gratis di-pause setelah ±1 minggu tanpa aktivitas. Buka situs (atau jalankan query ringan) tiap beberapa hari menjelang dan selama masa penjurian, dan cek status project di dashboard sebelum pengumpulan.
@@ -107,7 +107,7 @@ Platform menyediakan fitur opsional **Triase Foto Kerusakan Jalan dengan AI** be
 - **Hanya Saran (Bukan Keputusan Otomatis):** Rekomendasi AI bersifat asistif. Pelapor dapat memilih untuk menggunakan atau mengabaikan saran, dan petugas admin tetap memverifikasi secara independen sebelum menyetujui laporan.
 - **Biaya Rp0 & Aman:** Memanfaatkan paket gratis (*Free Tier*) Google Gemini API. Kunci API hanya tersimpan di *secrets* Edge Function (tidak pernah bocor ke sisi peramban/frontend).
 - **Gagal dengan Anggun (*Graceful Degradation*):** Jika fungsi dinonaktifkan, batas kuota gratis habis (HTTP 429), atau terjadi *timeout* (>12 detik), formulir pelaporan tetap berfungsi normal 100% secara manual tanpa hambatan.
-- **Metode Pengukuran Deterministik (Tanpa Halusinasi cm):** Model AI **dilarang menebak angka sentimeter**. Model hanya mendeteksi kotak pembatas (*bounding box*) lubang dan objek pembanding kertas A4. Diameter dihitung oleh algoritma kode berdasarkan rasio fisik kertas A4 standar (29,7 × 21,0 cm) dan disajikan dalam rentang target toleransi (belum terverifikasi; lihat tabel uji akurasi) (misal "25–35 cm"). Kedalaman disajikan murni dalam kelas kualitatif (*dangkal, sedang, dalam, tidak yakin*) tanpa angka sentimeter rekaan.
+- **Metode Pengukuran Deterministik (Tanpa Halusinasi cm):** Model AI **dilarang menebak angka sentimeter**. Model hanya mendeteksi kotak pembatas (*bounding box*) lubang dan objek pembanding kertas A4. Diameter dihitung oleh algoritma kode berdasarkan rasio fisik kertas A4 standar (29,7 × 21,0 cm) dan disajikan dalam rentang estimasi toleransi ±20% (misal "25–35 cm"). Kedalaman disajikan murni dalam kelas kualitatif (*dangkal, sedang, dalam, tidak yakin*) tanpa angka sentimeter rekaan.
 - **Kepatuhan CSP & Keamanan CORS:** Aturan *Content Security Policy* (`connect-src`) pada seluruh halaman mengizinkan `https://*.supabase.co`, dan Edge Function hanya merespons origin yang terdaftar di secret `ALLOWED_ORIGINS`.
 
 ### Panduan Setup & Deploy Edge Function
@@ -233,7 +233,7 @@ Platform dirancang dengan gaya visual modern, ramah pengguna, dan berstandar aks
 4. **Proteksi Injeksi:** Seluruh titik injeksi DOM (*innerHTML*) wajib melalui penyaringan fungsi `escapeHtml()`, `safeImageUrl()`, atau konversi eksplisit `Number()`.
 5. **Kebijakan Basis Data RLS:** Pengunjung publik hanya dapat membaca data yang diverifikasi, sementara modifikasi status laporan hanya diizinkan bagi UID terautentikasi yang terdaftar di tabel `admins`.
 6. **Privasi Foto:** Foto di-*re-encode* lewat canvas di browser (EXIF GPS/perangkat dibuang) dan dikompres sebelum diunggah ke bucket publik.
-7. **Integritas Server & Otoritatif Ruas:** Nama pelapor dikunci oleh trigger dari token login; `ruas_id` dihitung secara otoritatif di server berdasarkan koordinat GPS (`set_laporan_ruas_id`) untuk mencegah manipulasi/pemalsuan dari client; serta pembatas harian 10 laporan/24 jam per akun.
+7. **Integritas Server & Otoritatif Ruas:** Nama pelapor dikunci oleh trigger dari token login; `ruas_id` dihitung secara otoritatif di server berdasarkan koordinat GPS (`set_laporan_ruas_id` via PostGIS / fallback geometrik) untuk mencegah manipulasi/pemalsuan dari client; serta penguncian transaksi spasial (*advisory xact lock*) untuk mencegah *race condition* laporan ganda.
 8. **Kuota Penyimpanan & Trigger Storage:**
    - Sistem menetapkan batas kuota penyimpanan foto maksimal 30 berkas aktif per akun pengguna (`laporan/<uid>/...`).
    - Pada PostgreSQL lokal/mandiri, kuota dijaga ketat di level basis data melalui trigger `trg_batasi_kuota_upload` pada `storage.objects`.
@@ -244,7 +244,7 @@ Platform dirancang dengan gaya visual modern, ramah pengguna, dan berstandar aks
 ## 🙏 Kredit & Atribusi
 
 - **Ilustrasi** (`assets/img/*`): dibuat dengan AI generatif; bukan foto nyata.
-- **Peta**: Leaflet (BSD-2), tile © Esri, Maxar, Earthstar Geographics, HERE, Garmin, OpenStreetMap contributors.
+- **Peta**: Leaflet (BSD-2), MarkerCluster (MIT), citra satelit hibrida © Google, Maxar, CNES/Airbus, OpenStreetMap contributors.
 - **Routing**: OSRM demo server, data © OpenStreetMap contributors (ODbL).
 - **Ikon**: Lucide (ISC). **CSS**: Tailwind CSS (MIT). **Font**: Plus Jakarta Sans & Poppins (OFL). **Backend**: Supabase.
 

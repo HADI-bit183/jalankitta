@@ -199,7 +199,7 @@ drop trigger if exists trigger_laporan_updated_at on public.laporan_warga;
 alter table public.laporan_warga drop constraint if exists laporan_warga_status_check;
 alter table public.laporan_warga drop constraint if exists laporan_warga_kategori_rusak_check;
 
--- Trigger 1: admin hanya boleh mengubah kolom status, ruas_id, dan soft-delete
+-- Trigger 1: admin hanya boleh mengubah kolom status, kategori_rusak, ruas_id, dan soft-delete
 create or replace function public.cegah_ubah_kolom_laporan()
 returns trigger
 language plpgsql
@@ -211,13 +211,17 @@ begin
 
   if (new.id <> old.id)
      or (new.nama           is distinct from old.nama)
-     or (new.kategori_rusak is distinct from old.kategori_rusak)
      or (new.koordinat_lat  is distinct from old.koordinat_lat)
      or (new.koordinat_lng  is distinct from old.koordinat_lng)
      or (new.deskripsi      is distinct from old.deskripsi)
      or (new.created_at     is distinct from old.created_at)
      or ((new.foto_url is distinct from old.foto_url) and not (new.deleted_at is not null and new.foto_url is null and public.is_admin())) then
     raise exception 'Integritas data dilindungi: data laporan asli tidak boleh diubah.';
+  end if;
+
+  -- kategori_rusak hanya boleh diubah oleh admin (saat verifikasi atau menerapkan rekomendasi triase AI)
+  if (new.kategori_rusak is distinct from old.kategori_rusak) and not public.is_admin() then
+    raise exception 'Integritas data dilindungi: hanya admin yang dapat mengubah kategori kerusakan laporan.';
   end if;
 
   -- ruas_id hanya boleh diubah oleh admin

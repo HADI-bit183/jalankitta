@@ -13,6 +13,7 @@
   <meta property="og:title" content="JalanKitta — Platform Pemantauan Jalan Cerdas Provinsi Lampung" />
   <meta property="og:description"
     content="Pantau jalan, laporkan cepat, dan wujudkan Lampung yang tangguh dengan peta interaktif." />
+  <meta property="og:image" content="assets/img/og-image.jpg" />
   <meta name="theme-color" content="#0F172A" />
   <link rel="icon" type="image/png" sizes="32x32" href="assets/icons/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="assets/icons/logo-192.png" />
@@ -168,13 +169,9 @@
         <li><a href="app.html#peta"
             class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 bg-amber-500/10 text-amber-500"><i
               data-lucide="map" class="h-4 w-4"></i>Buka Peta Interaktif</a></li>
-        <li class="pt-2 border-t border-slate-200/50 dark:border-white/10 flex gap-2">
-          <a href="login.html"
-            class="flex-1 text-center py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-sm font-bold text-slate-700 dark:text-slate-200">Masuk
-            Akun</a>
-          <a href="app.html#lapor"
-            class="flex-1 text-center py-2.5 rounded-xl glow-btn-primary text-sm font-bold text-white">Lapor Cepat</a>
-        </li>
+        <li><a href="app.html#lapor"
+            class="mobile-link flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 hover:text-amber-500"><i
+              data-lucide="megaphone" class="h-4 w-4 text-amber-500"></i>Lapor Cepat</a></li>
       </ul>
     </div>
   </header>
@@ -904,7 +901,9 @@
             const katInfo = katMap[kat] || { label: kat, cls: 'bg-slate-500/15 text-slate-500' };
 
             const statusMap = {
+              baru: 'Menunggu Verifikasi',
               menunggu: 'Menunggu Verifikasi',
+              diverifikasi: 'Terverifikasi',
               diproses: 'Sedang Ditangani',
               selesai: 'Selesai Diperbaiki',
               ditolak: 'Ditolak'

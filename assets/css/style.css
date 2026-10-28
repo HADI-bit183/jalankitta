@@ -468,14 +468,17 @@ html.dark #picker-hint { background: rgba(15, 23, 42, 0.92); }
 html.dark #picker-map { background: #0f172a; }
 html.dark #modal-my-reports > div,
 html.dark #modal-my-reports-photo > div,
-html.dark #modal-ai-report-result > div { background: #0f172a; color: #f8fafc; }
+html.dark #modal-success-result > div,
+html.dark #modal-ai-report-result > div { background: #0f172a; color: #f8fafc; border: 1px solid rgba(255, 255, 255, 0.1); }
 html.dark #modal-my-reports .bg-white,
 html.dark #modal-my-reports .bg-slate-50,
 html.dark #modal-my-reports .bg-slate-50\/60 { background: rgba(30, 41, 59, 0.7); }
 html.dark #modal-my-reports .border-slate-100,
 html.dark #modal-my-reports .border-slate-200,
-html.dark #modal-my-reports-photo .border-slate-100 { border-color: rgba(255, 255, 255, 0.1); }
-html.dark #modal-my-reports-photo .hover\:bg-slate-100:hover { background: rgba(255, 255, 255, 0.08); }
+html.dark #modal-my-reports-photo .border-slate-100,
+html.dark #modal-success-result .border-slate-200 { border-color: rgba(255, 255, 255, 0.12); }
+html.dark #modal-my-reports-photo .hover\:bg-slate-100:hover,
+html.dark #modal-success-result .hover\:bg-slate-100:hover { background: rgba(255, 255, 255, 0.08); }
 
 /* Dark mode: wrapper A4 & kartu rekomendasi AI di app.html */
 html.dark #wrapper-checkbox-a4 {

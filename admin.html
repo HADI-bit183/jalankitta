@@ -53,8 +53,10 @@
       box-shadow: 0 10px 30px -10px rgba(0, 0, 0, .05);
     }
 
-    html.dark main .bg-white {
-      background: rgba(15, 23, 42, .65);
+    html.dark main .bg-white,
+    html.dark #modal-foto .bg-white,
+    html.dark #modal-foto > div {
+      background: rgba(15, 23, 42, .92);
       border-color: rgba(255, 255, 255, .08);
     }
 
@@ -71,29 +73,40 @@
     }
 
     html.dark main .bg-slate-50,
-    html.dark main .bg-slate-100 {
+    html.dark main .bg-slate-100,
+    html.dark #modal-foto .bg-slate-50,
+    html.dark #modal-foto .bg-slate-50\/70,
+    html.dark #modal-foto .bg-slate-100 {
       background: rgba(255, 255, 255, .06);
     }
 
     html.dark main .border-slate-100,
-    html.dark main .border-slate-200 {
+    html.dark main .border-slate-200,
+    html.dark #modal-foto .border-slate-100,
+    html.dark #modal-foto .border-slate-200,
+    html.dark #modal-foto .border-slate-200\/60 {
       border-color: rgba(255, 255, 255, .1);
     }
 
-    html.dark main .bg-navy.text-white {
+    html.dark main .bg-navy.text-white,
+    html.dark #modal-foto .bg-navy.text-white {
       background: #f59e0b;
       color: #0f172a;
     }
 
     html.dark main input,
     html.dark main select,
-    html.dark main textarea {
+    html.dark main textarea,
+    html.dark #modal-foto input,
+    html.dark #modal-foto select,
+    html.dark #modal-foto textarea {
       color: #f8fafc;
       background: rgba(30, 41, 59, 0.8);
       border-color: rgba(255, 255, 255, 0.1);
     }
 
-    html.dark main select option {
+    html.dark main select option,
+    html.dark #modal-foto select option {
       background: #0f172a;
       color: #f8fafc;
     }
@@ -2993,6 +3006,7 @@
 
         try {
           if (mode === 'add') {
+            const defaultGeom = await generateRoadSegmentGeometry(-5.40, 105.26, pjg || 1);
             const { error } = await db.from('ruas_jalan').insert({
               id,
               nama,
@@ -3000,7 +3014,7 @@
               panjang_km: pjg,
               kondisi_dasar: kondisi,
               kondisi: kondisi,
-              geometry: null
+              geometry: defaultGeom
             });
             if (error) throw error;
             showToast(`Ruas jalan "${nama}" berhasil ditambahkan ke Supabase!`);
@@ -3012,6 +3026,10 @@
               kondisi_dasar: kondisi
             }).eq('id', id);
             if (error) throw error;
+            await db.rpc('perbarui_kondisi_dasar_ruas', {
+              p_ruas_id: id,
+              p_kondisi_baru: kondisi
+            });
             showToast(`Data ruas jalan "${nama}" berhasil diperbarui!`);
           }
 

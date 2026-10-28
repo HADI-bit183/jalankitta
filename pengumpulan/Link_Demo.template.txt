@@ -1,4 +1,0 @@
-URL situs (deploy)      : ISI_DI_SINI   (Netlify/Vercel/GitHub Pages)
-URL video demo (2-5 mnt): ISI_DI_SINI   (YouTube/Drive, akses publik)
-Akun pelapor demo       : ISI_EMAIL / ISI_PASSWORD
-Akun admin demo         : ISI_EMAIL / ISI_PASSWORD

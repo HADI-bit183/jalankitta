@@ -16,7 +16,7 @@ const mobileMenu = document.getElementById('mobile-menu');
 if (mobileMenu) {
   const ul = mobileMenu.querySelector('ul');
   ul.insertAdjacentHTML('beforeend', `
-    <li id="mobile-login-li"><button id="btn-login-mobile" class="w-full text-left flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-soft font-bold text-navy"><i data-lucide="log-in" class="h-4 w-4 text-accent"></i>Login / Daftar</button></li>
+    <li id="mobile-login-li"><button id="btn-login-mobile" class="w-full text-left flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 font-bold text-navy"><i data-lucide="log-in" class="h-4 w-4 text-accent"></i>Login / Daftar</button></li>
     <li id="mobile-logout-li" class="hidden"><button id="btn-logout-mobile" class="w-full text-left flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-major/10 font-bold text-major"><i data-lucide="log-out" class="h-4 w-4 text-major"></i>Logout</button></li>
   `);
   if (window.lucide) window.lucide.createIcons();
@@ -339,7 +339,7 @@ async function syncAdminLinks(currentUser) {
         const ul = mobileMenu.querySelector('ul');
         if (ul) {
           ul.insertAdjacentHTML('afterbegin', `
-            <li id="mobile-admin-li"><a href="admin.html" class="w-full text-left flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-slate-100 font-bold text-navy"><i data-lucide="shield" class="h-4 w-4 text-accent"></i>Dashboard Admin</a></li>
+            <li id="mobile-admin-li"><a href="admin.html" class="w-full text-left flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 font-bold text-navy"><i data-lucide="shield" class="h-4 w-4 text-accent"></i>Dashboard Admin</a></li>
           `);
         }
       }
@@ -417,7 +417,7 @@ if (window.supabaseDb) {
         const ul = mobileMenu.querySelector('ul');
         if (ul) {
           ul.insertAdjacentHTML('afterbegin', `
-          <li id="mobile-my-reports-li"><button id="btn-my-reports-mob" class="w-full text-left flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-slate-100 font-bold text-navy"><i data-lucide="clipboard-list" class="h-4 w-4 text-accent"></i>Laporan Saya</button></li>
+          <li id="mobile-my-reports-li"><button id="btn-my-reports-mob" class="w-full text-left flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-amber-500/10 font-bold text-navy"><i data-lucide="clipboard-list" class="h-4 w-4 text-accent"></i>Laporan Saya</button></li>
         `);
           document.getElementById('btn-my-reports-mob')?.addEventListener('click', () => {
             const menuToggle = document.getElementById('menu-toggle');
@@ -511,6 +511,7 @@ if (window.supabaseDb) {
         if (!warning) {
           warning = document.createElement('div');
           warning.id = 'auth-warning-form';
+          warning.className = 'flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-major/30 bg-major/10 p-4 text-xs sm:text-sm font-bold text-major';
           warning.innerHTML = `
             <span><i data-lucide="lock" class="h-4 w-4 inline mr-2"></i>Silakan login terlebih dahulu untuk membuat laporan jalan rusak.</span>
             <a href="login.html" class="shrink-0 rounded-lg bg-major px-4 py-2 text-center text-xs font-bold text-white shadow hover:bg-major/90 transition w-full sm:w-auto">Login</a>

@@ -24,4 +24,4 @@ on conflict (id) do update set
   panjang_km = excluded.panjang_km,
   updated_at = now();
 
-delete from public.ruas_jalan where id not in ('R-01', 'R-02', 'R-03', 'R-04', 'R-05', 'R-06');
+delete from public.ruas_jalan where id not in ('R-01', 'R-02', 'R-03', 'R-04', 'R-05', 'R-06') and id not like 'R-LAP-%';
